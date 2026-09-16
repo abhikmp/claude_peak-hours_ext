@@ -22,8 +22,8 @@ function toLocalTimeStr(isoStr, tz) {
 function impactToLabel(impact) {
   if (!impact || impact === 'none') return 'All Clear';
   if (impact === 'critical') return 'Major Outage';
-  if (impact === 'major')    return 'Major Outage';
-  if (impact === 'minor')    return 'Partial Outage';
+  if (impact === 'major') return 'Major Outage';
+  if (impact === 'minor') return 'Partial Outage';
   // Capitalise unknown values as a fallback
   return impact.charAt(0).toUpperCase() + impact.slice(1);
 }
@@ -32,7 +32,7 @@ function impactToLabel(impact) {
 // Priority: watched-product issue → major model issue → generic elevated error → null
 function pickTickerText(local, watched) {
   const title = local.incidentTitle ?? '';
-  const body  = local.incidentBody  ?? '';
+  const body = local.incidentBody ?? '';
 
   if (!title) return null;
 
@@ -52,8 +52,8 @@ function pickTickerText(local, watched) {
 
   // Product name patterns for matching
   const PRODUCT_KEYWORDS = {
-    ai:     ['claude.ai', 'claude ai', 'logging in', 'login', 'web'],
-    code:   ['claude code', 'api'],
+    ai: ['claude.ai', 'claude ai', 'logging in', 'login', 'web'],
+    code: ['claude code', 'api'],
     cowork: ['cowork', 'desktop', 'mcp'],
     design: ['claude design', 'design']
   };
@@ -91,17 +91,19 @@ async function render() {
     chrome.storage.sync.get(['userTZ', 'watchedProducts'])
   ]);
 
-  const state   = local.state ?? 'grey';
-  const tz      = sync.userTZ ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const watched = sync.watchedProducts ?? ['ai', 'code', 'cowork', 'design'];
+  const state = local.state ?? 'grey';
+  const tz = sync.userTZ ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const VALID_PRODUCTS = new Set(['ai', 'code', 'cowork', 'design']);
+  const watched = (sync.watchedProducts ?? ['ai', 'code', 'cowork', 'design'])
+    .filter(p => VALID_PRODUCTS.has(p));
 
   // ── Circle color ──
   const circle = document.getElementById('circle');
   circle.className = `circle ${state}`;
 
   // ── Box 1: short 2-word status label ──
-  const label    = document.getElementById('status-label');
-  const sub      = document.getElementById('status-sub');
+  const label = document.getElementById('status-label');
+  const sub = document.getElementById('status-sub');
   const retryBtn = document.getElementById('retry-btn');
 
   if (state === 'green') {
@@ -143,7 +145,7 @@ async function render() {
 
   // ── Box 2: always-visible ticker ──
   const incidentBox = document.getElementById('incident-box');
-  const track       = document.getElementById('ticker-track');
+  const track = document.getElementById('ticker-track');
 
   if (state === 'grey') {
     // Show the fetch error message — static, no scroll needed (it's short)
@@ -154,7 +156,7 @@ async function render() {
     track.textContent = local.fetchError ?? 'Failed to reach status.claude.com';
   } else {
     track.style.color = ''; // reset any error colour override
-    const hasIssue   = !!(local.incidentTitle);
+    const hasIssue = !!(local.incidentTitle);
     const tickerText = hasIssue ? pickTickerText(local, watched) : null;
 
     if (tickerText) {
@@ -184,7 +186,7 @@ document.getElementById('retry-btn').addEventListener('click', async () => {
   const btn = document.getElementById('retry-btn');
   btn.textContent = '↺ Retrying…';
   btn.disabled = true;
-  chrome.runtime.sendMessage({ type: 'POLL_NOW' }).catch(() => {});
+  chrome.runtime.sendMessage({ type: 'POLL_NOW' }).catch(() => { });
   // Give the service worker time to fetch and write state, then re-render
   setTimeout(async () => {
     btn.textContent = '↺ Retry';
@@ -198,8 +200,13 @@ document.getElementById('retry-btn').addEventListener('click', async () => {
 let allTimezones = [];
 
 async function loadTimezones() {
-  const res = await fetch(chrome.runtime.getURL('data/timezones.json'));
-  allTimezones = await res.json();
+  try {
+    const res = await fetch(chrome.runtime.getURL('data/timezones.json'));
+    allTimezones = await res.json();
+  } catch {
+    allTimezones = [];
+    console.warn('Claude Status: failed to load timezones.json');
+  }
 }
 
 function renderTZList(filter = '') {
@@ -259,42 +266,23 @@ document.addEventListener('click', (e) => {
 
 const PRODUCT_IDS = ['ai', 'code', 'cowork', 'design'];
 
-// Disable the sole remaining checked checkbox so the user can't uncheck it.
-// All others stay enabled normally. Re-enables everything once 2+ are checked.
-function updateCheckboxConstraints() {
-  const checked = PRODUCT_IDS.filter(id => document.getElementById(`pf-${id}`)?.checked);
-  const isLastOne = checked.length === 1;
-  PRODUCT_IDS.forEach(id => {
-    const cb = document.getElementById(`pf-${id}`);
-    if (!cb) return;
-    const locked = isLastOne && cb.checked;
-    cb.disabled = locked;
-    const label = cb.closest('label');
-    if (label) label.style.opacity = locked ? '0.45' : '';
-  });
-  const hint = document.getElementById('product-filter-hint');
-  if (hint) hint.hidden = !isLastOne;
-}
-
 async function initProductFilter() {
   const sync = await chrome.storage.sync.get('watchedProducts');
-  const watched = sync.watchedProducts ?? PRODUCT_IDS;
+  const watched = (sync.watchedProducts ?? PRODUCT_IDS).filter(p => PRODUCT_IDS.includes(p));
   PRODUCT_IDS.forEach(id => {
     const cb = document.getElementById(`pf-${id}`);
     if (cb) cb.checked = watched.includes(id);
   });
-  updateCheckboxConstraints();
 }
 
 async function saveProductFilter() {
-  updateCheckboxConstraints();
   const watched = PRODUCT_IDS.filter(id => {
     const cb = document.getElementById(`pf-${id}`);
     return cb?.checked;
   });
   await chrome.storage.sync.set({ watchedProducts: watched });
   // Re-evaluate state immediately with the new filter — don't wait for the next 5-min alarm
-  chrome.runtime.sendMessage({ type: 'POLL_NOW' }).catch(() => {});
+  chrome.runtime.sendMessage({ type: 'POLL_NOW' }).catch(() => { });
   // Give the service worker a moment to write new state, then re-render the popup
   setTimeout(render, 400);
 }

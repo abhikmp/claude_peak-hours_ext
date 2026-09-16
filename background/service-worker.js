@@ -4,8 +4,8 @@ const POLL_MINUTES = 5;
 
 // Maps user-facing product keys to substrings found in component names from the API
 const PRODUCT_COMPONENT_MAP = {
-  ai:     ['claude.ai', 'claude ai', 'web'],
-  code:   ['claude code', 'api'],
+  ai: ['claude.ai', 'claude ai', 'web'],
+  code: ['claude code', 'api'],
   cowork: ['cowork', 'claude desktop', 'mcp'],
   design: ['claude design', 'design']
 };
@@ -69,18 +69,20 @@ async function fetchAndResolveState() {
     };
   }
 
-  const indicator    = apiData?.status?.indicator ?? 'none';
+  const VALID_INDICATORS = new Set(['none', 'minor', 'major', 'critical']);
+  const rawIndicator = apiData?.status?.indicator;
+  const indicator = VALID_INDICATORS.has(rawIndicator) ? rawIndicator : 'none';
   const statusDescription = apiData?.status?.description ?? null;
-  const incidents    = apiData?.incidents ?? [];
-  const components   = apiData?.components ?? [];
+  const incidents = apiData?.incidents ?? [];
+  const components = apiData?.components ?? [];
 
   // Find active incident
   const activeIncident = indicator !== 'none'
     ? incidents[0] ?? { name: apiData.status.description, incident_updates: [] }
     : incidents.find(i => {
-        const latest = i.incident_updates?.[0];
-        return latest && latest.status !== 'resolved';
-      });
+      const latest = i.incident_updates?.[0];
+      return latest && latest.status !== 'resolved';
+    });
 
   // Which products are affected (based on non-operational components)?
   const affectedProducts = activeIncident
@@ -88,8 +90,10 @@ async function fetchAndResolveState() {
     : [];
 
   // Does this affect any of the user's watched products? → drives icon color
+  const VALID_PRODUCTS = new Set(['ai', 'code', 'cowork', 'design']);
   const syncData = await chrome.storage.sync.get('watchedProducts');
-  const watched = syncData.watchedProducts ?? ['ai', 'code', 'cowork', 'design'];
+  const watched = (syncData.watchedProducts ?? ['ai', 'code', 'cowork', 'design'])
+    .filter(p => VALID_PRODUCTS.has(p));
   const watchedAffected = affectedProducts.length > 0 &&
     affectedProducts.some(p => watched.includes(p));
 
@@ -102,7 +106,7 @@ async function fetchAndResolveState() {
       statusDescription,
       incidentTitle: activeIncident.name ?? 'Active incident',
       incidentBody: latest?.body ?? null,
-      incidentImpact: activeIncident.impact ?? indicator,
+      incidentImpact: VALID_INDICATORS.has(activeIncident.impact) ? activeIncident.impact : indicator,
       affectedProducts,
       watchedAffected,
       nextPeakAt: watchedAffected ? null : getNextPeakISO(),
@@ -166,7 +170,7 @@ function ptWallClockToUTC(year, month, day, hour) {
   const parts = fmt.formatToParts(trial).reduce((acc, p) => { acc[p.type] = +p.value; return acc; }, {});
   // Difference in hours between trial PT wall clock and desired PT wall clock
   const trialPTMs = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
-  const targetMs  = Date.UTC(year, month - 1, day, hour, 0, 0);
+  const targetMs = Date.UTC(year, month - 1, day, hour, 0, 0);
   const diffMs = targetMs - trialPTMs;
   return new Date(trial.getTime() + diffMs);
 }
@@ -230,10 +234,10 @@ function getNextPeakISO() {
 
 // Generate a colored circle icon via OffscreenCanvas and set it as the action icon
 const STATE_COLORS = {
-  green:  '#22c55e',
-  red:    '#ef4444',
+  green: '#22c55e',
+  red: '#ef4444',
   orange: '#f97316',
-  grey:   '#9ca3af'
+  grey: '#9ca3af'
 };
 
 async function updateIcon(state) {
@@ -323,7 +327,8 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 // Allow the popup to request an immediate re-poll (e.g. after changing product filter)
-chrome.runtime.onMessage.addListener((msg) => {
+chrome.runtime.onMessage.addListener((msg, sender) => {
+  if (sender.id !== chrome.runtime.id) return;
   if (msg?.type === 'POLL_NOW') poll();
 });
 
