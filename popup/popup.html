@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="popup.css">
+  <title>Claude Status</title>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Main status area -->
+    <div class="status-row">
+      <div class="circle" id="circle"></div>
+      <div class="status-text">
+        <div class="status-label-row">
+          <div class="status-label" id="status-label">Checking…</div>
+          <button class="retry-btn" id="retry-btn" hidden>↺ Retry</button>
+        </div>
+        <div class="status-sub" id="status-sub"></div>
+      </div>
+    </div>
+
+    <!-- Incident / ticker banner — always present, empty when no issue -->
+    <div class="incident-box" id="incident-box">
+      <div class="ticker-wrap" id="ticker-wrap">
+        <div class="ticker-track" id="ticker-track"></div>
+      </div>
+    </div>
+
+    <!-- Product filter -->
+    <div class="product-filter">
+      <div class="product-filter-label">Alert me for issues with:</div>
+      <div class="product-checkboxes">
+        <label><input type="checkbox" value="ai" id="pf-ai"> Claude AI</label>
+        <label><input type="checkbox" value="code" id="pf-code"> Claude Code</label>
+        <label><input type="checkbox" value="cowork" id="pf-cowork"> Claude Cowork</label>
+        <label><input type="checkbox" value="design" id="pf-design"> Claude Design</label>
+      </div>
+      <p class="product-filter-hint" id="product-filter-hint" hidden>At least one product must be selected.</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <span class="tz-label" id="tz-label"></span>
+      <button class="tz-reset-btn" id="tz-reset-btn">↺ Reset to default</button>
+    </div>
+
+    <!-- Timezone picker — always visible, list opens on focus -->
+    <div class="tz-picker">
+      <input type="text" class="tz-search" id="tz-search" placeholder="Set custom timezone" autocomplete="off">
+      <ul class="tz-list" id="tz-list" hidden></ul>
+    </div>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
