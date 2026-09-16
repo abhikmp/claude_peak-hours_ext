@@ -266,6 +266,23 @@ document.addEventListener('click', (e) => {
 
 const PRODUCT_IDS = ['ai', 'code', 'cowork', 'design'];
 
+// Disable the sole remaining checked checkbox so the user can't uncheck it.
+// All others stay enabled normally. Re-enables everything once 2+ are checked.
+function updateCheckboxConstraints() {
+  const checked = PRODUCT_IDS.filter(id => document.getElementById(`pf-${id}`)?.checked);
+  const isLastOne = checked.length === 1;
+  PRODUCT_IDS.forEach(id => {
+    const cb = document.getElementById(`pf-${id}`);
+    if (!cb) return;
+    const locked = isLastOne && cb.checked;
+    cb.disabled = locked;
+    const label = cb.closest('label');
+    if (label) label.style.opacity = locked ? '0.45' : '';
+  });
+  const hint = document.getElementById('product-filter-hint');
+  if (hint) hint.hidden = !isLastOne;
+}
+
 async function initProductFilter() {
   const sync = await chrome.storage.sync.get('watchedProducts');
   const watched = (sync.watchedProducts ?? PRODUCT_IDS).filter(p => PRODUCT_IDS.includes(p));
@@ -273,9 +290,11 @@ async function initProductFilter() {
     const cb = document.getElementById(`pf-${id}`);
     if (cb) cb.checked = watched.includes(id);
   });
+  updateCheckboxConstraints();
 }
 
 async function saveProductFilter() {
+  updateCheckboxConstraints();
   const watched = PRODUCT_IDS.filter(id => {
     const cb = document.getElementById(`pf-${id}`);
     return cb?.checked;
