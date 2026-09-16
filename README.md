@@ -1,4 +1,4 @@
-![Peak Hours for Claude](images/promo_tile/promo_tile.png)
+![Peak Hours for Claude](images/promo_tile/promo_tile_git.png)
 
 # Peak Hours for Claude
 
