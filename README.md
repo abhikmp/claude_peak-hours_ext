@@ -23,7 +23,7 @@ A Chrome extension that shows a colored dot in your toolbar so you always know w
 <tr>
 <td align="center"><img src="images/screenshots/partial_outage.png" width="220"/><br><sub>Orange — partial outage on a watched product</sub></td>
 <td align="center"><img src="images/screenshots/partial_outage_on_unselected.png" width="220"/><br><sub>Green — incident exists but not on your watched products</sub></td>
-<td align="center"><img src="images/screenshots/grey_issue.png" width="220"/><br><sub>Grey — network error, retry available</sub></td>
+<td align="center"><img src="images/screenshots/grey_issue_gt.png" width="220"/><br><sub>Grey — network error, retry available</sub></td>
 </tr>
 </table>
 
