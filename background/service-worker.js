@@ -327,9 +327,16 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 // Allow the popup to request an immediate re-poll (e.g. after changing product filter)
+// Also receives USAGE_UPDATE from the content script and persists it to local storage.
 chrome.runtime.onMessage.addListener((msg, sender) => {
   if (sender.id !== chrome.runtime.id) return;
   if (msg?.type === 'POLL_NOW') poll();
+  if (msg?.type === 'USAGE_UPDATE') {
+    chrome.storage.local.set({
+      usagePercent: msg.percent,
+      usageResetsAt: msg.resetsAt ?? null  // Unix seconds, or null
+    });
+  }
 });
 
 // Re-run on browser startup (service workers don't persist)

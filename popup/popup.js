@@ -81,12 +81,64 @@ function pickTickerText(local, watched) {
   return best && best.length > 120 ? best.slice(0, 117) + '…' : (best || null);
 }
 
+// Renders the usage bar given a percent (0–100), a Unix seconds resets-at timestamp,
+// IANA tz, and whether the quota window has already expired (checked in render()).
+function renderUsageBar(percent, resetsAt, tz, expired) {
+  const fill = document.getElementById('usage-fill');
+  const label = document.getElementById('usage-label');
+  const resets = document.getElementById('usage-resets');
+
+  if (expired) {
+    // Quota window has rolled over — show a fresh-start state
+    fill.style.width = '0%';
+    fill.className = 'usage-fill';
+    label.textContent = '✦ Full quota available!';
+    label.className = 'usage-label fresh';
+    resets.textContent = 'Start messaging — your limit has reset';
+    return;
+  }
+
+  if (percent === null || percent === undefined) {
+    // No data seen yet in this quota window
+    fill.style.width = '0%';
+    fill.className = 'usage-fill';
+    label.textContent = 'Send a message to see usage';
+    label.className = 'usage-label';
+    resets.textContent = '';
+    return;
+  }
+
+  // Round to integer to avoid float display issues and ensure dark-text threshold is accurate
+  const pct = Math.round(Math.min(100, Math.max(0, percent)));
+  const colorClass = pct < 60 ? 'green' : pct < 85 ? 'orange' : 'red';
+
+  fill.style.width = pct + '%';
+  fill.className = `usage-fill ${colorClass}`;
+
+  label.textContent = `${pct}% used`;
+  // If fill is thin (< 60%), white text would sit mostly in the empty region — use dark
+  label.className = `usage-label has-data${pct < 60 ? ' dark-text' : ''}`;
+
+  // Resets countdown with clock time
+  if (resetsAt) {
+    const msLeft = resetsAt * 1000 - Date.now();
+    const resetsAtISO = new Date(resetsAt * 1000).toISOString();
+    const clockTime = toLocalTimeStr(resetsAtISO, tz ?? Intl.DateTimeFormat().resolvedOptions().timeZone);
+    resets.textContent = msLeft > 0
+      ? `Resets in ${formatDuration(msLeft)} · ${clockTime}`
+      : 'Resetting soon';
+  } else {
+    resets.textContent = '';
+  }
+}
+
 async function render() {
   const [local, sync] = await Promise.all([
     chrome.storage.local.get([
       'state', 'fetchError', 'statusDescription', 'incidentTitle', 'incidentBody',
       'nextPeakAt', 'peakEndsAt', 'lastChecked', 'affectedProducts',
-      'watchedAffected', 'incidentImpact'
+      'watchedAffected', 'incidentImpact',
+      'usagePercent', 'usageResetsAt'
     ]),
     chrome.storage.sync.get(['userTZ', 'watchedProducts'])
   ]);
@@ -101,12 +153,18 @@ async function render() {
   const circle = document.getElementById('circle');
   circle.className = `circle ${state}`;
 
-  // ── Box 1: short 2-word status label ──
+  // ── Status label + sub-text ──
   const label = document.getElementById('status-label');
   const sub = document.getElementById('status-sub');
   const retryBtn = document.getElementById('retry-btn');
 
-  if (state === 'green') {
+  if (state === 'orange') {
+    // Incident on a watched product — show incident detail in sub-text
+    label.textContent = impactToLabel(local.incidentImpact);
+    retryBtn.hidden = true;
+    const tickerText = pickTickerText(local, watched);
+    sub.textContent = tickerText ?? 'Check status page';
+  } else if (state === 'green') {
     label.textContent = 'All Clear';
     retryBtn.hidden = true;
     const next = local.nextPeakAt;
@@ -128,14 +186,6 @@ async function render() {
     } else {
       sub.textContent = 'Use with caution';
     }
-  } else if (state === 'orange') {
-    // Use the actual impact level from the API to show e.g. "Partial Outage" or "Major Outage"
-    label.textContent = impactToLabel(local.incidentImpact);
-    retryBtn.hidden = true;
-    const affected = local.affectedProducts ?? [];
-    const PRODUCT_LABELS = { ai: 'AI', code: 'Code', cowork: 'Cowork', design: 'Design' };
-    const productStr = affected.map(p => PRODUCT_LABELS[p] ?? p).join(', ');
-    sub.textContent = productStr ? `Affects: Claude ${productStr}` : 'Check status page';
   } else {
     // Grey — fetch failure
     label.textContent = 'Status Unavailable';
@@ -143,37 +193,17 @@ async function render() {
     sub.textContent = 'Will retry automatically in ~5 min';
   }
 
-  // ── Box 2: always-visible ticker ──
-  const incidentBox = document.getElementById('incident-box');
-  const track = document.getElementById('ticker-track');
-
-  if (state === 'grey') {
-    // Show the fetch error message — static, no scroll needed (it's short)
-    incidentBox.classList.add('has-issue');
-    track.className = 'ticker-track no-issue';
-    track.style.animationDuration = '';
-    track.style.color = '#b45309'; // amber tone for error, distinct from incident orange
-    track.textContent = local.fetchError ?? 'Failed to reach status.claude.com';
-  } else {
-    track.style.color = ''; // reset any error colour override
-    const hasIssue = !!(local.incidentTitle);
-    const tickerText = hasIssue ? pickTickerText(local, watched) : null;
-
-    if (tickerText) {
-      incidentBox.classList.add('has-issue');
-      track.className = 'ticker-track'; // scrolling mode
-      // Duplicate text so the scroll loops seamlessly
-      track.textContent = tickerText + '   ·   ' + tickerText;
-      // Adjust speed: ~60px/s feels natural; longer text = longer animation
-      const approxPx = tickerText.length * 6.5;
-      track.style.animationDuration = Math.max(10, approxPx / 40) + 's';
-    } else {
-      incidentBox.classList.remove('has-issue');
-      track.className = 'ticker-track no-issue';
-      track.style.animationDuration = '';
-      track.textContent = 'No active issues';
-    }
+  // ── Usage bar ──
+  // Check expiry at popup-open time. If the stored reset time has passed and we
+  // have stale data, clear it now so the next content-script update starts fresh.
+  const resetsAt = local.usageResetsAt ?? null;
+  const expired = resetsAt !== null
+    && local.usagePercent !== null && local.usagePercent !== undefined
+    && Date.now() / 1000 >= resetsAt;
+  if (expired) {
+    chrome.storage.local.remove(['usagePercent', 'usageResetsAt']).catch(() => {});
   }
+  renderUsageBar(local.usagePercent ?? null, resetsAt, tz, expired);
 
   // ── Footer timezone label ──
   document.getElementById('tz-label').textContent = tz;

@@ -95,63 +95,78 @@ body {
   line-height: 1.4;
 }
 
-/* ── Incident / ticker box ── */
-.incident-box {
+/* ── Usage bar ── */
+.usage-box {
   border-radius: 6px;
   height: 28px;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  /* default: empty / neutral */
   background: #f9fafb;
   border: 1px solid #e5e7eb;
-  transition: background 0.25s, border-color 0.25s;
 }
 
-.incident-box.has-issue {
-  background: #fff7ed;
-  border-color: #fed7aa;
-}
-
-/* Viewport that clips the scrolling text */
-.ticker-wrap {
-  width: 100%;
-  overflow: hidden;
+.usage-bar-wrap {
   position: relative;
+  width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
-/* The moving text strip */
-.ticker-track {
-  display: inline-block;
-  white-space: nowrap;
+.usage-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  border-radius: 6px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+.usage-fill.green {
+  background: #22c55e;
+}
+
+.usage-fill.orange {
+  background: #f97316;
+}
+
+.usage-fill.red {
+  background: #ef4444;
+}
+
+.usage-label {
+  position: relative;
+  /* sits above the fill */
+  z-index: 1;
   font-size: 11.5px;
   font-weight: 500;
-  color: #9a3412;
-  padding-left: 100%;
-  /* start off-screen right */
-  animation: ticker-scroll 18s linear infinite;
-  will-change: transform;
-}
-
-.ticker-track.no-issue {
-  padding-left: 12px;
-  animation: none;
   color: #9ca3af;
-  font-weight: 400;
   font-style: italic;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
-@keyframes ticker-scroll {
-  0% {
-    transform: translateX(0);
-  }
+.usage-label.has-data {
+  font-style: normal;
+  font-weight: 600;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
 
-  100% {
-    transform: translateX(-100%);
-  }
+/* When fill is very thin the white text may sit in empty space — switch to dark */
+.usage-label.has-data.dark-text {
+  color: #374151;
+  text-shadow: none;
+}
+
+.usage-resets {
+  font-size: 11px;
+  color: #9ca3af;
+  text-align: center;
+  margin-top: -4px;
+  /* tuck it closer to the bar */
+  min-height: 14px;
 }
 
 /* ── Footer ── */
