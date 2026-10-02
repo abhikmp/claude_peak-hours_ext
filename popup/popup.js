@@ -341,6 +341,6 @@ PRODUCT_IDS.forEach(id => {
   if (cb) cb.addEventListener('change', saveProductFilter);
 });
 
-// Init
+// Init.
 render();
 initProductFilter();
