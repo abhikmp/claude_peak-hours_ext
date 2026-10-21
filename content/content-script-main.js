@@ -1,6 +1,8 @@
 // Runs in the MAIN world — has access to the real window.fetch.
 // Cannot use chrome.runtime here, so posts data via window.postMessage
 // for the ISOLATED world bridge to pick up and forward.
+// Keep Account parsing in the bridge: Chrome can skip a shared script path
+// registered in both MAIN and ISOLATED worlds.
 
 (function () {
     const originalFetch = window.fetch;
@@ -9,8 +11,7 @@
         const response = await originalFetch(...args);
 
         const url = typeof args[0] === 'string' ? args[0] : args[0]?.url ?? args[0]?.href;
-        const accountId = Accounts.extractAccountId(url);
-        if (!accountId) return response;
+        if (typeof url !== 'string' || !/\/completion(?:[?#]|$)/.test(url)) return response;
 
         const clone = response.clone();
 
@@ -43,7 +44,7 @@
                             window.postMessage({
                                 source: 'claude-peak-extension',
                                 type: 'USAGE_UPDATE',
-                                accountId,
+                                completionUrl: url,
                                 percent,
                                 resetsAt
                             }, '*');

@@ -13,7 +13,7 @@
 - [x] The old flat usage keys and the expiry sentinel are cleaned up once; nothing else reads them.
 - [x] Peak-hours, outage, badge, tooltip, product filter and timezone behavior are unchanged.
 - [x] The manifest changes only to load the account module (no new permissions).
-- [ ] Manual check: load the unpacked extension, send a message, confirm popup and icon update.
+- [x] Manual check: load the unpacked extension, send a message, confirm popup and icon update.
 
 ## Comments
 
@@ -26,3 +26,9 @@ Validation: the Account module's 11 tests pass. A separate development smoke che
 Existing uncommitted UI, badge, default-setting, and version edits are preserved in the working tree. Integration changes are staged separately against the committed layout so this ticket does not absorb those edits.
 
 Final review: Standards has no findings. Spec identified an unintended reuse of toolbar colors in the popup; this was corrected so each layout keeps its existing renderer and color thresholds, including fractional readings near 60% and 85%. Targeted smoke checks pass for both the staged layout and the working-tree layout. Spec has no remaining implementation findings. `node --test` passes all 11 tests; JavaScript syntax and staged whitespace checks pass. The live manual check above remains pending.
+
+2026-10-21 live-check result: the user reloaded the extension, refreshed Claude, sent a message, and still saw the no-reading state. Live verification has failed; investigation is tracked in `07-usage-not-captured-after-message.md`. The prior automated and preview checks do not establish end-to-end success on the real site.
+
+2026-10-21 correction in ticket 07: Chrome skips repeated script paths across content-script worlds. MAIN now forwards `completionUrl`; the bridge alone loads the Account module, extracts the organization ID, and stores the Usage reading. The shared module is no longer listed in MAIN. The cross-world regression reproduces Chrome's path deduplication and checks both injection orders. This supersedes the earlier implementation note that both content-script worlds load the module. Live verification of this fix is pending.
+
+2026-10-21 post-fix result: after a full document reload of the connected Claude tab, the user sent a message and confirmed "Usage appears." The earlier failure was still running the old MAIN interceptor, as established by its `Accounts` stack frame absent from the corrected source. The live usage capture check now passes. Icon color rules are covered by the Account tests and the prior worker smoke check; no separate post-fix manual threshold sweep was performed. Final Standards and Spec reviews have no implementation findings, and temporary diagnostics have been removed.
