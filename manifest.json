@@ -17,6 +17,7 @@
         "https://claude.ai/*"
       ],
       "js": [
+        "shared/accounts.js",
         "content/content-script-main.js"
       ],
       "run_at": "document_start",
@@ -27,6 +28,7 @@
         "https://claude.ai/*"
       ],
       "js": [
+        "shared/accounts.js",
         "content/content-script-bridge.js"
       ],
       "run_at": "document_start",

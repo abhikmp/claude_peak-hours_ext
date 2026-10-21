@@ -138,7 +138,7 @@ async function render() {
       'state', 'fetchError', 'statusDescription', 'incidentTitle', 'incidentBody',
       'nextPeakAt', 'peakEndsAt', 'lastChecked', 'affectedProducts',
       'watchedAffected', 'incidentImpact',
-      'usagePercent', 'usageResetsAt'
+      'accounts'
     ]),
     chrome.storage.sync.get(['userTZ', 'watchedProducts'])
   ]);
@@ -194,16 +194,11 @@ async function render() {
   }
 
   // ── Usage bar ──
-  // Check expiry at popup-open time. If the stored reset time has passed and we
-  // have stale data, clear it now so the next content-script update starts fresh.
-  const resetsAt = local.usageResetsAt ?? null;
-  const expired = resetsAt !== null
-    && local.usagePercent !== null && local.usagePercent !== undefined
-    && Date.now() / 1000 >= resetsAt;
-  if (expired) {
-    chrome.storage.local.remove(['usagePercent', 'usageResetsAt']).catch(() => {});
-  }
-  renderUsageBar(local.usagePercent ?? null, resetsAt, tz, expired);
+  const now = Date.now();
+  const accounts = local.accounts ?? {};
+  const active = Accounts.getAccounts(accounts, now)[0];
+  renderUsageBar(active?.percent ?? null, active?.resetsAt ?? null, tz,
+    active?.isExpired ?? false);
 
   // ── Footer timezone label ──
   document.getElementById('tz-label').textContent = tz;

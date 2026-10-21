@@ -2,6 +2,10 @@
 // Listens for postMessage from the MAIN world script and writes directly to storage.
 // (Avoids routing through the service worker, which may be suspended in MV3.)
 
+// Serialize readings within this tab so consecutive stream events cannot both
+// read the same stored map before either writes it. Cross-tab races remain last-write-wins.
+let readingQueue = Promise.resolve();
+
 window.addEventListener('message', (event) => {
   if (event.source !== window) return;
   if (event.data?.source !== 'claude-peak-extension') return;
@@ -13,10 +17,19 @@ window.addEventListener('message', (event) => {
   // instead of throwing, unlike chrome.storage calls.
   if (!chrome.runtime?.id) return;
 
-  try {
-    chrome.storage.local.set({
-      usagePercent: event.data.percent,
-      usageResetsAt: event.data.resetsAt ?? null
+  const { accountId, percent, resetsAt = null } = event.data;
+  if (typeof accountId !== 'string' || !accountId) return;
+  if (!Number.isFinite(percent) || percent < 0 || percent > 100) return;
+  if (resetsAt !== null && (!Number.isFinite(resetsAt) || resetsAt < 0)) return;
+  const now = Date.now();
+
+  readingQueue = readingQueue.then(async () => {
+    const { accounts = {} } = await chrome.storage.local.get('accounts');
+    await chrome.storage.local.set({
+      accounts: Accounts.applyReading(accounts, { accountId, percent, resetsAt }, now)
     });
-  } catch (_) { }
+    // Wake the service worker only after storage contains the reading. It reads
+    // the Active account itself; the notification carries no reading to rewrite.
+    await chrome.runtime.sendMessage({ type: 'USAGE_UPDATE' }).catch(() => {});
+  }).catch(() => {});
 });

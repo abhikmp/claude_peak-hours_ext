@@ -8,8 +8,9 @@
     window.fetch = async function (...args) {
         const response = await originalFetch(...args);
 
-        const url = typeof args[0] === 'string' ? args[0] : args[0]?.url;
-        if (!url?.endsWith('/completion')) return response;
+        const url = typeof args[0] === 'string' ? args[0] : args[0]?.url ?? args[0]?.href;
+        const accountId = Accounts.extractAccountId(url);
+        if (!accountId) return response;
 
         const clone = response.clone();
 
@@ -42,6 +43,7 @@
                             window.postMessage({
                                 source: 'claude-peak-extension',
                                 type: 'USAGE_UPDATE',
+                                accountId,
                                 percent,
                                 resetsAt
                             }, '*');

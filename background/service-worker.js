@@ -1,5 +1,8 @@
+importScripts('../shared/accounts.js');
+
 const STATUS_URL = 'https://status.claude.com/api/v2/summary.json';
 const ALARM_NAME = 'statusPoll';
+const EXPIRY_ALARM_NAME = 'usageExpiryCheck';
 const POLL_MINUTES = 5;
 
 // Maps user-facing product keys to substrings found in component names from the API
@@ -232,16 +235,18 @@ function getNextPeakISO() {
   return ptWallClockToUTC(year, month, day, 5).toISOString();
 }
 
-// Generate a colored circle icon via OffscreenCanvas and set it as the action icon
-const STATE_COLORS = {
-  green: '#22c55e',
-  red: '#ef4444',
+// ── Icon: color driven by usage %, not peak/outage state ──
+// Usage thresholds: null→green (assume full quota), 0–60→green, 61–85→orange, 86–100→red
+const USAGE_COLORS = {
+  green:  '#22c55e',
   orange: '#f97316',
-  grey: '#9ca3af'
+  red:    '#ef4444'
 };
 
-async function updateIcon(state) {
-  const color = STATE_COLORS[state] ?? STATE_COLORS.grey;
+async function updateIcon() {
+  const { accounts = {} } = await chrome.storage.local.get('accounts');
+  const colorKey = Accounts.getIconColor(accounts, Date.now());
+  const color = USAGE_COLORS[colorKey];
   const sizes = [16, 32, 48, 128];
   const imageData = {};
 
@@ -249,12 +254,9 @@ async function updateIcon(state) {
     const canvas = new OffscreenCanvas(size, size);
     const ctx = canvas.getContext('2d');
     const r = size / 2;
-    const inset = size * 0.08; // small inset so circle doesn't clip
+    const inset = size * 0.08;
 
-    // Transparent background
     ctx.clearRect(0, 0, size, size);
-
-    // Colored circle
     ctx.beginPath();
     ctx.arc(r, r, r - inset, 0, Math.PI * 2);
     ctx.fillStyle = color;
@@ -301,7 +303,7 @@ function buildTitle(result) {
 async function poll() {
   const result = await fetchAndResolveState();
   await chrome.storage.local.set(result);
-  await updateIcon(result.state);
+  await updateIcon();
   await chrome.action.setTitle({ title: buildTitle(result) });
 }
 
@@ -316,31 +318,33 @@ async function initTimezone() {
 
 // ── Event listeners ──
 
-chrome.runtime.onInstalled.addListener(async () => {
+chrome.runtime.onInstalled.addListener(async (details) => {
+  if (details.reason === 'update') {
+    // The usage tracker was never public, so discard its old flat keys once on
+    // update. Keep all Account readings and settings already in the new schema.
+    await chrome.storage.local.remove(['usagePercent', 'usageResetsAt', 'usageExpired']);
+  }
   await initTimezone();
   chrome.alarms.create(ALARM_NAME, { periodInMinutes: POLL_MINUTES });
-  await poll(); // run immediately on install
+  chrome.alarms.create(EXPIRY_ALARM_NAME, { periodInMinutes: 0.5 });
+  await poll();
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === ALARM_NAME) poll();
+  if (alarm.name === EXPIRY_ALARM_NAME) updateIcon();
 });
 
-// Allow the popup to request an immediate re-poll (e.g. after changing product filter)
-// Also receives USAGE_UPDATE from the content script and persists it to local storage.
 chrome.runtime.onMessage.addListener((msg, sender) => {
   if (sender.id !== chrome.runtime.id) return;
   if (msg?.type === 'POLL_NOW') poll();
   if (msg?.type === 'USAGE_UPDATE') {
-    chrome.storage.local.set({
-      usagePercent: msg.percent,
-      usageResetsAt: msg.resetsAt ?? null  // Unix seconds, or null
-    });
+    updateIcon();
   }
 });
 
-// Re-run on browser startup (service workers don't persist)
 chrome.runtime.onStartup.addListener(() => {
   chrome.alarms.create(ALARM_NAME, { periodInMinutes: POLL_MINUTES });
+  chrome.alarms.create(EXPIRY_ALARM_NAME, { periodInMinutes: 0.5 });
   poll();
 });
