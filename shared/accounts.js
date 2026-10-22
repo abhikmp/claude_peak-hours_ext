@@ -5,6 +5,8 @@
 // mutates its input or reads a clock. Persist the returned map after applying,
 // pruning, or clearing; getAccounts returns display values, not stored readings.
 // Its first result is Active. Pruning is explicit so callers control persistence.
+// applyLabel updates only a known Account's name. Null stored labels are unresolved;
+// getAccounts supplies their fallback while the bridge can retry a later reading.
 const Accounts = (() => {
   const STALE_AFTER_MS = 10 * 60 * 1000;
   const DROP_AFTER_MS = 48 * 60 * 60 * 1000;
@@ -46,7 +48,8 @@ const Accounts = (() => {
         const ageMs = Math.max(0, now - account.lastReadingAt);
         return {
           accountId,
-          label: account.label,
+          // Null remains the retry marker in storage; callers always get a label.
+          label: account.label ?? `Account ${accountId.slice(0, 6)}…`,
           percent: isExpired ? 0 : account.percent,
           resetsAt: account.resetsAt,
           lastReadingAt: account.lastReadingAt,
@@ -65,6 +68,12 @@ const Accounts = (() => {
       });
   }
 
+  // A late name response must not create an Account or change its Usage reading.
+  function applyLabel(accounts, accountId, label) {
+    if (!accounts[accountId]) return accounts;
+    return { ...accounts, [accountId]: { ...accounts[accountId], label } };
+  }
+
   function pruneAccounts(accounts, now) {
     return Object.fromEntries(Object.entries(accounts)
       .filter(([, account]) => now - account.lastReadingAt <= DROP_AFTER_MS));
@@ -80,7 +89,7 @@ const Accounts = (() => {
     return active.percent <= 85 ? 'orange' : 'red';
   }
 
-  return { extractAccountId, applyReading, getAccounts, pruneAccounts, clearAccounts, getIconColor };
+  return { extractAccountId, applyReading, applyLabel, getAccounts, pruneAccounts, clearAccounts, getIconColor };
 })();
 
 if (typeof module !== 'undefined' && module.exports) {
