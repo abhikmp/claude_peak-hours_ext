@@ -37,3 +37,19 @@ The browser preview uses actual popup sources with a development-only Chrome-sto
 `node --test` passes all 27 existing tests. Syntax checks pass for the working and staged popup scripts and the new page controller. There is no separate typechecking/build configuration.
 
 Final review: Standards 0 findings; Spec 0 findings.
+
+## Username display follow-up
+
+The user requested that email-based labels display only the text before `@`. Browser-verified examples:
+
+| Stored sample label | Popup text, tooltip and announcement |
+| --- | --- |
+| `abjts98@example.com's Organization` plus trailing spaces | `abjts98` |
+| `you@example.com’s Organization` | `you` |
+| `alex.dev+work@example.net` | `alex.dev+work` |
+| `Work Design Team` | `Work Design Team` |
+| `Account 333333…` | `Account 333333…` |
+
+Both themes were checked. The display formatting does not write storage or alter Account identity, ordering, readings, or tags. The original screenshots above document ticket 04 before this user-requested presentation change; [the updated screenshot](screenshots/username-label.jpg) shows the follow-up.
+
+Follow-up validation: JavaScript syntax and all 27 tests pass. Standards: 0 findings. Spec: 0 findings.

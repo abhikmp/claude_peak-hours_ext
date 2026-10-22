@@ -9,6 +9,11 @@ const AccountPages = (() => {
   let accounts = [];
   let pageIndex = 0;
 
+  function displayLabel(label) {
+    const email = label.trim().match(/^([^@\s]+)@[^@\s]+(?:['’]s\s+Organization)?$/i);
+    return email ? email[1] : label;
+  }
+
   function showPage(index) {
     if (accounts.length < 2) return;
     pageIndex = Math.max(0, Math.min(accounts.length - 1, index));
@@ -21,7 +26,7 @@ const AccountPages = (() => {
       dots.children[i].classList.toggle('current', i === pageIndex);
     });
     const account = accounts[pageIndex];
-    announcement.textContent = `Account ${pageIndex + 1} of ${accounts.length}: ${account.label}`;
+    announcement.textContent = `Account ${pageIndex + 1} of ${accounts.length}: ${displayLabel(account.label)}`;
   }
 
   function makePage(account, tz, index, count) {
@@ -42,8 +47,9 @@ const AccountPages = (() => {
       <div class="account-bar"><div class="account-fill"></div></div>
       <div class="account-reset"></div>`;
     const name = page.querySelector('.account-name');
-    name.textContent = account.label;
-    name.title = account.label;
+    const label = displayLabel(account.label);
+    name.textContent = label;
+    name.title = label;
     page.querySelector('.active').hidden = !account.isActive;
     page.querySelector('.full').hidden = !account.isFull;
     const percent = Math.round(account.percent);
