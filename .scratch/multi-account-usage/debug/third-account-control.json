@@ -1,0 +1,4 @@
+{
+  "completionPath": "/api/organizations/33333333-3333-4333-8333-333333333333/chat_conversations/test/completion?source=web",
+  "chunks": ["data: {\"type\":\"message_limit\",\"message_limit\":{\"resolved\":{\"limit\":{\"percent\":35}},\"windows\":{\"5h\":{\"resets_at\":1800018000}}}}\n\n"]
+}
