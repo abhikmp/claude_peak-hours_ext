@@ -12,7 +12,7 @@
 - [x] The label is fetched once per Account, not on every reading.
 - [x] A failed fetch produces the fallback label and retries on a later reading.
 - [x] Labels are stored in local extension storage only.
-- [ ] Manual check: inspect extension storage in DevTools and confirm the label for the logged-in account.
+- [x] Manual check: inspect extension storage in DevTools and confirm the label for the logged-in account.
 
 ## Comments
 
@@ -31,3 +31,5 @@ Review correction: Standards found no issues in the initial implementation. Spec
 The first post-implementation manual attempt was inconclusive: the user reported a Claude tab continuing to load and a Console that would not submit the expression. No saved-label result was obtained; this is not recorded as a pass. A fresh no-page-reload check will follow the lifecycle fix.
 
 Final automated validation: `node --test` passes all 27 tests (19 top-level tests plus eight failure-case subtests). `node --check` passes for the Account module, both content scripts, the service worker, and the capture tests. The repository has no separate typechecking/build configuration. Final Standards review: no findings. Final Spec review: no findings; the already-open-tab issue is resolved. The live storage check remains pending and is not implied by the automated results.
+
+2026-10-22 final live verification: after the requested extension-only reload, message in the already-open Claude page, and Console storage check, the user reported `true` for whether local `accounts` contains a non-empty string label. This confirms a label is saved on the real site and completes the pending manual storage check. The check exposed no account ID or name. This supersedes the earlier pending/inconclusive verification notes. All ticket acceptance checks are complete; the ticket retains `ready-for-human` for final human review.
