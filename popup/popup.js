@@ -132,7 +132,9 @@ function renderUsageBar(percent, resetsAt, tz, expired) {
   }
 }
 
+let renderRevision = 0;
 async function render() {
+  const revision = ++renderRevision;
   const [local, sync] = await Promise.all([
     chrome.storage.local.get([
       'state', 'fetchError', 'statusDescription', 'incidentTitle', 'incidentBody',
@@ -142,6 +144,7 @@ async function render() {
     ]),
     chrome.storage.sync.get(['userTZ', 'watchedProducts'])
   ]);
+  if (revision !== renderRevision) return;
 
   const state = local.state ?? 'grey';
   const tz = sync.userTZ ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -196,9 +199,15 @@ async function render() {
   // ── Usage bar ──
   const now = Date.now();
   const accounts = local.accounts ?? {};
-  const active = Accounts.getAccounts(accounts, now)[0];
-  renderUsageBar(active?.percent ?? null, active?.resetsAt ?? null, tz,
-    active?.isExpired ?? false);
+  const orderedAccounts = Accounts.getAccounts(accounts, now);
+  const paged = AccountPages.render(orderedAccounts, tz);
+  document.getElementById('usage-box').style.display = paged ? 'none' : '';
+  document.getElementById('usage-resets').style.display = paged ? 'none' : '';
+  if (!paged) {
+    const active = orderedAccounts[0];
+    renderUsageBar(active?.percent ?? null, active?.resetsAt ?? null, tz,
+      active?.isExpired ?? false);
+  }
 
   // ── Footer timezone label ──
   document.getElementById('tz-label').textContent = tz;
@@ -334,6 +343,10 @@ async function saveProductFilter() {
 PRODUCT_IDS.forEach(id => {
   const cb = document.getElementById(`pf-${id}`);
   if (cb) cb.addEventListener('change', saveProductFilter);
+});
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.accounts) render();
 });
 
 // Init.

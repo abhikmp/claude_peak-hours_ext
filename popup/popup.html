@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="account-pages.css">
   <title>Claude Status</title>
 </head>
 
@@ -22,6 +23,20 @@
         <div class="status-sub" id="status-sub"></div>
       </div>
     </div>
+
+    <section class="account-hero" id="account-hero" aria-label="Account usage" hidden>
+      <div class="account-viewport"><div class="account-track" id="account-track"></div></div>
+      <div class="account-nav" role="group" aria-label="Account navigation">
+        <button id="account-previous" type="button" aria-label="Previous account" title="Previous account">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 5-5 5 5 5"/></svg>
+        </button>
+        <button id="account-next" type="button" aria-label="Next account" title="Next account">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 5 5 5-5 5"/></svg>
+        </button>
+      </div>
+      <div class="account-dots" id="account-dots" aria-hidden="true"></div>
+      <div class="account-announcement" id="account-announcement" role="status" aria-live="polite" aria-atomic="true"></div>
+    </section>
 
     <!-- Usage bar — repurposed from incident ticker -->
     <div class="usage-box" id="usage-box">
@@ -58,6 +73,7 @@
 
   </div>
   <script src="../shared/accounts.js"></script>
+  <script src="account-pages.js"></script>
   <script src="popup.js"></script>
 </body>
 
