@@ -5,7 +5,8 @@
   "description": "Shows Claude peak hours and incident status in your toolbar.",
   "permissions": [
     "alarms",
-    "storage"
+    "storage",
+    "scripting"
   ],
   "host_permissions": [
     "https://status.claude.com/*",

@@ -318,7 +318,24 @@ async function initTimezone() {
 
 // ── Event listeners ──
 
+async function injectCaptureIntoOpenTabs() {
+  const tabs = await chrome.tabs.query({ url: ['https://claude.ai/*'] });
+  const scripts = [...chrome.runtime.getManifest().content_scripts]
+    .sort((a, b) => Number(b.world === 'ISOLATED') - Number(a.world === 'ISOLATED'));
+  await Promise.allSettled(tabs.map(async ({ id }) => {
+    for (const script of scripts) {
+      await chrome.scripting.executeScript({
+        target: { tabId: id }, files: script.js, world: script.world,
+        injectImmediately: true
+      });
+    }
+  }));
+}
+
 chrome.runtime.onInstalled.addListener(async (details) => {
+  if (details.reason === 'install' || details.reason === 'update') {
+    await injectCaptureIntoOpenTabs().catch(() => {});
+  }
   if (details.reason === 'update') {
     // The usage tracker was never public, so discard its old flat keys once on
     // update. Keep all Account readings and settings already in the new schema.

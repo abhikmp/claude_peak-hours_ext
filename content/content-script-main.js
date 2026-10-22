@@ -5,13 +5,17 @@
 // registered in both MAIN and ISOLATED worlds.
 
 (function () {
+    // Updates leave the old MAIN world alive. Retire its interceptor before
+    // installing another, including any old stream reads still in progress.
+    window.__claudePeakCaptureCleanup?.();
+    let active = true;
     const originalFetch = window.fetch;
 
-    window.fetch = async function (...args) {
+    const captureFetch = async function (...args) {
         const response = await originalFetch(...args);
 
         const url = typeof args[0] === 'string' ? args[0] : args[0]?.url ?? args[0]?.href;
-        if (typeof url !== 'string' || !/\/completion(?:[?#]|$)/.test(url)) return response;
+        if (!active || typeof url !== 'string' || !/\/completion(?:[?#]|$)/.test(url)) return response;
 
         const clone = response.clone();
 
@@ -38,11 +42,12 @@
                             const percent = json.message_limit?.resolved?.limit?.percent ?? null;
                             const resetsAt = json.message_limit?.windows?.['5h']?.resets_at ?? null;
 
-                            if (percent === null) continue;
+                            if (!active || percent === null) continue;
 
                             // Post to the ISOLATED world bridge
                             window.postMessage({
-                                source: 'claude-peak-extension',
+                                // Ignore legacy interceptors from before update support.
+                                source: 'claude-peak-extension-v2',
                                 type: 'USAGE_UPDATE',
                                 completionUrl: url,
                                 percent,
@@ -56,5 +61,10 @@
         })();
 
         return response;
+    };
+    window.fetch = captureFetch;
+    window.__claudePeakCaptureCleanup = () => {
+        active = false;
+        if (window.fetch === captureFetch) window.fetch = originalFetch;
     };
 })();

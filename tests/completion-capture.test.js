@@ -9,10 +9,11 @@ const ROOT = path.resolve(__dirname, '..');
 const NOW = 1800000000000;
 const ACCOUNT_ID = '11111111-1111-4111-8111-111111111111';
 
-function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = 'MAIN' } = {}) {
+function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = 'MAIN', injectAtStart = true } = {}) {
   let stored = { accounts: structuredClone(initialAccounts) };
   const listeners = [];
   const requests = [];
+  const notifications = [];
   let percent = 18;
   let originalResponse;
   const window = {
@@ -33,19 +34,22 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
       return originalResponse;
     },
     addEventListener: (type, listener) => listeners.push(listener),
+    removeEventListener(type, listener) {
+      const index = listeners.indexOf(listener);
+      if (index !== -1) listeners.splice(index, 1);
+    },
     postMessage(message) {
       for (const listener of listeners) listener({ source: window, data: message });
     }
   };
-  const worlds = {
-    MAIN: vm.createContext({ URL, TextDecoder, window }),
-    ISOLATED: vm.createContext({ URL, AbortSignal, window, Date: class extends Date {
+  function createIsolatedWorld() {
+    return vm.createContext({ URL, AbortSignal, window, Date: class extends Date {
       static now() { return NOW; }
     }, fetch: async (url, options) => {
       requests.push({ url, options });
       return organizationFetch(url, options);
     }, chrome: {
-      runtime: { id: 'usage-test', sendMessage: async () => {} },
+      runtime: { id: 'usage-test', sendMessage: async message => { notifications.push(message); } },
       storage: {
         local: {
           get: async () => structuredClone(stored),
@@ -53,13 +57,14 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
         },
         sync: { set() { assert.fail('Account labels and readings must stay local'); } }
       }
-    } })
+    } });
   };
+  const worlds = { MAIN: vm.createContext({ URL, TextDecoder, window }), ISOLATED: createIsolatedWorld() };
   const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.json'), 'utf8'));
   const groups = [...manifest.content_scripts].sort((a, b) =>
     Number(b.world === firstWorld) - Number(a.world === firstWorld));
   const injected = new Set();
-  for (const group of groups) {
+  for (const group of injectAtStart ? groups : []) {
     for (const file of group.js) {
       if (injected.has(file)) continue;
       injected.add(file);
@@ -68,8 +73,59 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
   }
   return {
     requests,
+    notifications,
     accounts: () => Accounts.getAccounts(stored.accounts, NOW),
     forgetAccounts() { stored.accounts = Accounts.clearAccounts(); },
+    async legacyReading() {
+      window.postMessage({ source: 'claude-peak-extension', type: 'USAGE_UPDATE',
+        completionUrl: `/api/organizations/${ACCOUNT_ID}/chat_conversations/test/completion`,
+        percent: 99, resetsAt: 1800018000
+      });
+      await new Promise(setImmediate);
+    },
+    async install(reason) {
+      if (reason === 'update') {
+        worlds.ISOLATED.chrome.runtime.id = undefined;
+        worlds.ISOLATED = createIsolatedWorld();
+      }
+      let onInstalled;
+      let failure;
+      const worker = vm.createContext({ URL, console, fetch: () => new Promise(() => {}), chrome: {
+        runtime: {
+          getManifest: () => manifest,
+          onInstalled: { addListener(listener) { onInstalled = listener; } },
+          onMessage: { addListener() {} }, onStartup: { addListener() {} }
+        },
+        tabs: { query: async ({ url }) => {
+          assert.deepEqual(Array.from(url), ['https://claude.ai/*']);
+          return [{ id: 7 }, { id: 8 }];
+        } },
+        scripting: { async executeScript({ target, world = 'ISOLATED', func, files }) {
+          assert.ok(manifest.permissions.includes('scripting'));
+          if (target.tabId === 8) throw new Error('Tab was closed');
+          if (func) return [{ result: vm.runInContext(`(${func.toString()})()`, worlds[world]) }];
+          for (const file of files) {
+            vm.runInContext(fs.readFileSync(path.join(ROOT, file), 'utf8'), worlds[world], { filename: file });
+          }
+          return [];
+        } },
+        storage: {
+          local: {
+            get: async () => structuredClone(stored),
+            set: async value => { stored = { ...stored, ...structuredClone(value) }; },
+            remove: async () => {}
+          },
+          sync: { get: async () => ({ userTZ: 'UTC' }) }
+        },
+        alarms: { create() {}, onAlarm: { addListener() {} } }
+      } });
+      worker.importScripts = file => vm.runInContext(
+        fs.readFileSync(path.resolve(ROOT, 'background', file), 'utf8'), worker);
+      vm.runInContext(fs.readFileSync(path.join(ROOT, 'background/service-worker.js'), 'utf8'), worker);
+      onInstalled({ reason }).catch(error => { failure = error; });
+      await new Promise(setImmediate);
+      assert.equal(failure, undefined);
+    },
     async sendReading(value = 18, accountId = ACCOUNT_ID) {
       percent = value;
       const result = await window.fetch(`/api/organizations/${accountId}/chat_conversations/test/completion?source=web`);
@@ -78,6 +134,34 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
     }
   };
 }
+
+test('install and update capture names in an already-open Claude document', async () => {
+  for (const injectAtStart of [false, true]) {
+    const capture = createCapture({ injectAtStart,
+      organizationFetch: async () => ({ ok: true, json: async () => ({ name: 'Personal' }) })
+    });
+    await capture.install('install');
+    await capture.sendReading();
+    assert.equal(capture.accounts()[0]?.label, 'Personal');
+    await capture.install('update');
+    await capture.sendReading(25);
+    assert.equal(capture.accounts()[0]?.label, 'Personal');
+    assert.equal(capture.accounts()[0]?.percent, 25);
+    assert.equal(capture.requests.length, 1);
+    assert.equal(capture.notifications.length, 2, 'each reading reaches the worker once');
+  }
+});
+
+test('an old MAIN interceptor cannot overwrite readings from the updated capture scripts', async () => {
+  const capture = createCapture({
+    organizationFetch: async () => ({ ok: true, json: async () => ({ name: 'Personal' }) })
+  });
+  await capture.install('update');
+  await capture.sendReading(18);
+  await capture.legacyReading();
+  assert.equal(capture.accounts()[0].percent, 18);
+  assert.equal(capture.notifications.length, 1);
+});
 
 test('a new Account gets its organization name once without a page reload', async () => {
   const capture = createCapture({
