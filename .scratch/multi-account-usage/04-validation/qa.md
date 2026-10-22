@@ -20,6 +20,7 @@ Date: 2026-10-22. Source baseline: `164241c` plus the user's existing uncommitte
 | Motion | Computed transition: transform 0.3s cubic-bezier(0.77,0,0.175,1). CSS includes a reduced-motion override; browser tooling did not emulate the OS preference. |
 | Browser logs | No warning/error entries in the checked popup tab. |
 | Staged layout | Exported the exact staged popup sources and loaded them independently: width 260px, no horizontal overflow, correct first/second page and dots, original usage renderer hidden only in multi-Account mode, no browser errors. |
+| Live two-Account check | User reloaded the extension, sent messages from two Accounts in the same Chrome profile, and confirmed: "Yes, both Accounts page correctly." |
 
 The 9px tag size, uppercase tag styling, fixed 260px width, existing colors and existing single-Account presentation follow the user-approved prototype and ticket constraints. No new art direction, font, or dashboard-style shell is introduced.
 
@@ -31,6 +32,8 @@ The 9px tag size, uppercase tag styling, fixed 260px width, existing colors and 
 - [Full Active Account](screenshots/active-full.jpg)
 - [Long label](screenshots/long-label.jpg)
 
-The browser uses actual popup sources with a development-only Chrome-storage facade. This verifies UI behavior with controlled readings; it does not establish a real two-login capture result. That live check is recorded separately in ticket 04.
+The browser preview uses actual popup sources with a development-only Chrome-storage facade. Controlled browser checks and the separate user-confirmed live check are distinguished above; preview sample values are not real Account readings.
 
 `node --test` passes all 27 existing tests. Syntax checks pass for the working and staged popup scripts and the new page controller. There is no separate typechecking/build configuration.
+
+Final review: Standards 0 findings; Spec 0 findings.

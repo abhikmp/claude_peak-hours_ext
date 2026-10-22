@@ -14,7 +14,7 @@
 - [x] Pages slide in about 0.3 seconds; the popup always opens on page 1.
 - [x] The pill, filter, footer, timezone input and theme toggle stay put when paging, in both themes.
 - [x] Label, tags, arrows and dots are hidden with a single Account.
-- [ ] Manual check: with two logged-in accounts, compare the popup against the screenshots.
+- [x] Manual check: with two logged-in accounts, compare the popup against the screenshots.
 
 ## Comments
 
@@ -27,3 +27,5 @@ Existing uncommitted popup redesign files were saved as a visual baseline before
 Browser verification uses development-only sample Accounts with the actual popup HTML/CSS/JS and a Chrome-storage facade; samples never enter extension storage. It covers five-Account ordering, a Full Active account, switching Accounts while browsing, arrow/keyboard boundaries, input editing, long Unicode names, single/no Account, and fixed global controls in both themes. Details and screenshots are in [the QA record](../04-validation/qa.md). Following the spec's testing decisions, no new fake-DOM unit seam was added; ordering remains covered by the existing Account module tests. A live check with two logged-in Accounts has been requested and remains pending.
 
 Validation before review: `node --test` passes all 27 tests. JavaScript syntax checks pass for the working popup and for an independent export of the staged popup. The staged layout was also opened in the browser and paged successfully without overflow or runtime errors. No separate typechecking/build configuration exists in this plain-JavaScript extension.
+
+2026-10-22 live verification: after the requested extension reload and messages from two Claude Accounts in the same Chrome profile, the user reported "Yes, both Accounts page correctly." This completes the pending real-site paging check and supersedes the earlier pending note. Final Standards review: no findings. Final Spec review: no findings. All ticket 04 acceptance checks are complete.
