@@ -245,7 +245,12 @@ const USAGE_COLORS = {
 
 async function updateIcon() {
   const { accounts = {} } = await chrome.storage.local.get('accounts');
-  const colorKey = Accounts.getIconColor(accounts, Date.now());
+  const now = Date.now();
+  const retained = Accounts.pruneAccounts(accounts, now);
+  if (Object.keys(retained).length !== Object.keys(accounts).length) {
+    await chrome.storage.local.set({ accounts: retained });
+  }
+  const colorKey = Accounts.getIconColor(retained, now);
   const color = USAGE_COLORS[colorKey];
   const sizes = [16, 32, 48, 128];
   const imageData = {};

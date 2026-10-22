@@ -68,6 +68,12 @@ const AccountPages = (() => {
         ? `Resets in ${formatDuration(msLeft)} · ${clockTime}`
         : 'Resetting soon…';
     }
+    if (!account.isActive && account.isStale) {
+      const updated = document.createElement('div');
+      updated.className = 'account-updated';
+      updated.textContent = `Updated ${formatDuration(Math.floor(account.ageMs / 60000) * 60000)} ago`;
+      name.after(updated);
+    }
     return page;
   }
 

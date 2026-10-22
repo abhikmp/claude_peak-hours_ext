@@ -92,7 +92,7 @@ function renderUsageBar(percent, resetsAt, tz, expired) {
     // Quota window has rolled over — show a fresh-start state
     fill.style.width = '0%';
     fill.className = 'usage-fill';
-    label.textContent = '✦ Full quota available!';
+    label.textContent = '0% · ✦ Full quota available!';
     label.className = 'usage-label fresh';
     resets.textContent = 'Start messaging — your limit has reset';
     return;
@@ -266,7 +266,22 @@ function renderTZList(filter = '') {
 
 document.getElementById('tz-reset-btn').addEventListener('click', async () => {
   const systemTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  await chrome.storage.sync.set({ userTZ: systemTZ });
+  await chrome.storage.sync.set({
+    userTZ: systemTZ,
+    watchedProducts: ['ai'],
+    theme: 'dark'
+  });
+  document.documentElement.setAttribute('data-theme', 'dark');
+  PRODUCT_IDS.forEach(id => {
+    const cb = document.getElementById(`pf-${id}`);
+    if (cb) cb.checked = (id === 'ai');
+  });
+  updateCheckboxConstraints();
+
+  await chrome.storage.local.set({ accounts: Accounts.clearAccounts() });
+  chrome.runtime.sendMessage({ type: 'USAGE_UPDATE' }).catch(() => {});
+
+  chrome.runtime.sendMessage({ type: 'POLL_NOW' }).catch(() => {});
   document.getElementById('tz-list').hidden = true;
   document.getElementById('tz-search').value = '';
   await render();
@@ -349,6 +364,17 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'local' && changes.accounts) render();
 });
 
-// Init.
-render();
-initProductFilter();
+async function initAccounts() {
+  const { accounts = {} } = await chrome.storage.local.get('accounts');
+  const retained = Accounts.pruneAccounts(accounts, Date.now());
+  if (Object.keys(retained).length !== Object.keys(accounts).length) {
+    await chrome.storage.local.set({ accounts: retained });
+    chrome.runtime.sendMessage({ type: 'USAGE_UPDATE' }).catch(() => {});
+  }
+  await render();
+  await initProductFilter();
+  // Age and expiry also change while an otherwise idle popup stays open.
+  setInterval(render, 30000);
+}
+
+initAccounts();
