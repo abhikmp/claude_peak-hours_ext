@@ -6,24 +6,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="popup.css">
   <link rel="stylesheet" href="account-pages.css">
-  <title>Claude Status</title>
+  <title>QuotaBeacon</title>
 </head>
 
 <body>
   <div class="container">
 
-    <!-- Main status area -->
-    <div class="status-row">
-      <div class="circle" id="circle"></div>
-      <div class="status-text">
-        <div class="status-label-row">
-          <div class="status-label" id="status-label">Checking…</div>
-          <button class="retry-btn" id="retry-btn" hidden>↺ Retry</button>
-        </div>
-        <div class="status-sub" id="status-sub"></div>
-      </div>
-    </div>
+    <!-- Theme toggle — top-right corner, absolute positioned -->
+    <button class="theme-toggle" id="theme-toggle" title="Toggle theme" aria-label="Toggle light/dark mode">
+      <!-- Sun icon (shown in dark mode to switch to light): filled circle + stroke rays in #f9f1f1 -->
+      <svg class="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f9f1f1" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="5" fill="#f9f1f1" stroke="none"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+      <!-- Moon icon (shown in light mode to switch to dark): filled crescent in #0B0C0C -->
+      <svg class="icon-moon" width="14" height="14" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#0B0C0C" stroke="none"/>
+      </svg>
+    </button>
 
+    <!-- Usage hero — primary, top of popup -->
     <section class="account-hero" id="account-hero" aria-label="Account usage" hidden>
       <div class="account-viewport"><div class="account-track" id="account-track"></div></div>
       <div class="account-nav" role="group" aria-label="Account navigation">
@@ -37,15 +46,34 @@
       <div class="account-dots" id="account-dots" aria-hidden="true"></div>
       <div class="account-announcement" id="account-announcement" role="status" aria-live="polite" aria-atomic="true"></div>
     </section>
-
-    <!-- Usage bar — repurposed from incident ticker -->
-    <div class="usage-box" id="usage-box">
-      <div class="usage-bar-wrap" id="usage-bar-wrap">
-        <div class="usage-fill" id="usage-fill"></div>
-        <span class="usage-label" id="usage-label">Send a message to see usage</span>
+    <div class="usage-hero">
+      <div class="usage-hero-top">
+        <span class="usage-pct" id="usage-pct">— %</span>
+        <span class="usage-quota-label">5h quota</span>
       </div>
+      <div class="bar-wrap">
+        <div class="bar-fill" id="bar-fill"></div>
+      </div>
+      <div class="usage-sub" id="usage-sub">Send a message to see usage</div>
     </div>
-    <div class="usage-resets" id="usage-resets"></div>
+
+    <!-- Status pill — secondary signal -->
+    <div class="pill-row">
+      <div class="pill-and-aside">
+        <div class="pill" id="status-pill">
+          <span class="pill-dot" id="pill-dot"></span>
+          <span class="pill-text" id="pill-text">Checking…</span>
+          <!-- Retry icon — shown only in grey/fetch-failure state -->
+          <button class="retry-icon-btn" id="retry-btn" hidden title="Retry now">↺</button>
+        </div>
+        <span class="pill-aside" id="pill-aside" hidden></span>
+      </div>
+      <!-- Incident detail line — shown only in orange state -->
+      <div class="incident-sub" id="incident-sub" hidden></div>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider"></div>
 
     <!-- Product filter -->
     <div class="product-filter">
@@ -53,19 +81,22 @@
       <div class="product-checkboxes">
         <label><input type="checkbox" value="ai" id="pf-ai"> Claude AI</label>
         <label><input type="checkbox" value="code" id="pf-code"> Claude Code</label>
-        <label><input type="checkbox" value="cowork" id="pf-cowork"> Claude Cowork</label>
-        <label><input type="checkbox" value="design" id="pf-design"> Claude Design</label>
+        <label><input type="checkbox" value="cowork" id="pf-cowork"> Cowork</label>
+        <label><input type="checkbox" value="design" id="pf-design"> Design</label>
       </div>
       <p class="product-filter-hint" id="product-filter-hint" hidden>At least one product must be selected.</p>
     </div>
 
+    <!-- Divider -->
+    <div class="divider"></div>
+
     <!-- Footer -->
     <div class="footer">
       <span class="tz-label" id="tz-label"></span>
-      <button class="tz-reset-btn" id="tz-reset-btn">↺ Reset to default</button>
+      <button class="tz-reset-btn" id="tz-reset-btn">↺ reset to default</button>
     </div>
 
-    <!-- Timezone picker — always visible, list opens on focus -->
+    <!-- Timezone picker -->
     <div class="tz-picker">
       <input type="text" class="tz-search" id="tz-search" placeholder="Set custom timezone" autocomplete="off">
       <ul class="tz-list" id="tz-list" hidden></ul>

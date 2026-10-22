@@ -45,7 +45,6 @@ async function fetchAndResolveState() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     apiData = await res.json();
   } catch (err) {
-    // Build a short human-readable error string for the popup ticker
     let fetchError = 'Failed to reach status.claude.com';
     if (err?.message) {
       if (err.message.startsWith('HTTP ')) {
@@ -53,7 +52,6 @@ async function fetchAndResolveState() {
       } else if (err.message.toLowerCase().includes('network') || err.message.toLowerCase().includes('fetch')) {
         fetchError = 'Network error — check your connection';
       } else {
-        // Trim long JS error messages to something display-safe
         fetchError = err.message.length > 60 ? err.message.slice(0, 57) + '…' : err.message;
       }
     }
@@ -79,7 +77,6 @@ async function fetchAndResolveState() {
   const incidents = apiData?.incidents ?? [];
   const components = apiData?.components ?? [];
 
-  // Find active incident
   const activeIncident = indicator !== 'none'
     ? incidents[0] ?? { name: apiData.status.description, incident_updates: [] }
     : incidents.find(i => {
@@ -87,15 +84,14 @@ async function fetchAndResolveState() {
       return latest && latest.status !== 'resolved';
     });
 
-  // Which products are affected (based on non-operational components)?
   const affectedProducts = activeIncident
     ? getAffectedProducts(activeIncident, components)
     : [];
 
-  // Does this affect any of the user's watched products? → drives icon color
   const VALID_PRODUCTS = new Set(['ai', 'code', 'cowork', 'design']);
   const syncData = await chrome.storage.sync.get('watchedProducts');
-  const watched = (syncData.watchedProducts ?? ['ai', 'code', 'cowork', 'design'])
+  // Default is now ['ai'] only
+  const watched = (syncData.watchedProducts ?? ['ai'])
     .filter(p => VALID_PRODUCTS.has(p));
   const watchedAffected = affectedProducts.length > 0 &&
     affectedProducts.some(p => watched.includes(p));
@@ -103,7 +99,6 @@ async function fetchAndResolveState() {
   if (activeIncident) {
     const latest = activeIncident.incident_updates?.[0];
     return {
-      // Icon goes orange only if a watched product is affected
       state: watchedAffected ? 'orange' : isPeakNow() ? 'red' : 'green',
       fetchError: null,
       statusDescription,
@@ -118,7 +113,6 @@ async function fetchAndResolveState() {
     };
   }
 
-  // No incident
   const peak = isPeakNow();
   return {
     state: peak ? 'red' : 'green',
@@ -135,9 +129,7 @@ async function fetchAndResolveState() {
   };
 }
 
-// Determine which product keys are affected by an incident via component names
 function getAffectedProducts(incident, components) {
-  // Some incidents list affected component IDs; match against component names
   const affectedComponentIds = new Set(
     (incident.components ?? []).map(c => c.id ?? c)
   );
@@ -154,16 +146,8 @@ function getAffectedProducts(incident, components) {
   return matched;
 }
 
-// Convert a PT wall-clock date+hour into a real UTC Date.
-// Works correctly regardless of the device's local timezone or DST.
-// Strategy: format a reference UTC epoch in PT to get the PT offset,
-// then use that offset to build the target UTC instant.
 function ptWallClockToUTC(year, month, day, hour) {
-  // We need to find the UTC instant where PT wall clock = year/month/day hour:00:00.
-  // Use a binary-search-free approach: format a trial UTC date in PT and measure the gap.
-  // Trial: treat the wall-clock as if it were UTC, then correct.
   const trial = new Date(Date.UTC(year, month - 1, day, hour, 0, 0));
-  // Format that trial in PT to see what PT wall clock it maps to
   const fmt = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/Los_Angeles',
     year: 'numeric', month: 'numeric', day: 'numeric',
@@ -171,14 +155,12 @@ function ptWallClockToUTC(year, month, day, hour) {
     hour12: false
   });
   const parts = fmt.formatToParts(trial).reduce((acc, p) => { acc[p.type] = +p.value; return acc; }, {});
-  // Difference in hours between trial PT wall clock and desired PT wall clock
   const trialPTMs = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
   const targetMs = Date.UTC(year, month - 1, day, hour, 0, 0);
   const diffMs = targetMs - trialPTMs;
   return new Date(trial.getTime() + diffMs);
 }
 
-// Get current PT date parts {year, month, day, hour, weekday}
 function getPTNow() {
   const now = new Date();
   const fmt = new Intl.DateTimeFormat('en-US', {
@@ -189,24 +171,19 @@ function getPTNow() {
   return fmt.formatToParts(now).reduce((acc, p) => { acc[p.type] = p.value; return acc; }, {});
 }
 
-// Returns ISO string for when the current peak window ends (11 AM PT today)
 function getPeakEndISO() {
   const pt = getPTNow();
   return ptWallClockToUTC(+pt.year, +pt.month, +pt.day, 11).toISOString();
 }
 
-// Returns ISO string for next peak window start (next weekday 5 AM PT)
 function getNextPeakISO() {
   const pt = getPTNow();
   const ptHour = parseInt(pt.hour, 10);
 
-  // Start from a JS Date set to PT midnight today (UTC-based, for day arithmetic only)
-  // We'll use a simple day counter in PT calendar space
   let year = +pt.year;
   let month = +pt.month;
   let day = +pt.day;
 
-  // If it's already past 5 AM PT today, move to tomorrow
   if (ptHour >= 5) {
     const tomorrow = new Date(Date.UTC(year, month - 1, day + 1));
     year = tomorrow.getUTCFullYear();
@@ -214,8 +191,6 @@ function getNextPeakISO() {
     day = tomorrow.getUTCDate();
   }
 
-  // Skip until we land on a weekday
-  // Use ptWallClockToUTC to get the real weekday (handles month/year rollover)
   for (let i = 0; i < 7; i++) {
     const candidate = ptWallClockToUTC(year, month, day, 5);
     const weekday = candidate.toLocaleDateString('en-US', {
@@ -224,14 +199,12 @@ function getNextPeakISO() {
     if (!['Sat', 'Sun'].includes(weekday)) {
       return candidate.toISOString();
     }
-    // Advance one day in UTC calendar (safe since 5 AM PT is always same UTC date or +1)
     const next = new Date(Date.UTC(year, month - 1, day + 1));
     year = next.getUTCFullYear();
     month = next.getUTCMonth() + 1;
     day = next.getUTCDate();
   }
 
-  // Fallback (should never reach here)
   return ptWallClockToUTC(year, month, day, 5).toISOString();
 }
 
@@ -273,6 +246,30 @@ async function updateIcon() {
   await chrome.action.setIcon({ imageData });
 }
 
+// ── Badge: blinking PEAK or DOWN, driven by peak/outage state ──
+let blinkInterval = null;
+let blinkVisible = true;
+
+function startBadgeBlink(text, bgColor) {
+  stopBadgeBlink();
+  blinkVisible = true;
+  chrome.action.setBadgeText({ text });
+  chrome.action.setBadgeBackgroundColor({ color: bgColor });
+  chrome.action.setBadgeTextColor({ color: '#ffffff' });
+  blinkInterval = setInterval(() => {
+    blinkVisible = !blinkVisible;
+    chrome.action.setBadgeText({ text: blinkVisible ? text : '' });
+  }, 1000);
+}
+
+function stopBadgeBlink() {
+  if (blinkInterval) {
+    clearInterval(blinkInterval);
+    blinkInterval = null;
+  }
+  chrome.action.setBadgeText({ text: '' });
+}
+
 // Build a short tooltip title string
 function buildTitle(result) {
   if (result.state === 'orange') {
@@ -292,7 +289,6 @@ function buildTitle(result) {
     return 'Peak hours · Use with caution';
   }
   if (result.state === 'green') {
-    // Show API status description if there's a non-watched incident
     if (result.incidentTitle && !result.watchedAffected) {
       return result.statusDescription ?? 'Off-peak · All clear';
     }
@@ -302,17 +298,27 @@ function buildTitle(result) {
     }
     return 'Off-peak · All clear';
   }
-  return 'Claude Status · Unknown';
+  return 'QuotaBeacon · Unknown';
 }
 
 async function poll() {
   const result = await fetchAndResolveState();
   await chrome.storage.local.set(result);
+
   await updateIcon();
+
+  // Badge = peak/outage signal (DOWN takes priority over PEAK)
+  if (result.state === 'orange') {
+    startBadgeBlink('DOWN', '#c2410c');
+  } else if (result.state === 'red') {
+    startBadgeBlink('PEAK', '#b91c1c');
+  } else {
+    stopBadgeBlink();
+  }
+
   await chrome.action.setTitle({ title: buildTitle(result) });
 }
 
-// Detect and store timezone on install
 async function initTimezone() {
   const existing = await chrome.storage.sync.get('userTZ');
   if (!existing.userTZ) {

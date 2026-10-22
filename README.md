@@ -1,68 +1,52 @@
-![Peak Hours for Claude](images/promo_tile/promo_tile_git.png)
+# QuotaBeacon
 
-# Peak Hours for Claude
+A compact Chrome extension for Claude quota usage, reset times, peak hours and outage status. QuotaBeacon is independent of Anthropic.
 
-A Chrome extension that shows a colored dot in your toolbar so you always know whether Claude is slow, down, or good to go — without opening a status page.
+## Usage at a glance
 
----
-
-## What the colors mean
-
-🟢 **Green** — Off-peak, no incidents. Good time to use Claude.  
-🔴 **Red** — Peak hours. Claude may be slower than usual.  
-🟠 **Orange** — Active incident on a product you're watching.  
-⚫ **Grey** — Couldn't reach the status page. Will retry in 5 min.
-
----
-
-## Screenshots
-
-![All Clear — green dot, popup open](images/screenshots/green_fullscreen.png)
+- The toolbar circle follows the Account that most recently produced a Usage reading: green through 60%, orange above 60% through 85%, red above 85%. No reading or an expired quota is green.
+- Send a message on claude.ai to capture usage. Readings update after messages; the extension does not continuously poll quota or track weekly/token totals.
+- Multiple Accounts in the same Chrome profile get separate pages. Active stays first; Full accounts follow Accounts with available quota.
+- Non-Active pages show “Updated … ago” beside the name after 10 minutes. Expired readings show 0% and full quota. Accounts unused for more than 48 hours are forgotten automatically.
+- The status pill, PEAK/DOWN badge and hover tooltip show public peak-hours and incident information. The toolbar circle remains usage-driven.
+- Choose light/dark theme, timezone and Watched products. Claude AI is selected by default.
 
 <table>
 <tr>
-<td align="center"><img src="images/screenshots/partial_outage.png" width="220"/><br><sub>Orange — partial outage on a watched product</sub></td>
-<td align="center"><img src="images/screenshots/partial_outage_on_unselected.png" width="220"/><br><sub>Green — incident exists but not on your watched products</sub></td>
-<td align="center"><img src="images/screenshots/grey_issue_gt.png" width="220"/><br><sub>Grey — network error, retry available</sub></td>
+<td><img src="images/screenshots/usage-active.jpg" width="260" alt="Active Account with 5% quota used"></td>
+<td><img src="images/screenshots/usage-multi-account.jpg" width="260" alt="Another Account with an expired reading and inline reading age"></td>
 </tr>
 </table>
 
----
+Screenshots use development fixtures, not real Account readings.
 
-## How it works
+## Try locally
 
-- Checks [status.claude.com](https://status.claude.com) every 5 minutes
-- Peak hours (weekdays, 5–11 AM Pacific) turn the dot red
-- An active incident on a product you're watching turns it orange
-- You pick which Claude products matter to you — AI, Code, Cowork, or Design; at least one must stay selected at all times
-- Your timezone is auto-detected and used for the time displays; change it anytime from the popup
+1. Open chrome://extensions and enable Developer mode.
+2. Choose **Load unpacked** and select this repository's folder, or extract the release ZIP and select its folder.
+3. Pin QuotaBeacon, sign in to claude.ai and send a message yourself. Open the popup to see its first reading.
+4. To add another Account, use it in the same Chrome profile and send a message. Use the popup arrows or left/right keys to compare readings.
 
----
+Logging in alone does not switch Active. Usage depends on Claude returning a quota event with the completion response. QuotaBeacon covers the 5-hour quota carried by that event; it does not raise limits or provide usage history.
 
-## Folder structure
+## Privacy
 
-```
-extension/
-├── manifest.json
-├── background/
-│   └── service-worker.js
-├── popup/
-│   ├── popup.html
-│   ├── popup.js
-│   └── popup.css
-├── data/
-│   └── timezones.json
-├── icons/
-│   ├── logo_16.png
-│   ├── logo_48.png
-│   └── logo_128.png
-└── images/
-    ├── screenshots/
-    └── promo_tile/
-```
+Account names (which may be email addresses) and Usage readings stay in this extension's local Chrome storage and are not uploaded to the developer or third parties. Preferences may sync through Chrome. QuotaBeacon fetches public status information and Account labels directly from Claude; it does not save or upload prompts or replies, and has no analytics backend.
 
----
+[Full disclosure and permission explanations](docs/release/privacy-disclosure.md). Reset to default forgets all Accounts and restores system timezone, Claude AI only and dark theme.
+
+## Release status
+
+QuotaBeacon 1.0.0 is prepared for a **new Chrome Web Store listing**. It has not been submitted by this task. The earlier Peak Hours for Claude listing is a separate extension and does not automatically migrate users or readings.
+
+[Release checklist](docs/release/manual-qa.md) · [Design reference](design.md) · [Domain language](CONTEXT.md)
+
+Run checks with Node's built-in test runner:
+
+    node --test tests/*.test.js
+
+No dependencies, build step or separate typechecking configuration are required.
 
 ## Credits
 
-Inspired by [PeakClaude](https://github.com/pforret/PeakClaude) by [@pforret](https://github.com/pforret) — the original resource for tracking Claude's peak hours.
+The peak-hours feature was inspired by [PeakClaude](https://github.com/pforret/PeakClaude) by [@pforret](https://github.com/pforret).
