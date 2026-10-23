@@ -1,6 +1,6 @@
 # Ticket 04: Forget Account design exploration
 
-2026-10-24. The user explicitly asked to prototype and finalize the flow before implementing ticket 04. Production is unchanged by this exploration.
+2026-10-24. The user explicitly asked to prototype and finalize the flow before implementing ticket 04. **Final approval:** the user finalized this design on 2026-10-24, with **2.5-second Undo in production**. All implementation requirements are in [ticket 04](../issues/04-forget-undo-and-account-rediscovery.md), now ready-for-agent. Production remains unchanged; implement the complete ticket on the next user request without another design round.
 
 Open [prototype.html](prototype.html), served by the existing loopback server at [the live preview](http://127.0.0.1:8766/.scratch/account-overview/04-prototype/prototype.html?v=3). The selected Compact table, 1–3 slides / 4+ table threshold, 11px reset values, fifteen-minute table estimates/priority and three-hour detail estimates are retained. The user selected **Dialog** on 2026-10-24; it is now the default. The other directions remain for reference.
 
@@ -22,15 +22,15 @@ The fixed picker matches the prototype skill. Click its choices or press 1/2/3. 
 
 Active has no Forget action. If a sample reading makes the confirmation's Account Active, that confirmation closes. Data exists only in the page's sample state; no real Account state or extension storage is read or written.
 
-## Feedback to decide
+## Finalized Undo behavior
 
-Undo now expires automatically. The prototype-only **Undo duration** slider sits directly below the popup, ranges from **1–5 seconds** in half-second steps, and defaults to **2.5 seconds**. Adjusting it while a notification is visible starts a fresh countdown with the new duration. Navigating pages, changing theme, inspecting/Back, or simulated Reopen preserves the original deadline.
+Undo now expires automatically. The prototype-only **Undo duration** slider sits directly below the popup, ranges from **1–5 seconds** in half-second steps, and defaults to **2.5 seconds**. The slider is retained only for design history; production uses a fixed 2.5 seconds and exposes no duration control. Adjusting it while a notification is visible starts a fresh countdown with the new duration. Navigating pages, changing theme, inspecting/Back, or simulated Reopen preserves the original deadline.
 
 The notification always uses the same full-width lower slot, 30px above the popup bottom, on the table, Active page, smaller-count slides and inspection. It does not cover quota details or shift preferences. On detail pages it temporarily overlays the preference footer; covered controls cannot receive focus while it is visible.
 
 A 2px line along the notification's bottom edge shrinks linearly to indicate time remaining. Native animation uses transform only and resumes from the remaining fraction after a render. Reduced-motion users receive numeric time-left text instead of the moving line. Expiry removes the notification and its Undo action without rebuilding or shifting the underlying content. A second removal replaces the first notification with a new complete countdown. A later Usage reading can still rediscover the Account after Undo expires.
 
-Dialog is selected. The requested hidden table scrollbar and far-right vertical action menus are present in the prototype; large tables retain wheel, touch and keyboard scrolling. Awaiting review of these refinements and review of the timed lower Undo notification and the prototype duration slider. Selection here does not authorize automatic production integration: the user requested design finalization first.
+Dialog is selected. The requested hidden table scrollbar and far-right vertical action menus are present in the prototype; large tables retain wheel, touch and keyboard scrolling. These refinements and the timed lower Undo notification are approved. The user finalized 2.5 seconds after trying the prototype slider. Proceed with the complete production implementation when the user next requests ticket 04; no further design selection is needed.
 
 ## Verification
 
@@ -41,3 +41,5 @@ Dialog is selected. The requested hidden table scrollbar and far-right vertical 
 2026-10-24 timed Undo refinement: replaced indefinite feedback and page-dependent positioning with the shared lower slot and an expiring countdown. The user initially requested 3–5 seconds, then 2.5 seconds, then a prototype duration slider; 2.5 seconds is the slider default. Browser checks exercise real elapsed-time expiry separately from deterministic native-animation progress, because covered browser windows may suspend their animation clock.
 
 Timed-feedback evidence: [table page](undo-countdown-table.jpg) and [Active page](undo-countdown-active.jpg). Both notifications measured the same 228 × 32px box at identical coordinates. The expanded checks cover slider defaults/adjustment, fixed placement, preserved deadlines across page changes, native linear animation progress, real-time automatic expiry at 1 and 2.5 seconds, a replacement removal receiving a new countdown, and unchanged underlying row identity/geometry on expiry. All 152 checks pass with no prototype errors.
+
+2026-10-24 FINAL APPROVAL: Dialog plus all subsequent refinements are finalized. Production Undo is fixed at 2.5 seconds; the slider is not a production feature. Earlier comparison/review wording and alternative variants are design history. See the complete ticket for the single-pass implementation handoff.

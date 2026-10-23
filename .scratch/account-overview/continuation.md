@@ -14,16 +14,22 @@ The user explicitly authorized bringing every finalized prototype refinement int
 - For the first 15 minutes after the captured reset, table usage is green `~0%`, explicitly explained as an estimate. At exactly 15 minutes it becomes a dash. Actual Updated age and raw observations remain unchanged.
 - On table opening: recent resets first, newest reset first; then other non-Full Accounts by actual latest reading; then still-Full Accounts by soonest reset. Active remains page one. Ordinary slide ordering remains unchanged.
 - Open table membership, order and row identity remain frozen through readings, expiry and inspection. Values/Active update immediately. Notices explain that order/priority updates on reopening. Back restores search/scroll and keyboard access.
-- Detailed dormant views retain the existing three-hour `~0% estimated` duration, then No recent reading, plus Last reset / Last recorded / Updated facts.
+- Detailed dormant views retain the existing three-hour `~0% estimated` duration, then No recent reading, plus Last reset / Last recorded usage / Updated facts.
 - Estimates, time passing and browsing never write Usage readings or change Active/toolbar rules.
 
 The current prototype default used for production is the 15-minute table estimate/priority policy. Its optional three-hour table-estimate selector remains an exploration comparison, not production UI. The existing three-hour **detail** policy is independent.
 
-## Next work
+## Next work — design finalized, implement ticket 04 on request
 
-Ticket 03a is implemented. For [04: Forget/Undo](issues/04-forget-undo-and-account-rediscovery.md), the user explicitly requested design finalization first on 2026-10-24. The current [Forget-flow prototype](04-prototype/prototype.html) compares Anchored, Dedicated view and Dialog confirmation on the selected Compact layout. It includes sample removal, Cancel, Undo and rediscovery, but no ticket 04 production implementation. The user selected Dialog and requested a hidden table scrollbar plus vertical menus at the far right; those prototype refinements are complete. Review [design notes](04-prototype/README.md) and review timed Undo before proceeding: the notification now stays at the same lower coordinates on all pages, has a shrinking bottom line, and uses a prototype-only 1–5 second duration slider defaulting to 2.5 seconds. Page navigation preserves the deadline. [05: integrated verification/package](issues/05-verify-and-package-account-overview.md) follows implementation. Four-to-three becomes table-to-slides; three-to-two remains slides.
+The user finalized **all ticket 04 design on 2026-10-24**, chose **2.5 seconds** for Undo, and intends to resume in the morning. No production implementation is requested in this documentation-only handoff. When the user says **“Implement ticket 04”**, implement the entire [self-contained finalized ticket](issues/04-forget-undo-and-account-rediscovery.md) in one complete production pass. Do not restart design exploration, ask which variant/timing was chosen, request chat-history reconstruction, or deliver only one refinement and defer the rest. Testing, review and fixes belong inside that implementation pass.
 
-Tickets 01–03 were completed previously. The third-Account capture bug #08 was separately fixed and live-verified on 2026-10-23; current disposable popup fixtures are not new live capture evidence. Existing unrelated untracked files must not be staged wholesale.
+Final choices: **Dialog** confirmation; **vertical ⋮ menus at the far right after Reset**; **no visible table scrollbar**, with scrolling preserved; Undo notification **fixed to the same lower slot on all pages** (16px side insets, 30px from bottom, 228 × 32px); **2,500ms deadline** and **2px linear shrinking bottom line**, with reduced-motion time-left text. Navigation, theme, inspection and reopening preserve the original deadline. Expiry/dismiss ends Undo; a second removal starts its own complete window. The 1–5 second slider and other demo controls remain prototype-only and must not ship.
+
+The finalized ticket also captures persistence, race-safe Forget/Undo/label/reading/clear updates, Active guards, original reading restoration, newer-reading protection, rediscovery, count transitions, focus/Cancel behavior, and every earlier Compact/reset/layout requirement, including **Last recorded usage**. Use [the selected Dialog prototype](04-prototype/prototype.html?v=3), frozen at `20a08bb`, plus its [152 passing prototype checks and screenshots](04-prototype/README.md) as design evidence. Production is still at the completed 03a/label work; 04's acceptance boxes remain unchecked.
+
+Next sequence: implement **04** fully with production tests/review/evidence and a scoped commit; **05** then handles final integrated release verification/packaging. Four-to-three becomes table-to-slides; three-to-two remains slides. Do not package or publish as part of 04.
+
+Tickets 01–03a were completed previously. The third-Account capture bug #08 was separately fixed and live-verified on 2026-10-23; disposable popup fixtures are not new live capture evidence. Preserve existing unrelated untracked files and do not stage them wholesale.
 
 ## Reproduce
 
