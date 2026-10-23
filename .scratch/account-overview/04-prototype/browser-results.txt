@@ -1,5 +1,7 @@
 PASS 1 dark: four Accounts have three table rows in fixed bounds
-PASS all three rows fit without horizontal overflow
+PASS all three rows fit without horizontal overflow (width 228/228, height 173/173)
+PASS table hides its scrollbar while retaining scrolling
+PASS vertical three-dot menu follows Reset at the far right of each row
 PASS Active Account has no Forget action
 PASS confirmation names the Account, explains rediscovery and focuses Cancel
 PASS confirmation stays in fixed popup bounds
@@ -18,7 +20,9 @@ PASS large list supports internal scrolling
 PASS Cancel preserves exact filtered order and scroll position
 PASS long international names wrap or scroll inside confirmation without widening popup
 PASS 1 light: four Accounts have three table rows in fixed bounds
-PASS all three rows fit without horizontal overflow
+PASS all three rows fit without horizontal overflow (width 228/228, height 173/173)
+PASS table hides its scrollbar while retaining scrolling
+PASS vertical three-dot menu follows Reset at the far right of each row
 PASS Active Account has no Forget action
 PASS confirmation names the Account, explains rediscovery and focuses Cancel
 PASS confirmation stays in fixed popup bounds
@@ -37,7 +41,9 @@ PASS large list supports internal scrolling
 PASS Cancel preserves exact filtered order and scroll position
 PASS long international names wrap or scroll inside confirmation without widening popup
 PASS 2 dark: four Accounts have three table rows in fixed bounds
-PASS all three rows fit without horizontal overflow
+PASS all three rows fit without horizontal overflow (width 228/228, height 173/173)
+PASS table hides its scrollbar while retaining scrolling
+PASS vertical three-dot menu follows Reset at the far right of each row
 PASS Active Account has no Forget action
 PASS confirmation names the Account, explains rediscovery and focuses Cancel
 PASS confirmation stays in fixed popup bounds
@@ -56,7 +62,9 @@ PASS large list supports internal scrolling
 PASS Cancel preserves exact filtered order and scroll position
 PASS long international names wrap or scroll inside confirmation without widening popup
 PASS 2 light: four Accounts have three table rows in fixed bounds
-PASS all three rows fit without horizontal overflow
+PASS all three rows fit without horizontal overflow (width 228/228, height 173/173)
+PASS table hides its scrollbar while retaining scrolling
+PASS vertical three-dot menu follows Reset at the far right of each row
 PASS Active Account has no Forget action
 PASS confirmation names the Account, explains rediscovery and focuses Cancel
 PASS confirmation stays in fixed popup bounds
@@ -75,7 +83,9 @@ PASS large list supports internal scrolling
 PASS Cancel preserves exact filtered order and scroll position
 PASS long international names wrap or scroll inside confirmation without widening popup
 PASS 3 dark: four Accounts have three table rows in fixed bounds
-PASS all three rows fit without horizontal overflow
+PASS all three rows fit without horizontal overflow (width 228/228, height 173/173)
+PASS table hides its scrollbar while retaining scrolling
+PASS vertical three-dot menu follows Reset at the far right of each row
 PASS Active Account has no Forget action
 PASS confirmation names the Account, explains rediscovery and focuses Cancel
 PASS confirmation stays in fixed popup bounds
@@ -94,7 +104,9 @@ PASS large list supports internal scrolling
 PASS Cancel preserves exact filtered order and scroll position
 PASS long international names wrap or scroll inside confirmation without widening popup
 PASS 3 light: four Accounts have three table rows in fixed bounds
-PASS all three rows fit without horizontal overflow
+PASS all three rows fit without horizontal overflow (width 228/228, height 173/173)
+PASS table hides its scrollbar while retaining scrolling
+PASS vertical three-dot menu follows Reset at the far right of each row
 PASS Active Account has no Forget action
 PASS confirmation names the Account, explains rediscovery and focuses Cancel
 PASS confirmation stays in fixed popup bounds

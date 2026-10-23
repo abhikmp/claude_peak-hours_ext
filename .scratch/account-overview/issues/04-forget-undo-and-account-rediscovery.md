@@ -6,7 +6,7 @@
 
 **Status:** ready-for-human
 
-**Next action:** Review [the current Compact Forget-flow prototype](../04-prototype/prototype.html) and [its design notes](../04-prototype/README.md). Choose Anchored, Dedicated view or Dialog confirmation, and finalize Undo placement/lifetime before production implementation. The user's 2026-10-24 instruction to prototype/finalize design first supersedes the earlier request to start implementing this ticket. No ticket 04 production changes have been made.
+**Next action:** Review [the current Compact Forget-flow prototype](../04-prototype/prototype.html) and [its design notes](../04-prototype/README.md). Dialog is selected. Review the hidden table scrollbar and far-right vertical menu refinements, then finalize Undo placement/lifetime before production implementation. The user's 2026-10-24 instruction to prototype/finalize design first supersedes the earlier request to start implementing this ticket. No ticket 04 production changes have been made.
 
 ## Context
 
@@ -39,3 +39,5 @@ Prefer existing Account/storage/capture seams and meaningful user flows over imp
 2026-10-22: Created from the finalized Account overview design. Not implemented.
 
 2026-10-24: Built an isolated three-direction confirmation picker on the current Compact design, with sample removal, Cancel, Undo, rediscovery, count transitions, keyboard handling, both themes and long-name cases. Awaiting design selection; production acceptance criteria above remain unchecked.
+
+2026-10-24 design review: User selected Dialog, requested removal of the visible table scrollbar and movement of row menus to the far right as vertical dots. Updated the prototype accordingly; scrolling remains available. Dialog is now the default. No production changes; awaiting review of these refinements and Undo behavior.

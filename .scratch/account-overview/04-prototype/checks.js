@@ -27,7 +27,14 @@ document.getElementById('run').onclick = async () => {
         if (theme === 'light') click('.theme');
         check(fixed() && doc.querySelectorAll('tbody tr').length === 3, `${variant} ${theme}: four Accounts have three table rows in fixed bounds`);
         const scroller = doc.querySelector('.table-scroll');
-        check(scroller.scrollWidth === scroller.clientWidth && scroller.scrollHeight === scroller.clientHeight, 'all three rows fit without horizontal overflow');
+        check(scroller.scrollWidth === scroller.clientWidth && scroller.scrollHeight === scroller.clientHeight, `all three rows fit without horizontal overflow (width ${scroller.scrollWidth}/${scroller.clientWidth}, height ${scroller.scrollHeight}/${scroller.clientHeight})`);
+        check(win.getComputedStyle(scroller).scrollbarWidth === 'none' && win.getComputedStyle(scroller).overflowY === 'auto', 'table hides its scrollbar while retaining scrolling');
+        const menu = doc.querySelector('tbody tr .more'), resetCell = doc.querySelector('tbody tr .reset-cell');
+        const circles = [...menu.querySelectorAll('circle')];
+        check(menu.closest('td') === doc.querySelector('tbody tr').lastElementChild
+          && menu.getBoundingClientRect().left >= resetCell.getBoundingClientRect().right
+          && circles.length === 3 && circles.every(circle => circle.getAttribute('cx') === '8')
+          && circles.map(circle => circle.getAttribute('cy')).join() === '3,8,13', 'vertical three-dot menu follows Reset at the far right of each row');
         click('[data-action="previous"]');
         check(!doc.querySelector('.more'), 'Active Account has no Forget action');
         click('[data-action="next"]');
