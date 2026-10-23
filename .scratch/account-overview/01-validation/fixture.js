@@ -32,6 +32,16 @@
     });
   }
   if (params.get('activeFull') && seed.local.accounts[other]) seed.local.accounts[other].percent = 100;
+  if (params.has('count')) {
+    seed.local.accounts = Object.fromEntries(Array.from({ length: Number(params.get('count')) }, (_, index) => [
+      `account-${index}`, {
+        label: index === 0 ? 'Active workspace' : `Workspace ${String(index).padStart(2, '0')}`,
+        percent: index === 0 ? 24 : index % 5 === 0 ? 100 : index % 100,
+        resetsAt: (base + (index > 0 && index % 5 === 0 ? index : 120) * 60000) / 1000,
+        lastReadingAt: base - index * 60000, readingOrder: 100 - index
+      }
+    ]));
+  }
   const state = JSON.parse(localStorage.getItem(key) || 'null') || seed;
   const save = () => localStorage.setItem(key, JSON.stringify(state));
   const NativeDate = Date;

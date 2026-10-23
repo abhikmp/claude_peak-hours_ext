@@ -158,8 +158,8 @@ document.getElementById('run').onclick = async () => {
       await win.chrome.storage.local.set({ accounts: win.Accounts.applyReading(win.ticket01.state.local.accounts,
         { accountId: '33333333-3333-4333-8333-333333333333', label: 'Third workspace', percent: 30, resetsAt: win.Date.now() / 1000 + 3600 }, win.Date.now() + 1) });
       await settle();
-      check(doc.querySelectorAll('.account-page').length === 3 && doc.body.scrollHeight === 340,
-        'existing larger-Account paging remains usable until ticket 03 adds its table');
+      check(doc.querySelector('.account-track').children.length === 2 && !!doc.querySelector('table') && doc.body.scrollHeight === 340,
+        'three Accounts use two main pages with the ticket 03 table');
       check(currentPage(doc).querySelector('.account-name').textContent === 'Third workspace', 'incoming reading still returns the popup to the new Active Account');
     }
     results.textContent += '\nAll ticket 02 checks passed. Disposable fixtures, not live extension storage.\n';

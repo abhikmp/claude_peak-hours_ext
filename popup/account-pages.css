@@ -138,3 +138,59 @@
 @media (prefers-reduced-motion: reduce) {
   .account-track { transition: none; }
 }
+
+/* Secondary comparison uses the full 228px inner width: name + 39px + 62px. */
+.account-secondary .account-hero { position: static; padding-right: 0; }
+.account-secondary > .pill-row { min-height: 42px; padding-right: 28px; flex: none; }
+.account-secondary .account-nav { right: 6px; top: 34px; }
+.account-secondary .account-nav #account-next { visibility: hidden; }
+.account-table-view { padding-bottom: 6px; }
+.account-comparison, .account-list, .account-inspection {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+.account-comparison { flex: 0 0 100%; height: 100%; }
+.account-list, .account-inspection { flex: 1; }
+.account-search { position: relative; display: block; flex: none; margin-bottom: 5px; }
+.account-search svg { position: absolute; left: 8px; top: 8px; color: var(--text-secondary); }
+.account-search input {
+  display: block;
+  width: 100%;
+  height: 30px;
+  padding: 0 8px 0 28px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 11px;
+}
+.account-search input::placeholder { color: var(--text-secondary); }
+.account-table-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--border) transparent; scrollbar-gutter: stable; }
+.account-table-scroll table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 11px; }
+.account-used-column { width: 39px; }
+.account-reset-column { width: 62px; }
+.account-table-scroll th { position: sticky; top: 0; z-index: 1; background: var(--bg); padding: 5px 0 7px; font-size: 10px; font-weight: 400; color: var(--text-secondary); text-align: left; }
+.account-table-scroll td { height: 47px; padding: 5px 0; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+.account-table-scroll th:not(:first-child), .account-table-scroll td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+.account-table-scroll td:first-child { padding-right: 6px; }
+.account-table-scroll tr[data-account-id] { cursor: pointer; }
+.account-row-name { display: block; width: 100%; padding: 0; border: 0; background: none; color: var(--text-primary); font: inherit; font-weight: 500; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.account-row-age { display: block; margin-top: 2px; font-size: 10px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.account-row-used[data-tone="green"] { color: var(--green-pct); }
+.account-row-used[data-tone="orange"] { color: var(--orange-pct); }
+.account-row-used[data-tone="red"] { color: var(--red-pct); }
+.account-row-used[data-tone="unknown"], .account-row-reset { color: var(--text-secondary); }
+.account-table-foot { flex: none; padding-top: 14px; font-size: 10px; color: var(--text-secondary); }
+.account-search-empty { padding: 18px 2px; text-align: center; font-size: 11px; color: var(--text-secondary); }
+.account-refresh-notice { flex: none; padding: 0 0 6px; font-size: 10px; line-height: 1.4; color: var(--text-secondary); }
+.account-back { flex: none; align-self: flex-start; min-height: 24px; margin-bottom: 7px; padding: 0; border: 0; background: none; color: var(--text-secondary); font: inherit; font-size: 11px; cursor: pointer; }
+.account-detail { flex: 1; min-height: 0; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.account-detail .account-page { padding-right: 32px; overflow: visible; }
+.account-row-name:focus-visible, .account-search input:focus-visible, .account-back:focus-visible, .account-table-scroll:focus-visible { outline: 2px solid var(--text-secondary); outline-offset: -2px; }
+@media (hover: hover) and (pointer: fine) {
+  .account-table-scroll tr[data-account-id]:hover { background: var(--surface-1); }
+  .account-row-name:hover, .account-back:hover { text-decoration: underline; text-underline-offset: 3px; }
+}
