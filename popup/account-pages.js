@@ -45,7 +45,9 @@ const AccountPages = (() => {
         <span class="account-percent"></span><span class="account-quota">5h quota</span>
       </div>
       <div class="account-bar"><div class="account-fill"></div></div>
-      <div class="account-reset"></div>`;
+      <div class="account-reset"></div>
+      <div class="account-updated"></div>
+      <div class="account-observation" hidden></div>`;
     const name = page.querySelector('.account-name');
     const label = displayLabel(account.label);
     name.textContent = label;
@@ -53,14 +55,17 @@ const AccountPages = (() => {
     page.querySelector('.active').hidden = !account.isActive;
     page.querySelector('.full').hidden = !account.isFull;
     const percent = Math.round(account.percent);
-    const tone = percent <= 60 ? 'green' : percent <= 85 ? 'orange' : 'red';
+    const tone = account.isExpired ? 'unknown' : percent <= 60 ? 'green' : percent <= 85 ? 'orange' : 'red';
     page.dataset.tone = tone;
-    page.querySelector('.account-percent').textContent = account.isExpired ? '0%' : `${percent}%\u00a0used`;
+    page.querySelector('.account-percent').textContent = account.isExpired ? '— unknown' : `${percent}%\u00a0used`;
+    page.querySelector('.account-bar').hidden = account.isExpired;
     page.querySelector('.account-fill').style.width = `${percent}%`;
     const reset = page.querySelector('.account-reset');
     if (account.isExpired) {
-      reset.textContent = '✦ Full quota available — your limit has reset';
-      reset.classList.add('fresh');
+      reset.textContent = 'Window ended';
+      const observation = page.querySelector('.account-observation');
+      observation.hidden = false;
+      observation.textContent = observedUsageText(account);
     } else if (account.resetsAt) {
       const msLeft = account.resetsAt * 1000 - Date.now();
       const clockTime = toLocalTimeStr(new Date(account.resetsAt * 1000).toISOString(), tz);
@@ -68,12 +73,7 @@ const AccountPages = (() => {
         ? `Resets in ${formatDuration(msLeft)} · ${clockTime}`
         : 'Resetting soon…';
     }
-    if (!account.isActive && account.isStale) {
-      const updated = document.createElement('div');
-      updated.className = 'account-updated';
-      updated.textContent = `Updated ${formatDuration(Math.floor(account.ageMs / 60000) * 60000)} ago`;
-      name.after(updated);
-    }
+    page.querySelector('.account-updated').textContent = formatReadingAge(account.ageMs);
     return page;
   }
 

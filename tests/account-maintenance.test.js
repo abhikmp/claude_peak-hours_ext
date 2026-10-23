@@ -67,28 +67,30 @@ function startWorker(accounts) {
   };
 }
 
-test('the 30-second alarm drops Accounts just over 48 hours and keeps those just under', async () => {
-  let accounts = Accounts.applyReading({}, { accountId: OLD, percent: 100, resetsAt: NOW / 1000 + 3600 }, NOW - TWO_DAYS - 1);
+test('the 30-second alarm retains Accounts and their labels beyond 48 hours without rewriting readings', async () => {
+  let accounts = Accounts.applyReading({}, { accountId: OLD, label: 'Saved workspace', percent: 100, resetsAt: NOW / 1000 + 3600 }, NOW - 365 * 86400000);
   accounts = Accounts.applyReading(accounts, { accountId: KEPT, percent: 90, resetsAt: NOW / 1000 + 3600 }, NOW - TWO_DAYS + 1);
   const worker = startWorker(accounts);
   await worker.tick();
-  assert.deepEqual(worker.accounts().map(account => account.accountId), [KEPT]);
+  assert.deepEqual(worker.accounts().map(account => account.accountId), [KEPT, OLD]);
+  assert.deepEqual(worker.local().accounts, accounts);
+  assert.equal(worker.writes(), 0);
   assert.deepEqual(worker.iconColor(), [239, 68, 68, 255]);
   assert.equal(worker.local().state, 'orange');
   assert.equal(worker.local().incidentTitle, 'Existing incident');
 });
 
-test('dropping the last Account restores the green icon and does not keep rewriting storage', async () => {
+test('a lone Account remains remembered beyond 48 hours and keeps driving the icon', async () => {
   const accounts = Accounts.applyReading({}, {
     accountId: OLD, percent: 100, resetsAt: NOW / 1000 + 3600
   }, NOW - TWO_DAYS - 1);
   const worker = startWorker(accounts);
   await worker.tick();
-  assert.deepEqual(worker.accounts(), []);
-  assert.deepEqual(worker.iconColor(), [34, 197, 94, 255]);
-  assert.equal(worker.writes(), 1);
+  assert.equal(worker.accounts()[0].accountId, OLD);
+  assert.deepEqual(worker.iconColor(), [239, 68, 68, 255]);
+  assert.equal(worker.writes(), 0);
   await worker.tick();
-  assert.equal(worker.writes(), 1);
+  assert.equal(worker.writes(), 0);
 });
 
 test('an expired Active reading turns the icon green without deleting its stored reading', async () => {
@@ -98,7 +100,8 @@ test('an expired Active reading turns the icon green without deleting its stored
   const worker = startWorker(accounts);
   await worker.tick();
   assert.deepEqual(worker.iconColor(), [34, 197, 94, 255]);
-  assert.equal(worker.accounts()[0].percent, 0);
+  assert.equal(worker.accounts()[0].percent, null);
+  assert.equal(worker.accounts()[0].lastObservedPercent, 100);
   assert.equal(worker.accounts()[0].isFull, false);
   assert.equal(worker.local().accounts[KEPT].percent, 100);
   assert.equal(worker.writes(), 0);

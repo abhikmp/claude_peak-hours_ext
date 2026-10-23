@@ -203,9 +203,11 @@ body {
   text-align: center;
 }
 
-.usage-sub.fresh {
-  color: var(--green-pct);
-  font-style: italic;
+.usage-pct.unknown { font-size: 20px; color: var(--text-secondary); }
+.usage-updated, .usage-observation {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-secondary);
 }
 
 /* ══════════════════════════════════════════

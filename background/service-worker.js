@@ -209,7 +209,7 @@ function getNextPeakISO() {
 }
 
 // ── Icon: color driven by usage %, not peak/outage state ──
-// Usage thresholds: null→green (assume full quota), 0–60→green, 61–85→orange, 86–100→red
+// Usage thresholds: missing/expired→green, 0–60→green, 61–85→orange, 86–100→red
 const USAGE_COLORS = {
   green:  '#22c55e',
   orange: '#f97316',
@@ -219,11 +219,7 @@ const USAGE_COLORS = {
 async function updateIcon() {
   const { accounts = {} } = await chrome.storage.local.get('accounts');
   const now = Date.now();
-  const retained = Accounts.pruneAccounts(accounts, now);
-  if (Object.keys(retained).length !== Object.keys(accounts).length) {
-    await chrome.storage.local.set({ accounts: retained });
-  }
-  const colorKey = Accounts.getIconColor(retained, now);
+  const colorKey = Accounts.getIconColor(accounts, now);
   const color = USAGE_COLORS[colorKey];
   const sizes = [16, 32, 48, 128];
   const imageData = {};

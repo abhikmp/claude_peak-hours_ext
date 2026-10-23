@@ -31,6 +31,10 @@
   --account-color: var(--red, #ef4444);
   --account-percent-color: var(--red-pct, #991b1b);
 }
+.account-page[data-tone="unknown"] {
+  --account-percent-color: var(--text-secondary, #6b7280);
+}
+.account-page[data-tone="unknown"] .account-percent { font-size: 20px; }
 .account-heading {
   display: flex;
   align-items: center;
@@ -90,13 +94,10 @@
 }
 .account-fill { height: 100%; border-radius: inherit; background: var(--account-color); }
 .account-reset { font-size: 11px; line-height: 1.4; color: var(--text-muted, #6b7280); }
-.account-reset.fresh { color: var(--green-pct, #166534); font-style: italic; }
-.account-updated {
-  flex-shrink: 0;
-  white-space: nowrap;
-  font-size: 9px;
+.account-updated, .account-observation {
+  font-size: 11px;
   line-height: 1.4;
-  color: var(--text-muted, #6b7280);
+  color: var(--text-secondary, #6b7280);
 }
 .account-nav { position: absolute; right: 0; top: 34px; display: flex; flex-direction: column; gap: 2px; }
 .account-nav button {

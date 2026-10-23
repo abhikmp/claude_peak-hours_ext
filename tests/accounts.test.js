@@ -24,7 +24,7 @@ test('the same module works as a classic script without CommonJS, browser APIs, 
   ), PERSONAL);
   assert.equal(classic.getAccounts(accounts, NOW)[0].accountId, PERSONAL);
   assert.equal(classic.getIconColor(accounts, NOW), 'red');
-  assert.equal(classic.getAccounts(classic.pruneAccounts(accounts, NOW + 172800001), NOW).length, 0);
+  assert.equal(classic.getAccounts(accounts, NOW + 172800001).length, 1);
 });
 
 test('extracts the Account identity only from a completion URL', () => {
@@ -90,10 +90,10 @@ test('clearing forgets all Accounts without changing the previous state', () => 
   assert.equal(Accounts.getAccounts(accounts, NOW).length, 1);
 });
 
-test('pruning keeps readings through 48 hours and drops them just after without mutation', () => {
+test('remembered Accounts keep their labels and observations beyond 48 hours until cleared', () => {
   const boundary = NOW + 172800000;
   let accounts = Accounts.applyReading({}, {
-    accountId: PERSONAL, percent: 20, resetsAt: RESET
+    accountId: PERSONAL, label: 'Personal', percent: 20, resetsAt: RESET
   }, NOW - 1);
   accounts = Accounts.applyReading(accounts, {
     accountId: WORK, percent: 30, resetsAt: RESET
@@ -102,11 +102,15 @@ test('pruning keeps readings through 48 hours and drops them just after without 
     accountId: TEAM, percent: 40, resetsAt: RESET
   }, NOW + 1);
 
-  const pruned = Accounts.pruneAccounts(accounts, boundary);
-  assert.deepEqual(Accounts.getAccounts(pruned, boundary).map(account => account.accountId),
-    [TEAM, WORK]);
-  assert.equal(Accounts.getAccounts(accounts, boundary).length, 3);
-  assert.deepEqual(Accounts.getAccounts(Accounts.pruneAccounts(accounts, boundary + 2), boundary + 2), []);
+  for (const now of [boundary - 2, boundary, boundary + 2, NOW + 365 * 86400000]) {
+    const remembered = Accounts.getAccounts(accounts, now);
+    assert.deepEqual(remembered.map(account => account.accountId), [TEAM, WORK, PERSONAL]);
+    assert.equal(remembered[2].label, 'Personal');
+    assert.equal(remembered[2].lastObservedPercent, 20);
+    assert.equal(remembered[0].isActive, true);
+  }
+  assert.equal(accounts[PERSONAL].percent, 20);
+  assert.deepEqual(Accounts.getAccounts(Accounts.clearAccounts(), boundary), []);
 });
 
 test('every Account exposes its reading age and becomes stale at exactly 10 minutes', () => {
@@ -129,7 +133,7 @@ test('every Account exposes its reading age and becomes stale at exactly 10 minu
     [false, true]);
 });
 
-test('an Expired reading displays 0%, loses Full, and re-enters the normal order at reset time', () => {
+test('an Expired reading has unknown current usage, preserves its observation, and re-enters the normal order', () => {
   let accounts = Accounts.applyReading({}, {
     accountId: PERSONAL, percent: 20, resetsAt: RESET
   }, NOW);
@@ -144,7 +148,8 @@ test('an Expired reading displays 0%, loses Full, and re-enters the normal order
 
   const expired = Accounts.getAccounts(accounts, NOW + 60000);
   assert.deepEqual(expired.map(account => account.accountId), [TEAM, WORK, PERSONAL]);
-  assert.equal(expired[1].percent, 0);
+  assert.equal(expired[1].percent, null);
+  assert.equal(expired[1].lastObservedPercent, 100);
   assert.equal(expired[1].isExpired, true);
   assert.equal(expired[1].isFull, false);
   assert.equal(expired[0].isActive, true);
@@ -211,7 +216,7 @@ test('a first Usage reading creates an Account and a later one updates it withou
   }, NOW + 1000);
 
   assert.deepEqual(Accounts.getAccounts(updated, NOW + 2000), [{
-    accountId: PERSONAL, label: 'Personal', percent: 45,
+    accountId: PERSONAL, label: 'Personal', percent: 45, lastObservedPercent: 45,
     resetsAt: RESET + 60, lastReadingAt: NOW + 1000, isActive: true,
     isExpired: false, isFull: false, ageMs: 1000, isStale: false
   }]);

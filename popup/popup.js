@@ -104,19 +104,36 @@ function pickTickerText(local, watched) {
   return best && best.length > 120 ? best.slice(0, 117) + '…' : (best || null);
 }
 
+function formatReadingAge(ageMs) {
+  return ageMs < 60000 ? 'Updated just now'
+    : `Updated ${formatDuration(Math.floor(ageMs / 60000) * 60000)} ago`;
+}
+
+function observedUsageText(account) {
+  return `Last observed: ${Math.round(account.lastObservedPercent)}%. Send a message from this Account for a new reading.`;
+}
+
 // ── Render usage hero ──
-function renderUsageHero(percent, resetsAt, tz, expired) {
+function renderUsageHero(account, tz) {
+  const { percent, resetsAt, isExpired } = account ?? {};
   const pctEl = document.getElementById('usage-pct');
   const fill  = document.getElementById('bar-fill');
   const sub   = document.getElementById('usage-sub');
+  const updated = document.getElementById('usage-updated');
+  const observation = document.getElementById('usage-observation');
+  document.querySelector('.bar-wrap').hidden = !!isExpired;
+  updated.hidden = !account;
+  updated.textContent = account ? formatReadingAge(account.ageMs) : '';
+  observation.hidden = !isExpired;
+  observation.textContent = isExpired ? observedUsageText(account) : '';
 
-  if (expired) {
-    pctEl.textContent = '0%';
-    pctEl.className = 'usage-pct green';
+  if (isExpired) {
+    pctEl.textContent = '— unknown';
+    pctEl.className = 'usage-pct unknown';
     fill.style.width = '0%';
     fill.className = 'bar-fill';
-    sub.textContent = '✦ Full quota available — your limit has reset';
-    sub.className = 'usage-sub fresh';
+    sub.textContent = 'Window ended';
+    sub.className = 'usage-sub';
     return;
   }
 
@@ -232,7 +249,7 @@ async function render() {
   document.querySelector('.usage-hero').style.display = paged ? 'none' : '';
   if (!paged) {
     const active = orderedAccounts[0];
-    renderUsageHero(active?.percent ?? null, active?.resetsAt ?? null, tz, active?.isExpired ?? false);
+    renderUsageHero(active, tz);
   }
 
   // ── Status pill ──
@@ -403,12 +420,6 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'local' && changes.accounts) render();
 });
 async function initAccounts() {
-  const { accounts = {} } = await chrome.storage.local.get('accounts');
-  const retained = Accounts.pruneAccounts(accounts, Date.now());
-  if (Object.keys(retained).length !== Object.keys(accounts).length) {
-    await chrome.storage.local.set({ accounts: retained });
-    chrome.runtime.sendMessage({ type: 'USAGE_UPDATE' }).catch(() => {});
-  }
   await render();
   await initProductFilter();
   // Age and expiry also change while an otherwise idle popup stays open.

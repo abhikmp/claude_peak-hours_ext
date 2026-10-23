@@ -2,15 +2,15 @@
 // Callers pass a map (initially {}) and valid Usage readings: accountId (UUID),
 // percent (0–100), resetsAt (Unix seconds or null), and optionally label.
 // All now arguments and lastReadingAt values are milliseconds. No function
-// mutates its input or reads a clock. Persist the returned map after applying,
-// pruning, or clearing; getAccounts returns display values, not stored readings.
-// Its first result is Active. Pruning is explicit so callers control persistence.
+// mutates its input or reads a clock. Persist the returned map after applying
+// or clearing; Accounts are retained until explicitly removed. getAccounts returns
+// display values: percent is null after expiry; lastObservedPercent keeps the reading.
+// Its first result is Active.
 // applyLabel updates only a known Account's name. Null stored labels are unresolved;
 // getAccounts supplies their fallback while the bridge can retry a later reading.
 (function () {
   const Accounts = (() => {
     const STALE_AFTER_MS = 10 * 60 * 1000;
-    const DROP_AFTER_MS = 48 * 60 * 60 * 1000;
 
     function extractAccountId(url, organizationId) {
       if (typeof url !== 'string') return null;
@@ -57,7 +57,8 @@
             accountId,
             // Null remains the retry marker in storage; callers always get a label.
             label: account.label ?? `Account ${accountId.slice(0, 6)}…`,
-            percent: isExpired ? 0 : account.percent,
+            percent: isExpired ? null : account.percent,
+            lastObservedPercent: account.percent,
             resetsAt: account.resetsAt,
             lastReadingAt: account.lastReadingAt,
             isActive: index === 0,
@@ -81,22 +82,17 @@
       return { ...accounts, [accountId]: { ...accounts[accountId], label } };
     }
 
-    function pruneAccounts(accounts, now) {
-      return Object.fromEntries(Object.entries(accounts)
-        .filter(([, account]) => now - account.lastReadingAt <= DROP_AFTER_MS));
-    }
-
     function clearAccounts() {
       return {};
     }
 
     function getIconColor(accounts, now) {
       const active = getAccounts(accounts, now)[0];
-      if (!active || active.percent <= 60) return 'green';
+      if (!active || active.isExpired || active.percent <= 60) return 'green';
       return active.percent <= 85 ? 'orange' : 'red';
     }
 
-    return { extractAccountId, applyReading, applyLabel, getAccounts, pruneAccounts, clearAccounts, getIconColor };
+    return { extractAccountId, applyReading, applyLabel, getAccounts, clearAccounts, getIconColor };
   })();
 
   if (typeof module !== 'undefined' && module.exports) {
