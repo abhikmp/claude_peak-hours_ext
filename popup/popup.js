@@ -135,7 +135,7 @@ function renderUsageFacts(element, account, tz) {
   element.replaceChildren();
   if (element.hidden) return;
   element.innerHTML = `
-    <dt title="Reset time from the last captured reading">Reset</dt><dd><time></time></dd>
+    <dt title="Reset time from the last captured reading">Last reset</dt><dd><time></time></dd>
     <dt>Last recorded</dt><dd class="usage-last-recorded"></dd>
     <dt>Updated</dt><dd class="usage-reading-age"></dd>`;
   const reset = new Date(account.resetsAt * 1000);

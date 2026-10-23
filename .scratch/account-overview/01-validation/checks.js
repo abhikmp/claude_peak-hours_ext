@@ -42,7 +42,7 @@ document.getElementById('run').onclick = async () => {
         check(value().title.includes('Last observed: 100%') && value().title.includes('Send a message'), 'hover text preserves the observation and refresh guidance');
         check(!text().includes('Last observed') && !text().includes('Send a message') && !text().includes('5h quota') && !text().includes('Window ended'), 'dormant detail avoids paragraphs and redundant quota labels');
         const facts = () => page().querySelector('.usage-facts');
-        check([...facts().querySelectorAll('dt')].map(node => node.textContent).join('|') === 'Reset|Last recorded|Updated', 'dormant detail has three labeled fact rows');
+        check([...facts().querySelectorAll('dt')].map(node => node.textContent).join('|') === 'Last reset|Last recorded|Updated', 'dormant detail has three labeled fact rows');
         check([...facts().querySelectorAll('dd')].map(node => node.textContent).join('|') === '23 Oct, 4:30 pm|100%|1h 20m ago', 'fact rows show observed reset in selected timezone, last recorded percent and age');
         check(facts().querySelector('time').dateTime === '2026-10-23T11:00:00.000Z', 'reset timestamp comes from the actual last captured reading');
         await win.chrome.storage.sync.set({ userTZ: 'UTC' });
