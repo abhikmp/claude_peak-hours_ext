@@ -52,11 +52,11 @@ document.getElementById('run').onclick = async () => {
         check(!text().includes('Last observed') && !text().includes('Send a message') && !text().includes('5h quota') && !text().includes('Window ended'), 'dormant detail avoids paragraphs and redundant quota labels');
         const facts = () => page().querySelector('.usage-facts');
         check([...facts().querySelectorAll('dt')].map(node => node.textContent).join('|') === 'Last reset|Last recorded|Updated', 'dormant detail has three labeled fact rows');
-        check([...facts().querySelectorAll('dd')].map(node => node.textContent).join('|') === '23 Oct, 4:30 pm|100%|1h 20m ago', 'fact rows show observed reset in selected timezone, last recorded percent and age');
+        check([...facts().querySelectorAll('dd')].map(node => node.textContent).join('|') === 'just now|100%|1h 20m ago', 'fact rows show relative reset time, last recorded percent and reading age');
         check(facts().querySelector('time').dateTime === '2026-10-23T11:00:00.000Z', 'reset timestamp comes from the actual last captured reading');
         await win.chrome.storage.sync.set({ userTZ: 'UTC' });
         await win.ticket01.advance(0);
-        check(facts().querySelector('time').textContent === '23 Oct, 11:00 am', 'reset display follows the selected timezone');
+        check(facts().querySelector('time').textContent === 'just now' && facts().querySelector('time').title.includes('11:00') && facts().querySelector('time').title.includes('2026') && facts().querySelector('time').title.includes('(UTC)'), 'relative reset is timezone-independent and full timestamp hover follows selected timezone');
         await win.chrome.storage.sync.set({ userTZ: 'Asia/Calcutta' });
         await win.ticket01.advance(0);
         check(value().getAttribute('aria-description') === value().title && value().tabIndex === 0, 'dormant context is available to assistive technology and keyboard focus');
@@ -66,6 +66,7 @@ document.getElementById('run').onclick = async () => {
         check(value().innerText === '~0% estimated', 'estimate remains until just before three hours after reset');
         await win.ticket01.advance(1);
         check(value().innerText === 'No recent reading', 'estimate ends at exactly three hours after reset');
+        check(facts().querySelector('time').textContent === '3h ago', 'relative reset age refreshes while popup stays open');
         check(win.getComputedStyle(value()).color === themeColor('--text-secondary'), 'older dormant reading returns to neutral text');
         check(!facts().hidden && facts().querySelector('.usage-last-recorded').textContent === '100%' && facts().querySelector('.usage-reading-age').textContent === '4h 20m ago', 'fact rows remain visible and age refreshes after the estimate ends');
         check(JSON.stringify(win.ticket01.state.local.accounts) === stored, 'estimated display never overwrites a saved Usage reading');
@@ -75,6 +76,11 @@ document.getElementById('run').onclick = async () => {
         check(activeValue.innerText.includes('28%') && !activeValue.hasAttribute('title') && !activeValue.hasAttribute('aria-description') && !activeValue.hasAttribute('tabindex'), 'new reading clears the expired presentation and stale hover context');
         check(doc.querySelector('.account-page .usage-facts').hidden, 'fresh readings hide the dormant fact block');
       }
+    }
+
+    for (const [resetAgoMinutes, expected] of [[0.5, 'just now'], [1, '1m ago'], [59, '59m ago'], [60, '1h ago'], [1439, '23h ago'], [1440, '1d ago'], [2880, '2d ago']]) {
+      win = await open('reset-age-' + resetAgoMinutes, { expired: '1', resetAgoMinutes });
+      check(win.document.querySelector('.usage-facts time').textContent === expected, `last reset at ${resetAgoMinutes} minutes displays ${expected}`);
     }
 
     win = await open('active-expiry', { multi: '1', expired: '1' });

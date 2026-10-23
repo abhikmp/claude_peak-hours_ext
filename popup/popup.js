@@ -142,9 +142,11 @@ function renderUsageFacts(element, account, tz) {
   const reset = new Date(account.resetsAt * 1000);
   const time = element.querySelector('time');
   time.dateTime = reset.toISOString();
-  time.textContent = new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true, timeZone: tz
-  }).format(reset);
+  const minutesSinceReset = Math.max(0, Math.floor((Date.now() - reset.getTime()) / 60000));
+  time.textContent = minutesSinceReset < 1 ? 'just now'
+    : minutesSinceReset < 60 ? `${minutesSinceReset}m ago`
+    : minutesSinceReset < 1440 ? `${Math.floor(minutesSinceReset / 60)}h ago`
+    : `${Math.floor(minutesSinceReset / 1440)}d ago`;
   time.title = new Intl.DateTimeFormat('en-GB', {
     dateStyle: 'full', timeStyle: 'short', timeZone: tz
   }).format(reset) + ` (${tz})`;
