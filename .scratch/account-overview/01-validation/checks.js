@@ -39,6 +39,15 @@ document.getElementById('run').onclick = async () => {
         const stored = JSON.stringify(win.ticket01.state.local.accounts);
         await win.ticket01.advance(3600000);
         check(value().innerText === '~0% estimated', 'idle refresh shows explicitly estimated usage at the reset boundary');
+        const themeColor = token => {
+          const probe = doc.createElement('span');
+          probe.style.color = `var(${token})`;
+          doc.body.append(probe);
+          const color = win.getComputedStyle(probe).color;
+          probe.remove();
+          return color;
+        };
+        check(win.getComputedStyle(value()).color === themeColor('--green-pct'), 'recent reset estimate uses the theme green');
         check(value().title.includes('Last observed: 100%') && value().title.includes('Send a message'), 'hover text preserves the observation and refresh guidance');
         check(!text().includes('Last observed') && !text().includes('Send a message') && !text().includes('5h quota') && !text().includes('Window ended'), 'dormant detail avoids paragraphs and redundant quota labels');
         const facts = () => page().querySelector('.usage-facts');
@@ -57,6 +66,7 @@ document.getElementById('run').onclick = async () => {
         check(value().innerText === '~0% estimated', 'estimate remains until just before three hours after reset');
         await win.ticket01.advance(1);
         check(value().innerText === 'No recent reading', 'estimate ends at exactly three hours after reset');
+        check(win.getComputedStyle(value()).color === themeColor('--text-secondary'), 'older dormant reading returns to neutral text');
         check(!facts().hidden && facts().querySelector('.usage-last-recorded').textContent === '100%' && facts().querySelector('.usage-reading-age').textContent === '4h 20m ago', 'fact rows remain visible and age refreshes after the estimate ends');
         check(JSON.stringify(win.ticket01.state.local.accounts) === stored, 'estimated display never overwrites a saved Usage reading');
         await win.ticket01.reading();

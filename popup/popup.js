@@ -115,6 +115,7 @@ function observedUsageText(account) {
 
 function renderDormantUsage(element, account) {
   const estimated = Date.now() < account.resetsAt * 1000 + 3 * 60 * 60 * 1000;
+  element.classList.toggle('estimated', estimated);
   element.textContent = estimated ? '~0% ' : 'No recent reading';
   if (estimated) {
     const label = document.createElement('span');

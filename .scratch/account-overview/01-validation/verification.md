@@ -90,3 +90,9 @@ The block uses 11px text, 4px between rows and 10px between columns. In the chec
 ## Installed-extension confirmation — 2026-10-23
 
 The user supplied the updated live-popup screenshot and explicitly confirmed: “visual check is completed and everything is looking as intended.” It shows ~0% estimated, Reset, Last recorded and Updated in the intended compact layout, with status and preferences visible. This completes the final human visual check; the earlier note that it was unconfirmed is historical. Ticket 01 is complete.
+
+## Green recent-reset estimate — 2026-10-23
+
+The user considered unifying the two dormant headlines, then clarified that a recent reset should show zero in green. Preserve the approved three-hour `~0% estimated` rule and the same Last reset / Last recorded / Updated rows for both states. The estimated number now uses the theme's green percentage color; its small qualifier stays secondary. Older dormant readings retain neutral `No recent reading`. This is a color change only; reading storage, expiry and Active behavior are unchanged.
+
+All **94 Chrome lifecycle assertions** pass, including computed green/neutral colors in both themes and single/paged detail, exact three-hour cutoff, retained facts and fresh-reading cleanup: [results](green-estimate-browser-results.txt). Actual production popup sources with disposable adapters were visually checked in [dark](green-estimate-dark.png) and [light](green-estimate-light.png); no console warnings/errors. JavaScript syntax and whitespace checks pass. The design detector reports only the existing unrelated progress-bar width transition. The installed extension still needs a reload to pick up changed resources.
