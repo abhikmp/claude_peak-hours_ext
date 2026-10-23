@@ -29,6 +29,8 @@ Screenshots use development fixtures, not real Account readings.
 
 Logging in alone does not switch Active. Usage depends on Claude returning a quota event with the completion response. QuotaBeacon covers the 5-hour quota carried by that event; it does not raise limits or provide usage history.
 
+Capture supports both the original completion SSE and Bard's binary `ConversationService/StreamTimeline` response, including gzip-compressed quota messages. Only the five-hour window is used. A missing numeric quota field does not establish 0% usage and does not replace the Active account's reading.
+
 ## Privacy
 
 Account names (which may be email addresses) and Usage readings stay in this extension's local Chrome storage and are not uploaded to the developer or third parties. Preferences may sync through Chrome. QuotaBeacon fetches public status information and Account labels directly from Claude; it does not save or upload prompts or replies, and has no analytics backend.

@@ -18,6 +18,7 @@
         "https://claude.ai/*"
       ],
       "js": [
+        "content/connect-usage.js",
         "content/content-script-main.js"
       ],
       "run_at": "document_start",

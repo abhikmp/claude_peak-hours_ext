@@ -1,6 +1,7 @@
 # 08: Third Account's reply does not update the popup
 
-Status: needs-info
+Status: ready-for-human
+Resolution: fixed and reporter-verified; release packaging is a separate step
 
 ## Observed
 
@@ -129,3 +130,50 @@ The default positive control loads the actual manifest scripts with two saved sy
 2026-10-22: Reporter wants the scalable Account overview discussed in depth before implementation. Design decisions are recorded in ../../account-overview/discussion.md. No production code has been changed for this report.
 
 2026-10-23: Investigation and sanitized source findings are consolidated above. The user requested recording all collected information and continuing tomorrow. Work is paused at the user's request; status remains `needs-info`. No production fix or real three-Account capture verification is claimed.
+
+### Resumed investigation, 2026-10-23
+
+The user resumed this ticket. A temporary transport probe (`content/ticket08-transport-probe.js`, temporarily registered before MAIN in the manifest) records only normalized routes, transport types, MIME categories, and allowlisted numeric quota fields. The first attempted `.scratch/` resource path failed Chrome loading with an invalid script MIME error; moving the probe into `content/` resolved that loading failure. This probe is temporary and must be removed from the manifest and source after the investigation.
+
+The actual live reply trace contains a fetch response with MIME `application/connect+proto`. The user supplied the exact static RPC route from Network:
+
+```text
+/claudeai-rpc/anthropic.bard.api.v1alpha.ConversationService/StreamTimeline
+```
+
+This is evidence of the actual reply transport for this Account. The previously considered WebSocket route is not established as its transport.
+
+Static inspection of the loaded public [generated Bard client bundle](https://assets-proxy.anthropic.com/claude-ai/v2/assets/v1/b3fb7763f081d90edd49ace94c37e47a44e68435c024e003-DdU681ka.js) found embedded `streaming.proto` and `bard_api.proto` descriptors. Bundle SHA-256: `b8c2035526567218d3babe63098259aea6c7f9dbe95d8bf8f65ce5bd57ff071d`. Client code was inspected as data, not executed.
+
+Relevant protobuf field path:
+
+| Message | Field | Number / wire representation |
+| --- | --- | --- |
+| StreamTimelineResponse | event | 1, nested message |
+| StreamEvent | message_limit | 4, nested MessageLimit |
+| MessageLimit | status | 1, enum: unspecified 0, within 1, approaching 2, exceeded 3 |
+| MessageLimit | windows | 13, repeated map entries (key 1, value 2) |
+| MessageLimitWindow | resets_at | 2, Timestamp with seconds at field 1 |
+| MessageLimitWindow | utilization | 3, optional double / little-endian fixed64 |
+
+The generated client preserves windows under keys including `5h`; its conversion code uses Timestamp seconds. Schema presence alone does not establish that this Account receives a numeric window. Missing utilization must not be inferred as zero. The temporary probe now decodes only this field path, skips chat fields, handles Connect envelopes and gzip message compression, and reports quota fields without saving response bytes. Awaiting a live decoded event before selecting or implementing a fix.
+
+Wire references: [Connect streaming protocol](https://connectrpc.com/docs/protocol/) (five-byte envelope; data/compression/end-stream flags), [Protocol Buffers encoding](https://protobuf.dev/programming-guides/encoding/). The existing 16 completion-capture tests pass with the metadata probe enabled; no regression fixture for the actual numeric RPC event exists yet.
+
+The subsequent live reply was decoded successfully. The response advertises `connect-content-encoding: gzip`; the probe observed heartbeat, update, append, and message-limit events. The actual quota projection was status 1 (within limit), five-hour utilization 0.6 with reset 1792754400, and weekly utilization 0.03 with reset 1793142000. No chat fields or response bytes were saved. This establishes that the affected Account does expose a usable five-hour reading even though its organization `/usage` endpoint returned null.
+
+Root cause: production MAIN only recognized `/completion` and parsed text SSE; the affected Account supplies its reading through the binary, gzip-compressed Bard RPC instead. Its organization identity is in a request header rather than the URL. The replay `node --test --test-name-pattern="third Account becomes Active" tests/completion-capture.test.js` failed before the fix with `2 !== 3` saved Accounts, reproducing the reported mismatch.
+
+Implementation in progress: `content/connect-usage.js` projects only the five-hour quota from Connect/protobuf envelopes, MAIN recognizes the exact same-origin RPC and forwards its organization header, and the existing Account module validates that identity before the bridge stores a reading. The original SSE path remains covered. Optional utilization is not defaulted to zero; weekly-only signals and malformed frames do not replace Active. Readers are cancelled when scripts are retired, and Claude retains its original response. ADR-0001 now records the request-header identity source; Account identity and local-only storage semantics are unchanged.
+
+The regression fixture in `tests/fixtures/bard-message-limit.json` contains only the observed quota shape, with reset times normalized to the fixed test clock. It is generated from the documented field numbers by `../debug/build-rpc-fixture.cjs`. Both gzip and identity envelopes, byte-sized network chunks, Request/header overrides, explicit zero, exhausted quota, absent utilization, weekly-only data, malformed compression/framing, and invalid identity/origin cases are checked through the capture integration boundary. The 28 capture tests, including subtests, pass. Full-suite validation, final review, and real three-Account popup verification are pending.
+
+### Final checks, 2026-10-23
+
+The clean implementation removes the temporary transport probe from the manifest and source. Standards review identified comment ordering, which is corrected. Spec review identified a mutable request-header race: snapshotting identity only after the response could associate a reading with a later Account. A delayed-response integration test reproduced the wrong Account before the correction and passes afterward for both reused Headers and Request.headers. MAIN now snapshots the effective URL and organization header before calling fetch. Both reviewers report no remaining findings.
+
+Full validation: node --test tests/*.test.js passed all 43 tests (including subtests). Syntax checks passed for the quota decoder, MAIN, bridge, Account module, and fixture generator. The saved legacy third-Account replay passed, and git diff --cached --check reported no whitespace errors. The project has no separate typechecking/build configuration. The clean-build live popup check has been requested; it remains pending and is not inferred from automated results.
+
+### Reporter verification, 2026-10-23
+
+After reloading the clean QuotaBeacon build, hard-refreshing the affected Claude tab, and sending another message, the reporter confirmed: Third Account is Active; all three Accounts appear. This verifies the originally failing live popup behavior with the production capture path. The earlier transport probe had been removed before this check. Automated validation also preserves the original completion transport and the two earlier readings. No full release-package QA or new store submission is claimed. The capture fix is complete; ticket triage follows the existing completed implementation tickets' ready-for-human handoff convention.

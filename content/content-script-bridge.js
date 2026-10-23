@@ -53,8 +53,8 @@
     // instead of throwing, unlike chrome.storage calls.
     if (!chrome.runtime?.id) return;
 
-    const { completionUrl, percent, resetsAt = null } = event.data;
-    const accountId = Accounts.extractAccountId(completionUrl);
+    const { completionUrl, organizationId, percent, resetsAt = null } = event.data;
+    const accountId = Accounts.extractAccountId(completionUrl, organizationId);
     if (!accountId) return;
     if (!Number.isFinite(percent) || percent < 0 || percent > 100) return;
     if (resetsAt !== null && (!Number.isFinite(resetsAt) || resetsAt < 0)) return;

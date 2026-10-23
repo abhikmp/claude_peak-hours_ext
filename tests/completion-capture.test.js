@@ -8,6 +8,7 @@ const Accounts = require('../shared/accounts.js');
 const ROOT = path.resolve(__dirname, '..');
 const NOW = 1800000000000;
 const ACCOUNT_ID = '11111111-1111-4111-8111-111111111111';
+const RPC_FIXTURE = require('./fixtures/bard-message-limit.json');
 
 function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = 'MAIN', injectAtStart = true } = {}) {
   let stored = { accounts: structuredClone(initialAccounts) };
@@ -16,8 +17,24 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
   const notifications = [];
   let percent = 18;
   let originalResponse;
+  let nextRpc;
+  let onNotification;
   const window = {
     async fetch() {
+      if (nextRpc) {
+        const { bytes, encoding, chunkSize = 7, beforeResponse } = nextRpc;
+        nextRpc = null;
+        originalResponse = new Response(new ReadableStream({
+          start(controller) {
+            for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+              controller.enqueue(bytes.subarray(offset, offset + chunkSize));
+            }
+            controller.close();
+          }
+        }), { headers: { 'content-type': 'application/connect+proto', 'connect-content-encoding': encoding } });
+        await beforeResponse?.();
+        return originalResponse;
+      }
       let streamRead = false;
       originalResponse = { clone: () => ({ body: { getReader: () => ({
         async read() {
@@ -49,7 +66,7 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
       requests.push({ url, options });
       return organizationFetch(url, options);
     }, chrome: {
-      runtime: { id: 'usage-test', sendMessage: async message => { notifications.push(message); } },
+      runtime: { id: 'usage-test', sendMessage: async message => { notifications.push(message); onNotification?.(); } },
       storage: {
         local: {
           get: async () => structuredClone(stored),
@@ -59,7 +76,7 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
       }
     } });
   };
-  const worlds = { MAIN: vm.createContext({ URL, TextDecoder, window }), ISOLATED: createIsolatedWorld() };
+  const worlds = { MAIN: vm.createContext({ URL, TextDecoder, Headers, Response, Blob, DecompressionStream, window }), ISOLATED: createIsolatedWorld() };
   const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.json'), 'utf8'));
   const groups = [...manifest.content_scripts].sort((a, b) =>
     Number(b.world === firstWorld) - Number(a.world === firstWorld));
@@ -76,6 +93,20 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
     notifications,
     accounts: () => Accounts.getAccounts(stored.accounts, NOW),
     forgetAccounts() { stored.accounts = Accounts.clearAccounts(); },
+    async sendRpcReading(accountId, { encoding = 'gzip', chunkSize = 7, bytes, beforeResponse,
+      request = RPC_FIXTURE.path, init = { headers: { 'x-organization-uuid': accountId } } } = {}) {
+      const body = bytes ?? Buffer.from(encoding === 'gzip' ? RPC_FIXTURE.gzipBase64 : RPC_FIXTURE.identityBase64, 'base64');
+      nextRpc = { bytes: body, encoding, chunkSize, beforeResponse };
+      let timer;
+      const notified = new Promise(resolve => { onNotification = resolve; });
+      const result = await window.fetch(request, init);
+      assert.equal(result, originalResponse, 'Claude must still receive its original response');
+      assert.deepEqual(Buffer.from(await result.arrayBuffer()), body, 'capture must not consume or rewrite Claude\'s response body');
+      await Promise.race([notified, new Promise(resolve => { timer = setTimeout(resolve, 500); })]);
+      clearTimeout(timer);
+      onNotification = null;
+      await new Promise(setImmediate);
+    },
     async legacyReading() {
       window.postMessage({ source: 'claude-peak-extension', type: 'USAGE_UPDATE',
         completionUrl: `/api/organizations/${ACCOUNT_ID}/chat_conversations/test/completion`,
@@ -134,6 +165,100 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
     }
   };
 }
+
+test('a third Account becomes Active after a gzip RPC reply, preserving previous readings', async () => {
+  const second = '22222222-2222-4222-8222-222222222222';
+  const third = '33333333-3333-4333-8333-333333333333';
+  let initialAccounts = Accounts.applyReading({}, { accountId: ACCOUNT_ID, label: 'First', percent: 12 }, NOW - 2000);
+  initialAccounts = Accounts.applyReading(initialAccounts, { accountId: second, label: 'Second', percent: 75 }, NOW - 1000);
+  const capture = createCapture({ initialAccounts,
+    organizationFetch: async () => ({ ok: true, json: async () => ({ name: 'Third' }) })
+  });
+  await capture.sendRpcReading(third);
+  const accounts = capture.accounts();
+  assert.equal(accounts.length, 3, 'the third Account is saved alongside the previous two');
+  assert.deepEqual(accounts.map(({ accountId, percent, isActive }) => ({ accountId, percent, isActive })), [
+    { accountId: third, percent: 60, isActive: true },
+    { accountId: second, percent: 75, isActive: false },
+    { accountId: ACCOUNT_ID, percent: 12, isActive: false }
+  ]);
+  assert.equal(accounts[0].resetsAt, 1800018000);
+  assert.equal(accounts[0].label, 'Third');
+  assert.equal(capture.notifications.length, 1);
+});
+
+test('RPC capture handles byte-sized chunks and Request header overrides', async () => {
+  for (const override of [false, true]) {
+    const second = '22222222-2222-4222-8222-222222222222';
+    const capture = createCapture({
+      organizationFetch: async () => ({ ok: true, json: async () => ({ name: 'Observed' }) })
+    });
+    const request = new Request('https://claude.ai' + RPC_FIXTURE.path, {
+      headers: { 'x-organization-uuid': override ? second : ACCOUNT_ID }
+    });
+    await capture.sendRpcReading(ACCOUNT_ID, { encoding: 'identity', chunkSize: 1, request,
+      init: override ? { headers: new Headers({ 'X-Organization-UUID': ACCOUNT_ID }) } : {}
+    });
+    assert.equal(capture.accounts()[0]?.accountId, ACCOUNT_ID);
+    assert.equal(capture.accounts()[0]?.percent, 60);
+  }
+});
+
+test('RPC identity belongs to the sent request even when headers change before its response', async () => {
+  const second = '22222222-2222-4222-8222-222222222222';
+  for (const useRequest of [false, true]) {
+    const capture = createCapture({
+      organizationFetch: async () => ({ ok: true, json: async () => ({ name: 'Sent Account' }) })
+    });
+    const headers = new Headers({ 'x-organization-uuid': ACCOUNT_ID });
+    const request = useRequest ? new Request('https://claude.ai' + RPC_FIXTURE.path, { headers }) : RPC_FIXTURE.path;
+    await capture.sendRpcReading(ACCOUNT_ID, { request, init: useRequest ? {} : { headers },
+      beforeResponse: async () => {
+        (useRequest ? request.headers : headers).set('x-organization-uuid', second);
+      }
+    });
+    assert.equal(capture.accounts()[0]?.accountId, ACCOUNT_ID);
+    assert.equal(capture.accounts()[0]?.percent, 60);
+  }
+});
+
+test('RPC capture preserves an explicit zero and caps exhausted quota at 100%', async () => {
+  const capture = createCapture({
+    organizationFetch: async () => ({ ok: true, json: async () => ({ name: 'Observed' }) })
+  });
+  await capture.sendRpcReading(ACCOUNT_ID, { encoding: 'identity', bytes: Buffer.from(RPC_FIXTURE.zeroBase64, 'base64') });
+  assert.equal(capture.accounts()[0]?.percent, 0);
+  await capture.sendRpcReading(ACCOUNT_ID, { encoding: 'identity', bytes: Buffer.from(RPC_FIXTURE.exhaustedBase64, 'base64') });
+  assert.equal(capture.accounts()[0]?.percent, 100);
+  assert.equal(capture.accounts()[0]?.isFull, true);
+});
+
+test('unusable RPC signals never replace the Active Account', async (t) => {
+  const identity = Buffer.from(RPC_FIXTURE.identityBase64, 'base64');
+  const scenarios = {
+    'missing utilization': { encoding: 'identity', bytes: Buffer.from(RPC_FIXTURE.withoutUtilizationBase64, 'base64') },
+    'weekly quota only': { encoding: 'identity', bytes: Buffer.from(RPC_FIXTURE.weeklyOnlyBase64, 'base64') },
+    'truncated envelope': { encoding: 'identity', bytes: identity.subarray(0, -2) },
+    'invalid compression': { bytes: Buffer.from([1, 0, 0, 0, 3, 1, 2, 3]) },
+    'unsupported compression': { encoding: 'br', bytes: Buffer.from(RPC_FIXTURE.gzipBase64, 'base64') },
+    'missing Account header': { init: { headers: {} } },
+    'invalid Account header': { init: { headers: { 'x-organization-uuid': '../other' } } },
+    'another origin': { request: 'https://example.com' + RPC_FIXTURE.path }
+  };
+  for (const [name, options] of Object.entries(scenarios)) {
+    await t.test(name, async () => {
+      const capture = createCapture({ initialAccounts: Accounts.applyReading({}, {
+        accountId: ACCOUNT_ID, label: 'Kept', percent: 75
+      }, NOW - 1000) });
+      await capture.sendRpcReading('33333333-3333-4333-8333-333333333333', options);
+      const accounts = capture.accounts();
+      assert.equal(accounts.length, 1);
+      assert.equal(accounts[0].accountId, ACCOUNT_ID);
+      assert.equal(accounts[0].percent, 75);
+      assert.equal(capture.notifications.length, 0);
+    });
+  }
+});
 
 test('install and update capture names in an already-open Claude document', async () => {
   for (const injectAtStart of [false, true]) {

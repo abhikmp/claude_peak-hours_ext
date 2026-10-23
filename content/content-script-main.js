@@ -10,22 +10,48 @@
     window.__claudePeakCaptureCleanup?.();
     let active = true;
     const originalFetch = window.fetch;
+    const readers = new Set();
+    const RPC_PATH = '/claudeai-rpc/anthropic.bard.api.v1alpha.ConversationService/StreamTimeline';
 
     const captureFetch = async function (...args) {
+        // Snapshot identity before fetch yields: callers can reuse and mutate headers.
+        let url;
+        let rpc = false;
+        let organizationId;
+        try {
+            url = typeof args[0] === 'string' ? args[0] : args[0]?.url ?? args[0]?.href;
+            const endpoint = new URL(url, 'https://claude.ai');
+            rpc = endpoint.origin === 'https://claude.ai' && endpoint.pathname === RPC_PATH;
+            if (rpc) organizationId = new Headers(args[1]?.headers ?? args[0]?.headers).get('x-organization-uuid');
+        } catch (_) { url = undefined; }
         const response = await originalFetch(...args);
+        if (!active || typeof url !== 'string') return response;
+        if (!rpc && !/\/completion(?:[?#]|$)/.test(url)) return response;
+        if (rpc && (!response.ok || !organizationId ||
+            response.headers.get('content-type')?.split(';')[0].trim() !== 'application/connect+proto')) return response;
 
-        const url = typeof args[0] === 'string' ? args[0] : args[0]?.url ?? args[0]?.href;
-        if (!active || typeof url !== 'string' || !/\/completion(?:[?#]|$)/.test(url)) return response;
-
-        const clone = response.clone();
+        function publish({ percent, resetsAt }) {
+            if (!active) return;
+            window.postMessage({
+                source: 'claude-peak-extension-v2', type: 'USAGE_UPDATE',
+                completionUrl: url, organizationId, percent, resetsAt
+            }, '*');
+        }
 
         (async () => {
+            let reader;
             try {
-                const reader = clone.body.getReader();
+                reader = response.clone().body.getReader();
+                readers.add(reader);
+                if (rpc) {
+                    await globalThis.ConnectUsage.read(reader,
+                        response.headers.get('connect-content-encoding') ?? 'identity', publish);
+                    return;
+                }
                 const decoder = new TextDecoder();
                 let buffer = '';
 
-                while (true) {
+                while (active) {
                     const { done, value } = await reader.read();
                     if (done) break;
 
@@ -44,20 +70,18 @@
 
                             if (!active || percent === null) continue;
 
-                            // Post to the ISOLATED world bridge
-                            window.postMessage({
-                                // Ignore legacy interceptors from before update support.
-                                source: 'claude-peak-extension-v2',
-                                type: 'USAGE_UPDATE',
-                                completionUrl: url,
-                                percent,
-                                resetsAt
-                            }, '*');
+                            publish({ percent, resetsAt });
 
                         } catch (_) { }
                     }
                 }
             } catch (_) { }
+            finally {
+                if (reader) {
+                    readers.delete(reader);
+                    reader.cancel?.().catch(() => {});
+                }
+            }
         })();
 
         return response;
@@ -65,6 +89,7 @@
     window.fetch = captureFetch;
     window.__claudePeakCaptureCleanup = () => {
         active = false;
+        for (const reader of readers) reader.cancel?.().catch(() => {});
         if (window.fetch === captureFetch) window.fetch = originalFetch;
     };
 })();

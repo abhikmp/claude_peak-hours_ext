@@ -1,0 +1,10 @@
+{
+  "description": "Live Bard MessageLimit shape: five-hour utilization 0.6 and weekly 0.03. Reset timestamps normalized to the fixed test clock; all chat and identity fields omitted.",
+  "path": "/claudeai-rpc/anthropic.bard.api.v1alpha.ConversationService/StreamTimeline",
+  "gzipBase64": "AQAAAEYfiwgAAAAAAAAK47JSsuBgzJLkYjLNEBLmYBRi47iwYcUtNkljMHhsD5IyT4FKNcw8c4tNcodc6+vAHfPsAcKLFgw8AAAA",
+  "identityBase64": "AAAAADwKOiI4CAFqGQoCNWgSEwgBEgYI0LCo2gYZMzMzMzMz4z9qGQoCN2QSEwgBEgYIgJnM2gYZuB6F61G4nj8=",
+  "withoutUtilizationBase64": "AAAAABYKFCISahAKAjVoEgoIARIGCNCwqNoG",
+  "weeklyOnlyBase64": "AAAAAB8KHSIbahkKAjdkEhMIARIGCICZzNoGGbgehetRuJ4/",
+  "zeroBase64": "AAAAAB8KHSIbahkKAjVoEhMIARIGCNCwqNoGGQAAAAAAAAAA",
+  "exhaustedBase64": "AAAAAB8KHSIbahkKAjVoEhMIARIGCNCwqNoGGTMzMzMzM/M/"
+}

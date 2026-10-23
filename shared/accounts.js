@@ -12,10 +12,16 @@
     const STALE_AFTER_MS = 10 * 60 * 1000;
     const DROP_AFTER_MS = 48 * 60 * 60 * 1000;
 
-    function extractAccountId(url) {
+    function extractAccountId(url, organizationId) {
       if (typeof url !== 'string') return null;
       try {
-        const { pathname } = new URL(url, 'https://claude.ai');
+        const { origin, pathname } = new URL(url, 'https://claude.ai');
+        if (origin === 'https://claude.ai' && pathname ===
+            '/claudeai-rpc/anthropic.bard.api.v1alpha.ConversationService/StreamTimeline') {
+          return typeof organizationId === 'string' &&
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(organizationId)
+            ? organizationId.toLowerCase() : null;
+        }
         const match = pathname.match(/^\/api\/organizations\/([^/]+)\/.+\/completion$/);
         return match ? match[1] : null;
       } catch (_) {

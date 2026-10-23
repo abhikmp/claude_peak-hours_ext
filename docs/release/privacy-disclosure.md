@@ -23,7 +23,7 @@ QuotaBeacon uses this information only to provide its displayed features. It doe
 | `storage` | Keep Account names and Usage readings locally; save timezone, Watched products and theme preferences in Chrome sync storage. |
 | `alarms` | Refresh public incident/peak status every five minutes and check quota expiry and inactive Accounts every 30 seconds. |
 | `scripting` | Attach bundled capture scripts to Claude tabs already open when QuotaBeacon is installed or updated. |
-| `https://claude.ai/*` | Read quota information from completion responses and fetch the corresponding Account label through the signed-in Claude session. |
+| `https://claude.ai/*` | Read quota information from message response streams and fetch the corresponding Account label through the signed-in Claude session. |
 | `https://status.claude.com/*` | Read the public incident summary for the status pill, badge and tooltip. |
 
 **Remote code:** No remotely hosted executable code. All scripts ship in the extension package; network responses are data.
