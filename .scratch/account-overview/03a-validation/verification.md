@@ -30,3 +30,7 @@ Disposable adapters replace Chrome storage/runtime and provide a controlled cloc
 ## Handoff
 
 Reload the unpacked extension to apply the changed popup/shared scripts. This task updates production sources; it does not install/publish a new archive. Forget/Undo and final integrated release packaging remain tickets 04/05. Existing unrelated work is excluded from the scoped commit.
+
+## Usage-label clarification
+
+2026-10-24: At the user's request, dormant details now say **Last recorded usage**, so the observed percentage cannot be confused with remaining quota. The shared renderer covers slides and table inspection. The selected prototype was updated to match. All 105 lifecycle checks pass with the revised expected label; production JavaScript syntax passes. Both themes fit the longer label without horizontal or vertical overflow in the 196px detail column. [Dark-theme screenshot](usage-label-dark.jpg).
