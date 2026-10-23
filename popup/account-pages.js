@@ -18,6 +18,9 @@ const AccountPages = (() => {
   let layoutKind = null;
   let tablePage;
   let tableIds = [];
+  let tableRecentIds = new Set();
+  let hasNewReading = false;
+  let hasPriorityChange = false;
   let selectedId = null;
 
   function displayLabel(label) {
@@ -31,7 +34,8 @@ const AccountPages = (() => {
 
   function showPage(index) {
     if (accounts.length === 0) return;
-    const nextIndex = Math.max(0, Math.min(1, accounts.length - 1, index));
+    const lastPage = layoutKind === 'table' ? 1 : accounts.length - 1;
+    const nextIndex = Math.max(0, Math.min(lastPage, index));
     const changedPage = nextIndex !== pageIndex;
     const focused = document.activeElement;
     if (layoutKind === 'table' && nextIndex === 1 && pageIndex === 0) openTable();
@@ -44,7 +48,7 @@ const AccountPages = (() => {
     else lowerControls.prepend(status);
     track.style.transform = `translateX(-${pageIndex * 100}%)`;
     previous.disabled = pageIndex === 0;
-    next.disabled = pageIndex === Math.min(1, accounts.length - 1);
+    next.disabled = pageIndex === lastPage;
     [...track.children].forEach((page, i) => {
       page.inert = i !== pageIndex;
       page.setAttribute('aria-hidden', String(i !== pageIndex));
@@ -52,8 +56,8 @@ const AccountPages = (() => {
     });
     announcement.textContent = secondary
       ? selectedId ? `Page 2: ${accountsById.get(selectedId).label}` : 'Page 2: saved Accounts table'
-      : `Account ${pageIndex + 1} of ${Math.min(2, accounts.length)}: ${displayLabel(accounts[pageIndex].label)}`;
-    if (changedPage && (track.contains(focused) || focused === previous || focused === next)) {
+      : `Account ${pageIndex + 1} of ${layoutKind === 'table' ? 2 : accounts.length}: ${displayLabel(accounts[pageIndex].label)}`;
+    if (changedPage && (track.contains(focused) || (focused === previous && previous.disabled) || (focused === next && next.disabled))) {
       (pageIndex === 0 ? next : previous).focus();
     }
   }
@@ -130,7 +134,7 @@ const AccountPages = (() => {
         <div class="account-table-scroll" tabindex="0" role="region" aria-label="Saved Accounts table">
           <table aria-label="Account usage comparison">
             <colgroup><col><col class="account-used-column"><col class="account-reset-column"></colgroup>
-            <thead><tr><th scope="col">Account</th><th scope="col">Used</th><th scope="col">Resets</th></tr></thead>
+            <thead><tr><th scope="col">Account</th><th scope="col">Used</th><th scope="col">Reset</th></tr></thead>
             <tbody></tbody>
           </table>
           <p class="account-search-empty" role="status" hidden>No matching accounts.</p>
@@ -155,7 +159,11 @@ const AccountPages = (() => {
 
   function openTable() {
     selectedId = null;
-    tableIds = accounts.slice(1).map(account => account.accountId);
+    const now = Date.now();
+    tableIds = Accounts.orderComparisonAccounts(accounts, now).map(account => account.accountId);
+    tableRecentIds = new Set(tableIds.filter(id => Accounts.isRecentReset(accountsById.get(id), now)));
+    hasNewReading = false;
+    hasPriorityChange = false;
     const body = tablePage.querySelector('tbody');
     body.replaceChildren(...tableIds.map(accountId => {
       const row = document.createElement('tr');
@@ -185,6 +193,16 @@ const AccountPages = (() => {
   }
 
   function updateTable() {
+    const now = Date.now();
+    const notice = tablePage.querySelector('.account-refresh-notice');
+    hasPriorityChange ||= tableIds.some(id => {
+      const account = accountsById.get(id);
+      return account && tableRecentIds.has(id) !== Accounts.isRecentReset(account, now);
+    });
+    notice.hidden = !hasNewReading && !hasPriorityChange;
+    notice.textContent = hasNewReading
+      ? 'New reading received. Order updates when you reopen this list.'
+      : 'Reset priority updates when you reopen this list.';
     for (const row of tablePage.querySelectorAll('tbody tr')) {
       const account = accountsById.get(row.dataset.accountId);
       if (!account) continue;
@@ -193,14 +211,19 @@ const AccountPages = (() => {
       name.title = account.label;
       row.querySelector('.account-row-age').textContent = `${account.isActive ? 'Active · ' : ''}${formatReadingAge(account.ageMs)}`;
       const used = row.querySelector('.account-row-used');
-      used.textContent = account.percent === null ? '—' : `${Math.round(account.percent)}%`;
-      used.dataset.tone = usageTone(account);
-      used.title = account.isExpired ? 'Current usage unknown' : 'Observed usage';
+      const recent = Accounts.isRecentReset(account, now);
+      used.textContent = recent ? '~0%' : account.percent === null ? '—' : `${Math.round(account.percent)}%`;
+      used.dataset.tone = recent ? 'green' : usageTone(account);
+      used.title = recent
+        ? `Estimated 0% for fifteen minutes after the captured reset; current usage has not been observed. ${formatReadingAge(account.ageMs)}. ${observedUsageText(account)}`
+        : account.isExpired ? `Current usage unknown. ${observedUsageText(account)}` : 'Observed usage';
+      used.setAttribute('aria-label', `${used.textContent}. ${used.title}`);
       const reset = row.querySelector('.account-row-reset');
-      reset.textContent = account.isExpired ? 'Window ended' : account.resetsAt
-        ? formatDuration(account.resetsAt * 1000 - Date.now()) : '—';
-      reset.title = account.resetsAt
-        ? toLocalTimeStr(new Date(account.resetsAt * 1000).toISOString(), timezone) : 'Reset time unknown';
+      reset.textContent = account.isExpired ? formatLastReset(account.resetsAt) : account.resetsAt
+        ? `in ${formatDuration(account.resetsAt * 1000 - now)}` : '—';
+      reset.title = account.resetsAt !== null
+        ? `${account.isExpired ? 'Last reset' : 'Resets at'}: ${formatExactReset(account.resetsAt, timezone)}. From the last captured reading.` : 'Reset time unknown';
+      reset.setAttribute('aria-label', `${reset.textContent}. ${reset.title}`);
     }
     filterTable();
     if (selectedId) {
@@ -263,21 +286,21 @@ const AccountPages = (() => {
     dots.hidden = accounts.length === 1;
     // Data refreshes are immediate. Only a deliberate page change slides.
     track.classList.add('updating');
-    const nextLayoutKind = accounts.length >= 3 ? 'table' : accounts.length === 2 ? 'pair' : 'single';
-    if (layoutKind !== nextLayoutKind) {
+    const nextLayoutKind = accounts.length >= 4 ? 'table' : 'slides';
+    if (layoutKind !== nextLayoutKind || (nextLayoutKind === 'slides' && track.children.length !== accounts.length)) {
       layoutKind = nextLayoutKind;
       pageIndex = 0;
       selectedId = null;
       tablePage = layoutKind === 'table' ? makeTablePage() : null;
-      track.replaceChildren(makePage(accounts[0], tz, 0, Math.min(2, accounts.length)));
-      if (layoutKind === 'pair') track.append(makePage(accounts[1], tz, 1, 2));
+      const pageAccounts = tablePage ? accounts.slice(0, 1) : accounts;
+      const pageCount = tablePage ? 2 : accounts.length;
+      track.replaceChildren(...pageAccounts.map((account, index) => makePage(account, tz, index, pageCount)));
       if (tablePage) track.append(tablePage);
-      dots.replaceChildren(...accounts.slice(0, 2).map(() => document.createElement('span')));
+      dots.replaceChildren(...Array.from({ length: pageCount }, () => document.createElement('span')));
     } else {
-      updatePage(track.children[0], accounts[0], tz);
-      if (layoutKind === 'pair') updatePage(track.children[1], accounts[1], tz);
+      (layoutKind === 'table' ? accounts.slice(0, 1) : accounts).forEach((account, index) => updatePage(track.children[index], account, tz));
       if (layoutKind === 'table' && pageIndex === 1) {
-        if (readingChanged) tablePage.querySelector('.account-refresh-notice').hidden = false;
+        if (readingChanged) hasNewReading = true;
         updateTable();
       }
       if (activeChanged && layoutKind !== 'table') pageIndex = 0;

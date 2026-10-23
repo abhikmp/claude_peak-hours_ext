@@ -151,8 +151,9 @@
   min-height: 0;
   min-width: 0;
 }
-.account-comparison { flex: 0 0 100%; height: 100%; }
+.account-comparison { --account-footer-height: 48px; position: relative; flex: 0 0 100%; height: 100%; }
 .account-list, .account-inspection { flex: 1; }
+.account-inspection { padding-bottom: var(--account-footer-height); }
 .account-search { position: relative; display: block; flex: none; margin-bottom: 5px; }
 .account-search svg { position: absolute; left: 8px; top: 8px; color: var(--text-secondary); }
 .account-search input {
@@ -183,9 +184,11 @@
 .account-row-used[data-tone="orange"] { color: var(--orange-pct); }
 .account-row-used[data-tone="red"] { color: var(--red-pct); }
 .account-row-used[data-tone="unknown"], .account-row-reset { color: var(--text-secondary); }
-.account-table-foot { flex: none; padding-top: 14px; font-size: 10px; color: var(--text-secondary); }
+.account-row-reset { font-size: 11px; font-weight: 400; line-height: 1.4; }
+.account-table-foot { flex: none; height: var(--account-footer-height); display: flex; align-items: flex-end; padding-top: 14px; font-size: 10px; color: var(--text-secondary); }
 .account-search-empty { padding: 18px 2px; text-align: center; font-size: 11px; color: var(--text-secondary); }
-.account-refresh-notice { flex: none; padding: 0 0 6px; font-size: 10px; line-height: 1.4; color: var(--text-secondary); }
+/* A fixed footer slot keeps notices from shifting the row under the pointer. */
+.account-refresh-notice { position: absolute; inset: auto 0 14px; font-size: 10px; line-height: 1.4; color: var(--text-secondary); }
 .account-back { flex: none; align-self: flex-start; min-height: 24px; margin-bottom: 7px; padding: 0; border: 0; background: none; color: var(--text-secondary); font: inherit; font-size: 11px; cursor: pointer; }
 .account-detail { flex: 1; min-height: 0; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 .account-detail .account-page { padding-right: 32px; overflow: visible; }

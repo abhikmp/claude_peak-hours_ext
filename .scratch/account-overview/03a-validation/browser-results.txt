@@ -1,0 +1,241 @@
+PASS four Accounts open a comparison table on page two
+PASS page two contains three other Accounts, with only two main pages
+PASS row opens full usage details
+PASS Back restores search, row snapshot and exact scroll position
+PASS inspection leaves stored readings, Active and toolbar unchanged
+PASS reopening the table after leaving details restores keyboard access
+PASS clock-only expiry announces priority without inventing a new reading
+PASS recently reset observations show estimated availability and elapsed reset age
+PASS incoming reading updates inspected usage and Active immediately
+PASS approved refresh notice stays visible while inspecting
+PASS status remains above row details
+PASS incoming reading preserves row identity, order, search and scroll through Back (scroll 280/280, order true, same row true)
+PASS the newly Active Account remains in its frozen row with an Active indicator
+PASS incoming-reading notice preserves the same row coordinates through inspection/Back
+PASS refresh notice fits between rows and saved count without covering either
+PASS page one follows the new Active while the table remains open
+PASS newly discovered Account does not alter open table membership
+PASS reopening excludes new Active, includes previous Active and recomputes membership without a count cap
+PASS reopening promotes recent resets before non-Full recency and clears the refresh notice
+PASS reopened popup starts on the latest Active Account
+PASS dark 1 Accounts Active: exactly 260 × 340, no outer overflow
+PASS ordinary Active detail fits without a scrollbar
+PASS single Account has no navigation
+PASS dark 2 Accounts Active: exactly 260 × 340, no outer overflow
+PASS ordinary Active detail fits without a scrollbar
+PASS multiple Accounts open with the appropriate dot count and a bounded previous arrow
+PASS dark 2 Accounts secondary: exactly 260 × 340, no outer overflow
+PASS next arrow reflects the actual page boundary
+PASS two or three Accounts retain individual detailed views
+PASS small-count status and preferences remain aligned
+PASS dark 3 Accounts Active: exactly 260 × 340, no outer overflow
+PASS ordinary Active detail fits without a scrollbar
+PASS multiple Accounts open with the appropriate dot count and a bounded previous arrow
+PASS dark 3 Accounts secondary: exactly 260 × 340, no outer overflow
+PASS next arrow reflects the actual page boundary
+PASS two or three Accounts retain individual detailed views
+PASS small-count status and preferences remain aligned
+PASS intermediate slide retains next-arrow focus
+PASS third Account is reachable with correct dots and announcement
+PASS third slide preserves shared control positions
+PASS dark 4 Accounts Active: exactly 260 × 340, no outer overflow
+PASS ordinary Active detail fits without a scrollbar
+PASS multiple Accounts open with the appropriate dot count and a bounded previous arrow
+PASS dark 4 Accounts secondary: exactly 260 × 340, no outer overflow
+PASS next arrow reflects the actual page boundary
+PASS table includes every other Account and excludes Active initially
+PASS comparison exposes Account / Used / Reset headers
+PASS Compact reset copy and typography include exact captured date and timezone
+PASS three saved Accounts fit fully while reserving notice space (173/173)
+PASS sticky column labels stay visible with no horizontal table overflow
+PASS status sits above table and preferences are absent
+PASS covered preferences cannot receive focus
+PASS search finds Accounts case-insensitively
+PASS search arrow keys do not change main pages or focus
+PASS empty search has a clear message and only the saved-Account count beneath the table
+PASS dark 4 Accounts empty search: exactly 260 × 340, no outer overflow
+PASS footer has approved 14px separation and lowered placement
+PASS long international names truncate, expose the full name and remain plain text
+PASS inspection moves focus to Back
+PASS covered table input cannot receive focus
+PASS dark 4 Accounts details: exactly 260 × 340, no outer overflow
+PASS Escape returns to the table and restores keyboard focus
+PASS theme remains available and saves on the table
+PASS left arrow returns to Active and restores preference controls
+PASS dark 64 Accounts Active: exactly 260 × 340, no outer overflow
+PASS ordinary Active detail fits without a scrollbar
+PASS multiple Accounts open with the appropriate dot count and a bounded previous arrow
+PASS dark 64 Accounts secondary: exactly 260 × 340, no outer overflow
+PASS next arrow reflects the actual page boundary
+PASS table includes every other Account and excludes Active initially
+PASS comparison exposes Account / Used / Reset headers
+PASS Compact reset copy and typography include exact captured date and timezone
+PASS sticky column labels stay visible with no horizontal table overflow
+PASS 64 Accounts scroll internally
+PASS initial ordering places Full Accounts last by soonest reset
+PASS status sits above table and preferences are absent
+PASS covered preferences cannot receive focus
+PASS search finds Accounts case-insensitively
+PASS search arrow keys do not change main pages or focus
+PASS empty search has a clear message and only the saved-Account count beneath the table
+PASS dark 64 Accounts empty search: exactly 260 × 340, no outer overflow
+PASS footer has approved 14px separation and lowered placement
+PASS long international names truncate, expose the full name and remain plain text
+PASS inspection moves focus to Back
+PASS covered table input cannot receive focus
+PASS dark 64 Accounts details: exactly 260 × 340, no outer overflow
+PASS Escape returns to the table and restores keyboard focus
+PASS theme remains available and saves on the table
+PASS left arrow returns to Active and restores preference controls
+PASS dark: row details preserve the approved estimate and last captured reading
+PASS row details refresh at the estimate cutoff without inventing a new reading
+PASS Back retains honest expired table values after inspecting dormant details
+PASS a captured zero stays zero while an unknown reset stays a dash
+PASS a reading without reset time clears the previous countdown on the persistent Active detail
+PASS dark: green status is preserved on secondary page
+PASS status is above row details in every status state
+PASS status and details fit the fixed popup
+PASS dark: red status is preserved on secondary page
+PASS status is above row details in every status state
+PASS status and details fit the fixed popup
+PASS dark: orange status is preserved on secondary page
+PASS status is above row details in every status state
+PASS status and details fit the fixed popup
+PASS dark: grey status is preserved on secondary page
+PASS status is above row details in every status state
+PASS status and details fit the fixed popup
+PASS light 1 Accounts Active: exactly 260 × 340, no outer overflow
+PASS ordinary Active detail fits without a scrollbar
+PASS single Account has no navigation
+PASS light 2 Accounts Active: exactly 260 × 340, no outer overflow
+PASS ordinary Active detail fits without a scrollbar
+PASS multiple Accounts open with the appropriate dot count and a bounded previous arrow
+PASS light 2 Accounts secondary: exactly 260 × 340, no outer overflow
+PASS next arrow reflects the actual page boundary
+PASS two or three Accounts retain individual detailed views
+PASS small-count status and preferences remain aligned
+PASS light 3 Accounts Active: exactly 260 × 340, no outer overflow
+PASS ordinary Active detail fits without a scrollbar
+PASS multiple Accounts open with the appropriate dot count and a bounded previous arrow
+PASS light 3 Accounts secondary: exactly 260 × 340, no outer overflow
+PASS next arrow reflects the actual page boundary
+PASS two or three Accounts retain individual detailed views
+PASS small-count status and preferences remain aligned
+PASS intermediate slide retains next-arrow focus
+PASS third Account is reachable with correct dots and announcement
+PASS third slide preserves shared control positions
+PASS light 4 Accounts Active: exactly 260 × 340, no outer overflow
+PASS ordinary Active detail fits without a scrollbar
+PASS multiple Accounts open with the appropriate dot count and a bounded previous arrow
+PASS light 4 Accounts secondary: exactly 260 × 340, no outer overflow
+PASS next arrow reflects the actual page boundary
+PASS table includes every other Account and excludes Active initially
+PASS comparison exposes Account / Used / Reset headers
+PASS Compact reset copy and typography include exact captured date and timezone
+PASS three saved Accounts fit fully while reserving notice space (173/173)
+PASS sticky column labels stay visible with no horizontal table overflow
+PASS status sits above table and preferences are absent
+PASS covered preferences cannot receive focus
+PASS search finds Accounts case-insensitively
+PASS search arrow keys do not change main pages or focus
+PASS empty search has a clear message and only the saved-Account count beneath the table
+PASS light 4 Accounts empty search: exactly 260 × 340, no outer overflow
+PASS footer has approved 14px separation and lowered placement
+PASS long international names truncate, expose the full name and remain plain text
+PASS inspection moves focus to Back
+PASS covered table input cannot receive focus
+PASS light 4 Accounts details: exactly 260 × 340, no outer overflow
+PASS Escape returns to the table and restores keyboard focus
+PASS theme remains available and saves on the table
+PASS left arrow returns to Active and restores preference controls
+PASS light 64 Accounts Active: exactly 260 × 340, no outer overflow
+PASS ordinary Active detail fits without a scrollbar
+PASS multiple Accounts open with the appropriate dot count and a bounded previous arrow
+PASS light 64 Accounts secondary: exactly 260 × 340, no outer overflow
+PASS next arrow reflects the actual page boundary
+PASS table includes every other Account and excludes Active initially
+PASS comparison exposes Account / Used / Reset headers
+PASS Compact reset copy and typography include exact captured date and timezone
+PASS sticky column labels stay visible with no horizontal table overflow
+PASS 64 Accounts scroll internally
+PASS initial ordering places Full Accounts last by soonest reset
+PASS status sits above table and preferences are absent
+PASS covered preferences cannot receive focus
+PASS search finds Accounts case-insensitively
+PASS search arrow keys do not change main pages or focus
+PASS empty search has a clear message and only the saved-Account count beneath the table
+PASS light 64 Accounts empty search: exactly 260 × 340, no outer overflow
+PASS footer has approved 14px separation and lowered placement
+PASS long international names truncate, expose the full name and remain plain text
+PASS inspection moves focus to Back
+PASS covered table input cannot receive focus
+PASS light 64 Accounts details: exactly 260 × 340, no outer overflow
+PASS Escape returns to the table and restores keyboard focus
+PASS theme remains available and saves on the table
+PASS left arrow returns to Active and restores preference controls
+PASS light: row details preserve the approved estimate and last captured reading
+PASS row details refresh at the estimate cutoff without inventing a new reading
+PASS Back retains honest expired table values after inspecting dormant details
+PASS a captured zero stays zero while an unknown reset stays a dash
+PASS a reading without reset time clears the previous countdown on the persistent Active detail
+PASS light: green status is preserved on secondary page
+PASS status is above row details in every status state
+PASS status and details fit the fixed popup
+PASS light: red status is preserved on secondary page
+PASS status is above row details in every status state
+PASS status and details fit the fixed popup
+PASS light: orange status is preserved on secondary page
+PASS status is above row details in every status state
+PASS status and details fit the fixed popup
+PASS light: grey status is preserved on secondary page
+PASS status is above row details in every status state
+PASS status and details fit the fixed popup
+PASS dark: clock expiry updates estimates without moving open rows
+PASS showing a reset-priority notice does not shift rows vertically
+PASS six-minute reset retains truthful reading age and accessible estimate explanation
+PASS estimated table zero uses the green usage tone
+PASS reopening places the newest recent reset first
+PASS table and detail estimates survive until one millisecond before fifteen minutes
+PASS at fifteen minutes table estimate ends while the three-hour detail estimate remains
+PASS priority-expiry notice remains visible during inspection
+PASS Back after estimate cutoff preserves row identity and order with current values
+PASS reopening removes expired priority and restores remaining reading-recency order
+PASS clock, browsing and estimates never persist readings or send toolbar updates
+PASS dark: changing retained count to 3 rebuilds the appropriate navigation
+PASS count transition restores lower controls and fixed dimensions
+PASS dark: changing retained count to 2 rebuilds the appropriate navigation
+PASS count transition restores lower controls and fixed dimensions
+PASS dark: changing retained count to 1 rebuilds the appropriate navigation
+PASS count transition restores lower controls and fixed dimensions
+PASS dark: changing retained count to 0 rebuilds the appropriate navigation
+PASS count transition restores lower controls and fixed dimensions
+PASS dark: changing retained count to 3 rebuilds the appropriate navigation
+PASS count transition restores lower controls and fixed dimensions
+PASS dark: changing retained count to 4 rebuilds the appropriate navigation
+PASS count transition restores lower controls and fixed dimensions
+PASS light: clock expiry updates estimates without moving open rows
+PASS showing a reset-priority notice does not shift rows vertically
+PASS six-minute reset retains truthful reading age and accessible estimate explanation
+PASS estimated table zero uses the green usage tone
+PASS reopening places the newest recent reset first
+PASS table and detail estimates survive until one millisecond before fifteen minutes
+PASS at fifteen minutes table estimate ends while the three-hour detail estimate remains
+PASS priority-expiry notice remains visible during inspection
+PASS Back after estimate cutoff preserves row identity and order with current values
+PASS reopening removes expired priority and restores remaining reading-recency order
+PASS clock, browsing and estimates never persist readings or send toolbar updates
+PASS light: changing retained count to 3 rebuilds the appropriate navigation
+PASS count transition restores lower controls and fixed dimensions
+PASS light: changing retained count to 2 rebuilds the appropriate navigation
+PASS count transition restores lower controls and fixed dimensions
+PASS light: changing retained count to 1 rebuilds the appropriate navigation
+PASS count transition restores lower controls and fixed dimensions
+PASS light: changing retained count to 0 rebuilds the appropriate navigation
+PASS count transition restores lower controls and fixed dimensions
+PASS light: changing retained count to 3 rebuilds the appropriate navigation
+PASS count transition restores lower controls and fixed dimensions
+PASS light: changing retained count to 4 rebuilds the appropriate navigation
+PASS count transition restores lower controls and fixed dimensions
+PASS rendered popup reports no runtime errors or unhandled rejections
+
+All ticket 03/03a checks passed. Disposable fixtures, not live extension storage.

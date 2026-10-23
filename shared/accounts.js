@@ -76,6 +76,23 @@
         });
     }
 
+    // A display-only estimate, never a new Usage reading or a change to Active.
+    function isRecentReset(account, now) {
+      const elapsed = now - account.resetsAt * 1000;
+      return account.resetsAt !== null && account.isExpired && elapsed >= 0 && elapsed < 15 * 60 * 1000;
+    }
+
+    // Takes getAccounts display values. Stable sorting retains their ordinary
+    // recency/tie and Full ordering outside the recent-reset priority group.
+    function orderComparisonAccounts(accounts, now) {
+      return accounts.filter(account => !account.isActive).sort((a, b) => {
+        const aRecent = isRecentReset(a, now);
+        const bRecent = isRecentReset(b, now);
+        if (aRecent !== bRecent) return aRecent ? -1 : 1;
+        return aRecent ? b.resetsAt - a.resetsAt : 0;
+      });
+    }
+
     // A late name response must not create an Account or change its Usage reading.
     function applyLabel(accounts, accountId, label) {
       if (!accounts[accountId]) return accounts;
@@ -92,7 +109,7 @@
       return active.percent <= 85 ? 'orange' : 'red';
     }
 
-    return { extractAccountId, applyReading, applyLabel, getAccounts, clearAccounts, getIconColor };
+    return { extractAccountId, applyReading, applyLabel, getAccounts, isRecentReset, orderComparisonAccounts, clearAccounts, getIconColor };
   })();
 
   if (typeof module !== 'undefined' && module.exports) {

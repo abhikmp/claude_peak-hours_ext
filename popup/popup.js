@@ -109,6 +109,18 @@ function formatReadingAge(ageMs) {
     : `Updated ${formatDuration(Math.floor(ageMs / 60000) * 60000)} ago`;
 }
 
+function formatLastReset(resetsAt) {
+  const minutes = Math.max(0, Math.floor((Date.now() - resetsAt * 1000) / 60000));
+  return minutes < 1 ? 'just now' : minutes < 60 ? `${minutes}m ago`
+    : minutes < 1440 ? `${Math.floor(minutes / 60)}h ago` : `${Math.floor(minutes / 1440)}d ago`;
+}
+
+function formatExactReset(resetsAt, tz) {
+  return new Intl.DateTimeFormat('en-GB', {
+    dateStyle: 'full', timeStyle: 'short', timeZone: tz
+  }).format(new Date(resetsAt * 1000)) + ` (${tz})`;
+}
+
 function observedUsageText(account) {
   return `Last observed: ${Math.round(account.lastObservedPercent)}%. Send a message from this Account for a new reading.`;
 }
@@ -142,14 +154,8 @@ function renderUsageFacts(element, account, tz) {
   const reset = new Date(account.resetsAt * 1000);
   const time = element.querySelector('time');
   time.dateTime = reset.toISOString();
-  const minutesSinceReset = Math.max(0, Math.floor((Date.now() - reset.getTime()) / 60000));
-  time.textContent = minutesSinceReset < 1 ? 'just now'
-    : minutesSinceReset < 60 ? `${minutesSinceReset}m ago`
-    : minutesSinceReset < 1440 ? `${Math.floor(minutesSinceReset / 60)}h ago`
-    : `${Math.floor(minutesSinceReset / 1440)}d ago`;
-  time.title = new Intl.DateTimeFormat('en-GB', {
-    dateStyle: 'full', timeStyle: 'short', timeZone: tz
-  }).format(reset) + ` (${tz})`;
+  time.textContent = formatLastReset(account.resetsAt);
+  time.title = formatExactReset(account.resetsAt, tz);
   element.querySelector('.usage-last-recorded').textContent = `${Math.round(account.lastObservedPercent)}%`;
   element.querySelector('.usage-reading-age').textContent = formatReadingAge(account.ageMs).replace(/^Updated /, '');
 }
