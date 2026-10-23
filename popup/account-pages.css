@@ -94,7 +94,7 @@
 }
 .account-fill { height: 100%; border-radius: inherit; background: var(--account-color); }
 .account-reset { font-size: 11px; line-height: 1.4; color: var(--text-muted, #6b7280); }
-.account-updated, .account-observation {
+.account-updated {
   font-size: 11px;
   line-height: 1.4;
   color: var(--text-secondary, #6b7280);

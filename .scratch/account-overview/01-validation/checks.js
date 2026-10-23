@@ -32,27 +32,35 @@ document.getElementById('run').onclick = async () => {
         const doc = win.document;
         const page = () => multi ? doc.querySelectorAll('.account-page')[1] : doc.querySelector('.usage-hero');
         if (multi) doc.getElementById('account-next').click();
-        const text = () => page().textContent;
+        const text = () => page().innerText;
+        const value = () => page().querySelector(multi ? '.account-percent' : '.usage-pct');
         check(text().includes('100%') && text().includes('Resets in 1h'), theme + ' ' + (multi ? 'paged' : 'single') + ': ordinary reading and countdown');
         check(text().includes('Updated 20m ago'), 'reading age is shown');
         const stored = JSON.stringify(win.ticket01.state.local.accounts);
         await win.ticket01.advance(3600000);
-        check(text().includes('unknown') && text().includes('Window ended'), 'idle refresh shows unknown usage at the exact reset boundary');
-        check(text().includes('Last observed: 100%') && text().includes('Send a message'), 'expired detail preserves observation and explains refresh');
-        check(!text().includes('Full quota available') && !text().includes('0% used'), 'expiry makes no inferred quota claim');
+        check(value().innerText === '~0% estimated', 'idle refresh shows explicitly estimated usage at the reset boundary');
+        check(value().title.includes('Last observed: 100%') && value().title.includes('Send a message'), 'hover text preserves the observation and refresh guidance');
+        check(!text().includes('Updated') && !text().includes('Last observed') && !text().includes('5h quota') && !text().includes('Window ended'), 'dormant detail removes the dense helper lines and redundant quota label');
+        check(value().getAttribute('aria-description') === value().title && value().tabIndex === 0, 'dormant context is available to assistive technology and keyboard focus');
         check(JSON.stringify(win.ticket01.state.local.accounts) === stored, 'expiry and browsing leave stored readings and Active unchanged');
         check((multi ? page().querySelector('.account-bar') : doc.querySelector('.bar-wrap')).hidden, 'expired reading hides the current-usage bar');
+        await win.ticket01.advance(3 * 3600000 - 1);
+        check(value().innerText === '~0% estimated', 'estimate remains until just before three hours after reset');
+        await win.ticket01.advance(1);
+        check(value().innerText === 'No recent reading', 'estimate ends at exactly three hours after reset');
+        check(JSON.stringify(win.ticket01.state.local.accounts) === stored, 'estimated display never overwrites a saved Usage reading');
         await win.ticket01.reading();
         await settle();
-        check(doc.body.textContent.includes('28%') && !doc.body.textContent.includes('Last observed: 100%'), 'new reading clears the expired presentation');
+        const activeValue = doc.querySelector(multi ? '.account-page .account-percent' : '.usage-pct');
+        check(activeValue.innerText.includes('28%') && !activeValue.hasAttribute('title') && !activeValue.hasAttribute('aria-description') && !activeValue.hasAttribute('tabindex'), 'new reading clears the expired presentation and stale hover context');
       }
     }
 
     win = await open('active-expiry', { multi: '1', expired: '1' });
     // Make the latest observation expire too, then exercise the actual refresh timer.
     await win.ticket01.advance(7200000);
-    const activeText = win.document.querySelector('.account-page').textContent;
-    check(activeText.includes('Active') && activeText.includes('unknown') && activeText.includes('Last observed: 45%'), 'expired Active detail remains Active and retains its observation');
+    const activePage = win.document.querySelector('.account-page');
+    check(!activePage.querySelector('.active').hidden && activePage.innerText.includes('~0% estimated') && activePage.querySelector('.account-percent').title.includes('Last observed: 45%'), 'expired Active detail remains Active and retains its observation');
 
     win = await open('reset', { multi: '1', theme: 'light', old: '1' });
     win.document.getElementById('tz-reset-btn').click();
@@ -62,7 +70,7 @@ document.getElementById('run').onclick = async () => {
     check(win.ticket01.state.sync.userTZ === win.Intl.DateTimeFormat().resolvedOptions().timeZone, 'reset restores system timezone');
     check(win.ticket01.messages.includes('USAGE_UPDATE') && win.ticket01.messages.includes('POLL_NOW'), 'reset requests icon and status refresh');
     check(win.document.getElementById('usage-sub').textContent === 'Send a message to see usage', 'reset restores the no-reading view');
-    check(win.document.getElementById('usage-updated').hidden && win.document.getElementById('usage-observation').hidden, 'reset clears reading age and observation text');
+    check(win.document.getElementById('usage-updated').hidden && !win.document.getElementById('usage-pct').hasAttribute('title'), 'reset clears reading age and hover context');
     win = await open('reset', {}, true);
     check(Object.keys(win.ticket01.state.local.accounts).length === 0, 'cleared Accounts stay cleared after reopening');
     results.textContent += '\nAll lifecycle checks passed. Fixtures only; not a live extension capture test.\n';

@@ -203,8 +203,13 @@ body {
   text-align: center;
 }
 
-.usage-pct.unknown { font-size: 20px; color: var(--text-secondary); }
-.usage-updated, .usage-observation {
+.usage-pct.dormant { font-size: 20px; color: var(--text-secondary); }
+.usage-estimate-label { font-size: 11px; font-weight: 400; letter-spacing: 0; }
+.usage-pct.dormant:focus-visible, .account-percent:focus-visible {
+  outline: 1px solid var(--text-secondary);
+  outline-offset: 3px;
+}
+.usage-updated {
   font-size: 11px;
   line-height: 1.4;
   color: var(--text-secondary);

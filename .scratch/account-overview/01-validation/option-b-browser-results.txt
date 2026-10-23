@@ -1,0 +1,63 @@
+PASS popup startup retains a year-old Account
+PASS saved label survives
+PASS opening popup writes no storage
+PASS idle popup refresh retains the Account beyond 48 more hours
+PASS closing/reopening preserves the Account
+PASS dark single: ordinary reading and countdown
+PASS reading age is shown
+PASS idle refresh shows explicitly estimated usage at the reset boundary
+PASS hover text preserves the observation and refresh guidance
+PASS dormant detail removes the dense helper lines and redundant quota label
+PASS dormant context is available to assistive technology and keyboard focus
+PASS expiry and browsing leave stored readings and Active unchanged
+PASS expired reading hides the current-usage bar
+PASS estimate remains until just before three hours after reset
+PASS estimate ends at exactly three hours after reset
+PASS estimated display never overwrites a saved Usage reading
+PASS new reading clears the expired presentation and stale hover context
+PASS dark paged: ordinary reading and countdown
+PASS reading age is shown
+PASS idle refresh shows explicitly estimated usage at the reset boundary
+PASS hover text preserves the observation and refresh guidance
+PASS dormant detail removes the dense helper lines and redundant quota label
+PASS dormant context is available to assistive technology and keyboard focus
+PASS expiry and browsing leave stored readings and Active unchanged
+PASS expired reading hides the current-usage bar
+PASS estimate remains until just before three hours after reset
+PASS estimate ends at exactly three hours after reset
+PASS estimated display never overwrites a saved Usage reading
+PASS new reading clears the expired presentation and stale hover context
+PASS light single: ordinary reading and countdown
+PASS reading age is shown
+PASS idle refresh shows explicitly estimated usage at the reset boundary
+PASS hover text preserves the observation and refresh guidance
+PASS dormant detail removes the dense helper lines and redundant quota label
+PASS dormant context is available to assistive technology and keyboard focus
+PASS expiry and browsing leave stored readings and Active unchanged
+PASS expired reading hides the current-usage bar
+PASS estimate remains until just before three hours after reset
+PASS estimate ends at exactly three hours after reset
+PASS estimated display never overwrites a saved Usage reading
+PASS new reading clears the expired presentation and stale hover context
+PASS light paged: ordinary reading and countdown
+PASS reading age is shown
+PASS idle refresh shows explicitly estimated usage at the reset boundary
+PASS hover text preserves the observation and refresh guidance
+PASS dormant detail removes the dense helper lines and redundant quota label
+PASS dormant context is available to assistive technology and keyboard focus
+PASS expiry and browsing leave stored readings and Active unchanged
+PASS expired reading hides the current-usage bar
+PASS estimate remains until just before three hours after reset
+PASS estimate ends at exactly three hours after reset
+PASS estimated display never overwrites a saved Usage reading
+PASS new reading clears the expired presentation and stale hover context
+PASS expired Active detail remains Active and retains its observation
+PASS reset-to-default clears all retained Accounts
+PASS reset restores theme and watched products
+PASS reset restores system timezone
+PASS reset requests icon and status refresh
+PASS reset restores the no-reading view
+PASS reset clears reading age and hover context
+PASS cleared Accounts stay cleared after reopening
+
+All lifecycle checks passed. Fixtures only; not a live extension capture test.

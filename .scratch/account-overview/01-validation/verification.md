@@ -62,3 +62,15 @@ Review summary: Standards **0** findings; Spec **0** findings.
 ## Limits
 
 These browser checks use real popup sources with synthetic adapters, not an installed extension or new real Claude reply. They make no claim about repairing capture. The separate bug #08 already has its own live verification. No live stored readings were changed, no extension reload or package rebuild was performed, and no publication occurred. The ready-for-human status is a completed implementation handoff, consistent with earlier tickets in this repository.
+
+## User-approved compact option B — 2026-10-23
+
+This follow-up supersedes the original visible expired presentation above. The user chose option B after finding unknown, Window ended, age and the paragraph too dense. Both production popup renderers now show only `~0% estimated` until three hours after the observed five-hour reset, then `No recent reading`. The estimated percentage is a presentation assumption explicitly authorized by the user, not an observed Usage reading. The module still exposes null after expiry, and storage is untouched.
+
+The dormant label carries reading age, the last observed percentage and message guidance in native hover text and aria-description, with keyboard focus. Dormant age/reset/helper lines, quota label and bar are hidden. Ordinary readings remain unchanged. A fresh reading or reset removes all stale hover/accessibility context.
+
+- `node --test`: all 43 tests pass. Popup/harness syntax and whitespace checks pass.
+- [Updated Chrome output](option-b-browser-results.txt): all 61 lifecycle assertions pass across single/paged views and both themes. Includes reset, reopening, exact reset, 3h minus 1ms, exact 3h, no storage mutation, preserved Active, hidden dense copy, accessible context, and new-reading cleanup. Two test assertions were corrected to follow the newly Active Account after a real renderer reorder and the uppercase-rendered Active tag; these were fixture assertion issues, not runtime defects.
+- [Dark production popup](option-b-dark.png), [light production popup](option-b-light.png). Screenshots show the actual production scripts with disposable adapters, not the earlier static comparison. The shared track still takes its tallest page's height; ticket 02 owns the upcoming fixed layout.
+- Separate Standards and Spec reviews each found zero issues.
+- Browser tooling could not claim the Chrome internal Extensions page, so it did not reload the user's installed extension. Reopen after reloading the unpacked extension to pick up the updated resources if Chrome retains the previous version. No live readings were edited.

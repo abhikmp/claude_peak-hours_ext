@@ -113,6 +113,23 @@ function observedUsageText(account) {
   return `Last observed: ${Math.round(account.lastObservedPercent)}%. Send a message from this Account for a new reading.`;
 }
 
+function renderDormantUsage(element, account) {
+  const estimated = Date.now() < account.resetsAt * 1000 + 3 * 60 * 60 * 1000;
+  element.textContent = estimated ? '~0% ' : 'No recent reading';
+  if (estimated) {
+    const label = document.createElement('span');
+    label.className = 'usage-estimate-label';
+    label.textContent = 'estimated';
+    element.append(label);
+  }
+  const context = estimated
+    ? 'Estimated for three hours after the observed 5-hour quota reset; current usage has not been observed. '
+    : 'The observed 5-hour quota period ended; current usage has not been observed. ';
+  element.title = context + formatReadingAge(account.ageMs) + '. ' + observedUsageText(account);
+  element.setAttribute('aria-description', element.title);
+  element.tabIndex = 0;
+}
+
 // ── Render usage hero ──
 function renderUsageHero(account, tz) {
   const { percent, resetsAt, isExpired } = account ?? {};
@@ -120,19 +137,21 @@ function renderUsageHero(account, tz) {
   const fill  = document.getElementById('bar-fill');
   const sub   = document.getElementById('usage-sub');
   const updated = document.getElementById('usage-updated');
-  const observation = document.getElementById('usage-observation');
   document.querySelector('.bar-wrap').hidden = !!isExpired;
-  updated.hidden = !account;
+  document.querySelector('.usage-quota-label').hidden = !!isExpired;
+  sub.hidden = !!isExpired;
+  updated.hidden = !account || isExpired;
   updated.textContent = account ? formatReadingAge(account.ageMs) : '';
-  observation.hidden = !isExpired;
-  observation.textContent = isExpired ? observedUsageText(account) : '';
+  pctEl.removeAttribute('title');
+  pctEl.removeAttribute('aria-description');
+  pctEl.removeAttribute('tabindex');
 
   if (isExpired) {
-    pctEl.textContent = '— unknown';
-    pctEl.className = 'usage-pct unknown';
+    renderDormantUsage(pctEl, account);
+    pctEl.className = 'usage-pct dormant';
     fill.style.width = '0%';
     fill.className = 'bar-fill';
-    sub.textContent = 'Window ended';
+    sub.textContent = '';
     sub.className = 'usage-sub';
     return;
   }

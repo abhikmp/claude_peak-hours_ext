@@ -46,8 +46,7 @@ const AccountPages = (() => {
       </div>
       <div class="account-bar"><div class="account-fill"></div></div>
       <div class="account-reset"></div>
-      <div class="account-updated"></div>
-      <div class="account-observation" hidden></div>`;
+      <div class="account-updated"></div>`;
     const name = page.querySelector('.account-name');
     const label = displayLabel(account.label);
     name.textContent = label;
@@ -57,15 +56,15 @@ const AccountPages = (() => {
     const percent = Math.round(account.percent);
     const tone = account.isExpired ? 'unknown' : percent <= 60 ? 'green' : percent <= 85 ? 'orange' : 'red';
     page.dataset.tone = tone;
-    page.querySelector('.account-percent').textContent = account.isExpired ? '— unknown' : `${percent}%\u00a0used`;
+    const percentElement = page.querySelector('.account-percent');
+    percentElement.textContent = `${percent}%\u00a0used`;
+    page.querySelector('.account-quota').hidden = account.isExpired;
     page.querySelector('.account-bar').hidden = account.isExpired;
     page.querySelector('.account-fill').style.width = `${percent}%`;
     const reset = page.querySelector('.account-reset');
+    reset.hidden = account.isExpired;
     if (account.isExpired) {
-      reset.textContent = 'Window ended';
-      const observation = page.querySelector('.account-observation');
-      observation.hidden = false;
-      observation.textContent = observedUsageText(account);
+      renderDormantUsage(percentElement, account);
     } else if (account.resetsAt) {
       const msLeft = account.resetsAt * 1000 - Date.now();
       const clockTime = toLocalTimeStr(new Date(account.resetsAt * 1000).toISOString(), tz);
@@ -73,7 +72,9 @@ const AccountPages = (() => {
         ? `Resets in ${formatDuration(msLeft)} · ${clockTime}`
         : 'Resetting soon…';
     }
-    page.querySelector('.account-updated').textContent = formatReadingAge(account.ageMs);
+    const updated = page.querySelector('.account-updated');
+    updated.hidden = account.isExpired;
+    updated.textContent = formatReadingAge(account.ageMs);
     return page;
   }
 
