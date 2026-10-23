@@ -1,3 +1,4 @@
+PASS prototype duration slider defaults to 2.5 seconds within a 1–5 second range
 PASS 1 dark: four Accounts have three table rows in fixed bounds
 PASS all three rows fit without horizontal overflow (width 228/228, height 173/173)
 PASS table hides its scrollbar while retaining scrolling
@@ -40,6 +41,7 @@ PASS Undo restores three slides
 PASS large list supports internal scrolling
 PASS Cancel preserves exact filtered order and scroll position
 PASS long international names wrap or scroll inside confirmation without widening popup
+PASS prototype duration slider defaults to 2.5 seconds within a 1–5 second range
 PASS 2 dark: four Accounts have three table rows in fixed bounds
 PASS all three rows fit without horizontal overflow (width 228/228, height 173/173)
 PASS table hides its scrollbar while retaining scrolling
@@ -82,6 +84,7 @@ PASS Undo restores three slides
 PASS large list supports internal scrolling
 PASS Cancel preserves exact filtered order and scroll position
 PASS long international names wrap or scroll inside confirmation without widening popup
+PASS prototype duration slider defaults to 2.5 seconds within a 1–5 second range
 PASS 3 dark: four Accounts have three table rows in fixed bounds
 PASS all three rows fit without horizontal overflow (width 228/228, height 173/173)
 PASS table hides its scrollbar while retaining scrolling
@@ -103,6 +106,19 @@ PASS Undo restores three slides
 PASS large list supports internal scrolling
 PASS Cancel preserves exact filtered order and scroll position
 PASS long international names wrap or scroll inside confirmation without widening popup
+PASS dark: Undo stays at the same lower coordinates on Active without moving preferences
+PASS page navigation preserves the remaining countdown instead of restarting it
+PASS fixed lower Undo position leaves the ordinary usage details unobstructed and naturally fitted
+PASS adjusting the slider restarts a visible countdown with the chosen duration
+PASS native countdown animation uses the selected remaining duration and linear timing
+PASS bottom countdown line shrinks at an intermediate animation time
+PASS returning to the table keeps the position and original deadline
+PASS notification and Undo expire automatically while the Account remains forgotten
+PASS automatic dismissal leaves underlying rows and geometry unchanged
+PASS 2.5-second Undo remains available before its deadline
+PASS 2.5-second Undo disappears after its deadline without restoring the Account
+PASS a second removal gets its own complete countdown and survives the previous deadline
+PASS the replacement notification also expires automatically
 PASS 3 light: four Accounts have three table rows in fixed bounds
 PASS all three rows fit without horizontal overflow (width 228/228, height 173/173)
 PASS table hides its scrollbar while retaining scrolling
@@ -124,6 +140,15 @@ PASS Undo restores three slides
 PASS large list supports internal scrolling
 PASS Cancel preserves exact filtered order and scroll position
 PASS long international names wrap or scroll inside confirmation without widening popup
+PASS light: Undo stays at the same lower coordinates on Active without moving preferences
+PASS page navigation preserves the remaining countdown instead of restarting it
+PASS fixed lower Undo position leaves the ordinary usage details unobstructed and naturally fitted
+PASS adjusting the slider restarts a visible countdown with the chosen duration
+PASS native countdown animation uses the selected remaining duration and linear timing
+PASS bottom countdown line shrinks at an intermediate animation time
+PASS returning to the table keeps the position and original deadline
+PASS notification and Undo expire automatically while the Account remains forgotten
+PASS automatic dismissal leaves underlying rows and geometry unchanged
 PASS no prototype runtime errors
 
 All prototype checks passed. Sample data only.

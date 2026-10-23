@@ -23,6 +23,12 @@ document.getElementById('run').onclick = async () => {
       const order = () => [...doc.querySelectorAll('tbody tr')].map(row => row.dataset.id).join();
       const positions = () => JSON.stringify(['.preferences', '.checks', '.footer', '.tz'].map(selector => { const b = doc.querySelector(selector).getBoundingClientRect(); return [b.x, b.y, b.width, b.height]; }));
       const ask = id => { click(`.more[data-id="${id}"]`); click('[role="menuitem"]'); };
+      const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+      const setDuration = seconds => { const slider = doc.getElementById('undo-duration'); slider.value = seconds; slider.dispatchEvent(new win.Event('input', { bubbles: true })); };
+      const toastPosition = () => { const t = doc.querySelector('.toast').getBoundingClientRect(), p = popup().getBoundingClientRect(); return [t.x - p.x, t.y - p.y, t.width, t.height].join(); };
+      const remainingFraction = () => new win.DOMMatrixReadOnly(win.getComputedStyle(doc.querySelector('.undo-countdown')).transform).a;
+      check(doc.getElementById('undo-duration').value === '2.5' && doc.getElementById('undo-duration').min === '1'
+        && doc.getElementById('undo-duration').max === '5', 'prototype duration slider defaults to 2.5 seconds within a 1–5 second range');
       for (const theme of ['dark', 'light']) {
         if (theme === 'light') click('.theme');
         check(fixed() && doc.querySelectorAll('tbody tr').length === 3, `${variant} ${theme}: four Accounts have three table rows in fixed bounds`);
@@ -80,6 +86,60 @@ document.getElementById('run').onclick = async () => {
         const longDialog = doc.querySelector('[role="dialog"]');
         check(longDialog.textContent.includes('研究と開発') && longDialog.scrollWidth === longDialog.clientWidth && fixed(), 'long international names wrap or scroll inside confirmation without widening popup');
         click('[data-action="cancel"]'); select('#scenario', 'normal');
+
+        if (variant === 3) {
+          select('#count', '8');
+          click('[data-action="previous"]');
+          const primaryPositions = positions();
+          click('[data-action="next"]');
+          ask('a4'); click('[data-action="forget"]');
+          const tableToast = toastPosition();
+          await delay(150);
+          const tableFraction = remainingFraction();
+          click('[data-action="previous"]');
+          check(toastPosition() === tableToast && positions() === primaryPositions, `${theme}: Undo stays at the same lower coordinates on Active without moving preferences`);
+          check(remainingFraction() <= tableFraction && remainingFraction() > 0, 'page navigation preserves the remaining countdown instead of restarting it');
+          const primaryUsage = doc.querySelector('.usage');
+          check(primaryUsage.clientHeight === primaryUsage.scrollHeight, 'fixed lower Undo position leaves the ordinary usage details unobstructed and naturally fitted');
+          setDuration('1');
+          check(doc.getElementById('undo-duration-output').textContent === '1 second' && remainingFraction() > 0.9, 'adjusting the slider restarts a visible countdown with the chosen duration');
+          if (!win.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            const countdownAnimation = doc.querySelector('.undo-countdown').getAnimations()[0];
+            check(countdownAnimation.effect.getTiming().easing === 'linear' && countdownAnimation.effect.getTiming().duration <= 1000,
+              'native countdown animation uses the selected remaining duration and linear timing');
+            // A covered Chrome window can suspend its animation clock. Seek the
+            // native animation for deterministic visual verification; expiry below
+            // still runs against elapsed real time without a mocked timer.
+            countdownAnimation.currentTime = 350;
+            check(remainingFraction() < 0.8 && remainingFraction() > 0.2, 'bottom countdown line shrinks at an intermediate animation time');
+          } else {
+            check(win.getComputedStyle(doc.querySelector('.undo-time')).display !== 'none', 'reduced motion exposes a numeric time-left label');
+          }
+          await delay(350);
+          click('[data-action="next"]');
+          check(toastPosition() === tableToast && remainingFraction() < 0.8, 'returning to the table keeps the position and original deadline');
+          const firstRow = doc.querySelector('tbody tr'), firstRowTop = firstRow.getBoundingClientRect().top;
+          await delay(750);
+          check(!doc.querySelector('.toast') && !doc.querySelector('tr[data-id="a4"]'), 'notification and Undo expire automatically while the Account remains forgotten');
+          check(doc.querySelector('tbody tr') === firstRow && firstRow.getBoundingClientRect().top === firstRowTop, 'automatic dismissal leaves underlying rows and geometry unchanged');
+
+          if (theme === 'dark') {
+            setDuration('2.5');
+            ask('a5'); click('[data-action="forget"]');
+            await delay(2000);
+            check(!!doc.querySelector('.undo'), '2.5-second Undo remains available before its deadline');
+            await delay(650);
+            check(!doc.querySelector('.undo') && !doc.querySelector('tr[data-id="a5"]'), '2.5-second Undo disappears after its deadline without restoring the Account');
+            setDuration('1');
+            ask('a3'); click('[data-action="forget"]');
+            await delay(650);
+            ask('a6'); click('[data-action="forget"]');
+            await delay(450);
+            check(doc.querySelector('.toast-text')?.textContent === 'Forgot Weekend projects', 'a second removal gets its own complete countdown and survives the previous deadline');
+            await delay(650);
+            check(!doc.querySelector('.toast'), 'the replacement notification also expires automatically');
+          }
+        }
       }
     }
     check(errors.length === 0, 'no prototype runtime errors');

@@ -6,7 +6,7 @@
 
 **Status:** ready-for-human
 
-**Next action:** Review [the current Compact Forget-flow prototype](../04-prototype/prototype.html) and [its design notes](../04-prototype/README.md). Dialog is selected. Review the hidden table scrollbar and far-right vertical menu refinements, then finalize Undo placement/lifetime before production implementation. The user's 2026-10-24 instruction to prototype/finalize design first supersedes the earlier request to start implementing this ticket. No ticket 04 production changes have been made.
+**Next action:** Review [the current Compact Forget-flow prototype](../04-prototype/prototype.html) and [its design notes](../04-prototype/README.md). Dialog is selected. Review the hidden table scrollbar and far-right vertical menu refinements, then review the fixed lower Undo notification, shrinking countdown line, and prototype duration slider (1–5 seconds, default 2.5) before production implementation. The user's 2026-10-24 instruction to prototype/finalize design first supersedes the earlier request to start implementing this ticket. No ticket 04 production changes have been made.
 
 ## Context
 
@@ -41,3 +41,5 @@ Prefer existing Account/storage/capture seams and meaningful user flows over imp
 2026-10-24: Built an isolated three-direction confirmation picker on the current Compact design, with sample removal, Cancel, Undo, rediscovery, count transitions, keyboard handling, both themes and long-name cases. Awaiting design selection; production acceptance criteria above remain unchecked.
 
 2026-10-24 design review: User selected Dialog, requested removal of the visible table scrollbar and movement of row menus to the far right as vertical dots. Updated the prototype accordingly; scrolling remains available. Dialog is now the default. No production changes; awaiting review of these refinements and Undo behavior.
+
+2026-10-24 Undo review: User requested automatic expiry, a consistent lower position on every page, and a countdown line along the bottom. They then requested 2.5 seconds and a prototype slider to compare durations. Implemented a 1–5 second slider with 2.5-second default, original deadlines across navigation, linear shrinking bottom line, reduced-motion fallback, and automatic removal of the Undo action. Prototype only; awaiting review.
