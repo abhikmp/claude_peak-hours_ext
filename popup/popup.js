@@ -130,6 +130,27 @@ function renderDormantUsage(element, account) {
   element.tabIndex = 0;
 }
 
+function renderUsageFacts(element, account, tz) {
+  element.hidden = !account?.isExpired;
+  element.replaceChildren();
+  if (element.hidden) return;
+  element.innerHTML = `
+    <dt title="Reset time from the last captured reading">Reset</dt><dd><time></time></dd>
+    <dt>Last recorded</dt><dd class="usage-last-recorded"></dd>
+    <dt>Updated</dt><dd class="usage-reading-age"></dd>`;
+  const reset = new Date(account.resetsAt * 1000);
+  const time = element.querySelector('time');
+  time.dateTime = reset.toISOString();
+  time.textContent = new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true, timeZone: tz
+  }).format(reset);
+  time.title = new Intl.DateTimeFormat('en-GB', {
+    dateStyle: 'full', timeStyle: 'short', timeZone: tz
+  }).format(reset) + ` (${tz})`;
+  element.querySelector('.usage-last-recorded').textContent = `${Math.round(account.lastObservedPercent)}%`;
+  element.querySelector('.usage-reading-age').textContent = formatReadingAge(account.ageMs).replace(/^Updated /, '');
+}
+
 // ── Render usage hero ──
 function renderUsageHero(account, tz) {
   const { percent, resetsAt, isExpired } = account ?? {};
@@ -137,6 +158,7 @@ function renderUsageHero(account, tz) {
   const fill  = document.getElementById('bar-fill');
   const sub   = document.getElementById('usage-sub');
   const updated = document.getElementById('usage-updated');
+  renderUsageFacts(document.getElementById('usage-facts'), account, tz);
   document.querySelector('.bar-wrap').hidden = !!isExpired;
   document.querySelector('.usage-quota-label').hidden = !!isExpired;
   sub.hidden = !!isExpired;

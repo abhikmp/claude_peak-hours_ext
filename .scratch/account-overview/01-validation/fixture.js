@@ -8,8 +8,8 @@
   const isOld = params.get('old') === '1';
   const expired = params.get('expired') === '1';
   const reading = {
-    label: 'Studio', percent: 100, resetsAt: (base + (expired ? 0 : 3600000)) / 1000,
-    lastReadingAt: base - (isOld ? 365 * 86400000 : 1200000), readingOrder: 1
+    label: 'Studio', percent: 100, resetsAt: (base + (expired ? -Number(params.get('resetAgoMinutes') || 0) * 60000 : 3600000)) / 1000,
+    lastReadingAt: base - (isOld ? 365 * 86400000 : Number(params.get('ageMinutes') || 20) * 60000), readingOrder: 1
   };
   const seed = {
     now: base,

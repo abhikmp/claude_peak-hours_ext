@@ -40,7 +40,16 @@ document.getElementById('run').onclick = async () => {
         await win.ticket01.advance(3600000);
         check(value().innerText === '~0% estimated', 'idle refresh shows explicitly estimated usage at the reset boundary');
         check(value().title.includes('Last observed: 100%') && value().title.includes('Send a message'), 'hover text preserves the observation and refresh guidance');
-        check(!text().includes('Updated') && !text().includes('Last observed') && !text().includes('5h quota') && !text().includes('Window ended'), 'dormant detail removes the dense helper lines and redundant quota label');
+        check(!text().includes('Last observed') && !text().includes('Send a message') && !text().includes('5h quota') && !text().includes('Window ended'), 'dormant detail avoids paragraphs and redundant quota labels');
+        const facts = () => page().querySelector('.usage-facts');
+        check([...facts().querySelectorAll('dt')].map(node => node.textContent).join('|') === 'Reset|Last recorded|Updated', 'dormant detail has three labeled fact rows');
+        check([...facts().querySelectorAll('dd')].map(node => node.textContent).join('|') === '23 Oct, 4:30 pm|100%|1h 20m ago', 'fact rows show observed reset in selected timezone, last recorded percent and age');
+        check(facts().querySelector('time').dateTime === '2026-10-23T11:00:00.000Z', 'reset timestamp comes from the actual last captured reading');
+        await win.chrome.storage.sync.set({ userTZ: 'UTC' });
+        await win.ticket01.advance(0);
+        check(facts().querySelector('time').textContent === '23 Oct, 11:00 am', 'reset display follows the selected timezone');
+        await win.chrome.storage.sync.set({ userTZ: 'Asia/Calcutta' });
+        await win.ticket01.advance(0);
         check(value().getAttribute('aria-description') === value().title && value().tabIndex === 0, 'dormant context is available to assistive technology and keyboard focus');
         check(JSON.stringify(win.ticket01.state.local.accounts) === stored, 'expiry and browsing leave stored readings and Active unchanged');
         check((multi ? page().querySelector('.account-bar') : doc.querySelector('.bar-wrap')).hidden, 'expired reading hides the current-usage bar');
@@ -48,11 +57,13 @@ document.getElementById('run').onclick = async () => {
         check(value().innerText === '~0% estimated', 'estimate remains until just before three hours after reset');
         await win.ticket01.advance(1);
         check(value().innerText === 'No recent reading', 'estimate ends at exactly three hours after reset');
+        check(!facts().hidden && facts().querySelector('.usage-last-recorded').textContent === '100%' && facts().querySelector('.usage-reading-age').textContent === '4h 20m ago', 'fact rows remain visible and age refreshes after the estimate ends');
         check(JSON.stringify(win.ticket01.state.local.accounts) === stored, 'estimated display never overwrites a saved Usage reading');
         await win.ticket01.reading();
         await settle();
         const activeValue = doc.querySelector(multi ? '.account-page .account-percent' : '.usage-pct');
         check(activeValue.innerText.includes('28%') && !activeValue.hasAttribute('title') && !activeValue.hasAttribute('aria-description') && !activeValue.hasAttribute('tabindex'), 'new reading clears the expired presentation and stale hover context');
+        check(doc.querySelector(multi ? '.account-page .usage-facts' : '#usage-facts').hidden, 'fresh readings hide the dormant fact block');
       }
     }
 
@@ -71,6 +82,7 @@ document.getElementById('run').onclick = async () => {
     check(win.ticket01.messages.includes('USAGE_UPDATE') && win.ticket01.messages.includes('POLL_NOW'), 'reset requests icon and status refresh');
     check(win.document.getElementById('usage-sub').textContent === 'Send a message to see usage', 'reset restores the no-reading view');
     check(win.document.getElementById('usage-updated').hidden && !win.document.getElementById('usage-pct').hasAttribute('title'), 'reset clears reading age and hover context');
+    check(win.document.getElementById('usage-facts').hidden && win.document.getElementById('usage-facts').children.length === 0, 'reset clears the dormant fact block');
     win = await open('reset', {}, true);
     check(Object.keys(win.ticket01.state.local.accounts).length === 0, 'cleared Accounts stay cleared after reopening');
     results.textContent += '\nAll lifecycle checks passed. Fixtures only; not a live extension capture test.\n';

@@ -74,3 +74,15 @@ The dormant label carries reading age, the last observed percentage and message 
 - [Dark production popup](option-b-dark.png), [light production popup](option-b-light.png). Screenshots show the actual production scripts with disposable adapters, not the earlier static comparison. The shared track still takes its tallest page's height; ticket 02 owns the upcoming fixed layout.
 - Separate Standards and Spec reviews each found zero issues.
 - Browser tooling could not claim the Chrome internal Extensions page, so it did not reload the user's installed extension. Reopen after reloading the unpacked extension to pick up the updated resources if Chrome retains the previous version. No live readings were edited.
+
+## Three compact fact rows — user amendment, 2026-10-23
+
+The user asked to use the now-empty dormant region for last reset time, last recorded percentage and update age. Both production renderers now share a semantic definition-list renderer for **Reset / Last recorded / Updated**. The two columns separate labels from values without prose, cards or borders. The reset is the timestamp saved with the last reading, formatted in the selected timezone; its full date including year and timezone is available on hover. It does not guess subsequent resets. The last recorded value remains separate from the estimated current headline.
+
+The block uses 11px text, 4px between rows and 10px between columns. In the checked two-Account popup it measures 196px by 50.89px; the entire content is 260px by 321.89px with no horizontal overflow or arrow overlap. The shared track still keeps status/preferences aligned while paging. No fixed-size redesign or other ticket-02 behavior was added.
+
+- All **43 Node tests** pass; popup and fixture syntax/whitespace checks pass.
+- All **86 Chrome lifecycle assertions** pass: [output](facts-browser-results.txt). New checks cover all three row labels/values, actual stored reset ISO timestamp, selected-timezone conversion between Calcutta and UTC, age refresh, visibility past the estimate cutoff, and cleanup after new readings/reset. Existing retention/capture-boundary, Active and estimate-cutoff checks remain intact.
+- Actual production-popup fixture screenshots: [estimated dark](facts-estimated-dark.png), [estimated light](facts-estimated-light.png), [older dormant dark](facts-dormant-dark.png), [older dormant light](facts-dormant-light.png). Sample readings only. Existing normal/empty-state coverage remains in the lifecycle run.
+- Console warnings/errors on screenshot checks: none. Separate Standards and Spec reviews: zero findings.
+- The installed extension has not been reloaded by the agent. Reload it once if Chrome still serves the earlier popup resources. No live readings, package or publication were changed.

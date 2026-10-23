@@ -46,7 +46,8 @@ const AccountPages = (() => {
       </div>
       <div class="account-bar"><div class="account-fill"></div></div>
       <div class="account-reset"></div>
-      <div class="account-updated"></div>`;
+      <div class="account-updated"></div>
+      <dl class="usage-facts" aria-label="Last captured reading" hidden></dl>`;
     const name = page.querySelector('.account-name');
     const label = displayLabel(account.label);
     name.textContent = label;
@@ -75,6 +76,7 @@ const AccountPages = (() => {
     const updated = page.querySelector('.account-updated');
     updated.hidden = account.isExpired;
     updated.textContent = formatReadingAge(account.ageMs);
+    renderUsageFacts(page.querySelector('.usage-facts'), account, tz);
     return page;
   }
 
