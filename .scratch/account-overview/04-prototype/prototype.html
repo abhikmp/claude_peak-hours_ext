@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QuotaBeacon · Forget Account flow</title><style>
+*{box-sizing:border-box}body{margin:0;background:#101011;color:#eee;font:14px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.25;cursor:default}[hidden]{display:none!important}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #aaa;outline-offset:2px}h1,h2,p{margin:0}.layout{max-width:980px;margin:0 auto;padding:48px 28px 120px;display:grid;grid-template-columns:320px 300px;gap:90px;align-items:start}h1{font-size:25px;font-weight:600;line-height:1.2;letter-spacing:-.5px}.intro{color:#b4b4bc;margin-top:14px}.lab h2{font-size:15px;margin:28px 0 6px}.lab p{color:#b4b4bc;font-size:13px}.lab label{display:block;font-size:12px;color:#b4b4bc;margin:20px 0 6px}.lab select{width:100%;height:34px;background:#202023;color:#eee;border:1px solid #424248;border-radius:6px;padding:0 8px}.lab button{background:#202023;border:1px solid #424248;color:#eee;border-radius:6px;padding:7px 9px;font-size:12px}.lab .pair{display:flex;gap:8px;margin-top:10px}.pair button{flex:1}.lab .wide{width:100%;margin-top:8px}.lab .note{font-size:12px;color:#a0a0a8;margin-top:20px}.preview{display:flex;align-items:center;flex-direction:column;gap:12px}.caption{width:260px;display:flex;justify-content:space-between;font-size:12px;color:#a8a8b0}.preview-note{font-size:12px;color:#a8a8b0;max-width:280px;text-align:center}.event{min-height:40px;margin-top:16px;font-size:12px;color:#b4b4bc}
+.popup{--bg:#1c1c1e;--surface:#252528;--line:#38383c;--ink:#f0f0f0;--muted:#a0a0a8;--green:#22c55e;--orange:#fb923c;--red:#f87171;position:relative;background:var(--bg);color:var(--ink);width:260px;height:340px;padding:14px 16px 12px;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;font-size:11px;line-height:1.4;color-scheme:dark}.popup.light{--bg:#f5f0eb;--surface:#edeae5;--line:#d6d0c8;--ink:#1a1814;--muted:#5a5650;--green:#166534;--orange:#9a3412;--red:#b91c1c;color-scheme:light}.popup button{font:inherit}.theme{position:absolute;top:5px;right:6px;width:24px;height:24px;border:0;background:none;color:var(--ink);font-size:17px}.arrows{position:absolute;top:34px;right:6px;display:flex;flex-direction:column;gap:2px}.arrows button{width:24px;height:22px;border:0;background:none;color:var(--ink);font-size:19px;line-height:1}.arrows button:hover:not(:disabled){background:var(--surface);border-radius:5px}.usage{flex:1;min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}.hero{padding-right:32px;display:flex;flex-direction:column;gap:5px}.identity{display:flex;gap:6px;align-items:center;min-width:0;color:var(--muted)}.identity .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.tag{font-size:9px;color:var(--green);padding:1px 5px;border:1px solid color-mix(in srgb,var(--green) 30%,transparent);border-radius:99px;flex:none}.value-line{display:flex;align-items:baseline;justify-content:space-between}.value{font-size:22px;line-height:1.15;font-weight:600;letter-spacing:-.5px}.value.dormant{font-size:20px}.value small{font-size:11px;font-weight:400;letter-spacing:0;color:var(--muted)}.quota,.reset-detail,.age{color:var(--muted)}.bar{height:8px;background:var(--surface);border:1px solid var(--line);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--green)}.facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 10px;margin:4px 0 0}.facts dt{color:var(--muted)}.facts dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}.status{display:flex;align-items:center;gap:7px;min-width:0;flex:none}.pill{display:flex;align-items:center;gap:5px;padding:3px 7px;border:1px solid color-mix(in srgb,var(--red) 25%,transparent);border-radius:99px;color:var(--red);background:color-mix(in srgb,var(--red) 10%,transparent);white-space:nowrap}.pill i{width:6px;height:6px;border-radius:50%;background:currentColor}.aside{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);min-width:0}.preferences{flex:none;margin-top:9px;display:flex;flex-direction:column;gap:7px}.preferences .status{margin-bottom:0}.divider{border-top:1px solid var(--line)}.settings-title{color:var(--muted);margin-bottom:5px}.checks{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;color:var(--muted);font-size:12px}.checks label{display:flex;align-items:center;gap:5px;white-space:nowrap}.checks input{margin:0;accent-color:#6366f1}.hint{color:var(--muted);margin-top:5px}.footer{display:flex;justify-content:space-between;gap:6px;color:var(--muted)}.footer button{padding:0;border:0;background:none;color:var(--muted);font-size:10px}.tz{height:30px;width:100%;padding:0 8px;border:1px solid var(--line);border-radius:7px;color:var(--muted);background:var(--surface);font-size:11px}.dots{display:flex;justify-content:center;gap:5px;flex:none;margin-top:7px;height:5px}.dots i{width:5px;height:5px;border-radius:50%;background:var(--line)}.dots i.current{background:var(--muted)}.secondary{padding-bottom:6px}.secondary>.status{padding-right:28px;min-height:42px;margin-bottom:10px}.list{display:flex;flex:1;flex-direction:column;min-height:0}.search{height:30px;flex:none;position:relative;margin-bottom:5px}.search span{position:absolute;top:5px;left:8px;color:var(--muted);font-size:15px}.search input{width:100%;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px 0 28px;background:var(--surface);color:var(--ink);font-size:11px}.search input::placeholder{color:var(--muted)}.table-scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;scrollbar-gutter:stable}table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:11px}col.used{width:39px}col.reset{width:75px}th{position:sticky;top:0;z-index:1;background:var(--bg);text-align:left;font-size:10px;font-weight:400;color:var(--muted);padding:5px 0 7px}th:not(:first-child),td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}td{height:47px;padding:5px 0;border-bottom:1px solid var(--line)}td:first-child{padding-right:6px}tbody tr{cursor:pointer}tbody tr:hover{background:var(--surface)}.row-name{display:block;width:100%;padding:0;border:0;background:none;color:var(--ink);font-weight:500;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.row-age{display:block;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.reset-cell{color:var(--muted);font-size:11px;font-weight:400;white-space:nowrap}.reset-cell .verb{display:block;font-size:9px}.reset-cell strong{font-size:11px;font-weight:400}.row-timing{display:block;color:var(--muted);font-size:10px;margin-top:2px}.name-side td{height:54px}.name-side .row-timing,.name-side .row-age{line-height:1.25;margin-top:1px}.table-foot{flex:none;padding-top:14px;font-size:10px;color:var(--muted)}.empty{padding:18px 0;text-align:center;color:var(--muted)}.notice{color:var(--muted);font-size:10px;line-height:1.4;margin:0 0 6px;flex:none}.back{align-self:flex-start;min-height:24px;flex:none;padding:0;margin-bottom:7px;border:0;background:none;color:var(--muted)}.inspection{display:flex;flex:1;min-height:0;flex-direction:column}.inspection .usage{min-height:0}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.popup button:focus-visible,.table-scroll:focus-visible{outline:2px solid var(--muted);outline-offset:-2px}
+@media(max-width:760px){.layout{display:flex;flex-direction:column-reverse;align-items:center;gap:36px;padding-top:28px}.lab{max-width:320px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.proto-picker {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.82);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  backdrop-filter: blur(12px) saturate(1.4);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+    0 8px 24px rgba(0, 0, 0, 0.24),
+    0 2px 6px rgba(0, 0, 0, 0.12);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.proto-picker-highlight {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  will-change: transform;
+}
+
+/* The slide is enabled only after first paint (data-ready), so load doesn't animate. */
+.proto-picker[data-ready] .proto-picker-highlight {
+  transition:
+    transform 250ms cubic-bezier(0.23, 1, 0.32, 1),
+    width 250ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proto-picker[data-ready] .proto-picker-highlight { transition: none; }
+}
+
+.proto-picker-item {
+  position: relative; /* sits above the highlight */
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font: inherit;
+  cursor: pointer;
+  transition: color 150ms ease-out;
+}
+
+.proto-picker-item:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.proto-picker-item:active {
+  transform: scale(0.97);
+}
+
+.proto-picker-item:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 2px;
+}
+
+.proto-picker-item[data-active] {
+  color: #fff;
+}
+
+.proto-picker-divider {
+  width: 1px;
+  height: 16px;
+  margin: 0 4px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.proto-picker-replay {
+  padding: 0 10px;
+  font-size: 14px;
+}
+
+.proto-picker[data-position="top"] {
+  bottom: auto;
+  top: 24px;
+}
+
+col.reset{width:62px}.popup-body{display:flex;flex-direction:column;min-height:0;height:100%}.secondary .popup-body>.status{padding-right:28px;min-height:42px;margin-bottom:10px}.name-actions{display:flex;align-items:center;gap:3px;min-width:0}.row-name{min-width:0;flex:1}.more{flex:none;width:18px;height:16px;padding:0;border:0;border-radius:3px;background:none;color:var(--muted);font-size:16px!important;line-height:1!important;display:grid;place-items:center}.more:hover{color:var(--ink);background:var(--surface)}.table-foot{height:48px;display:flex;align-items:flex-end}.popup-base{display:contents}.notice{position:absolute;bottom:26px;left:16px;right:16px;margin:0;pointer-events:none}.layer{position:absolute;inset:0;z-index:10}.dialog-layer{background:rgb(0 0 0/.42);display:flex;align-items:center;padding:16px}.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;color:var(--ink);box-shadow:0 6px 20px rgb(0 0 0/.18);max-height:280px;overflow:auto;width:100%;animation:appear 160ms ease-out}.anchored-panel,.action-menu{position:absolute;right:16px;top:var(--panel-top,100px);width:228px}.action-menu{width:154px;padding:4px;border-radius:6px}.action-menu button{width:100%;text-align:left;padding:7px 9px;border:0;border-radius:3px;background:none;color:var(--ink)}.action-menu button:hover{background:var(--bg)}.confirm-title{font-size:12px;font-weight:600;line-height:1.4;overflow-wrap:anywhere}.confirm-copy{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.4}.actions{display:flex;justify-content:flex-end;gap:7px;margin-top:10px}.actions button{min-height:27px;padding:4px 10px;border-radius:5px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}.actions .danger{background:var(--red);border-color:transparent;color:#24110e}.light .actions .danger{color:#fff}.dedicated-confirm{flex:1;min-height:0;overflow:auto;padding-right:32px}.dedicated-confirm .actions{justify-content:flex-start;margin-top:7px}.dedicated-confirm .confirm-title{font-size:12px}.dedicated-confirm .confirm-copy{font-size:10px;margin-top:4px}.dedicated-confirm .actions button{min-height:24px;padding:3px 8px}.toast{position:absolute;left:16px;right:16px;top:var(--toast-top,270px);z-index:5;display:flex;align-items:center;gap:8px;min-height:32px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);font-size:10px;box-shadow:0 2px 8px rgb(0 0 0/.12);animation:appear 160ms ease-out}.toast-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.toast button{padding:0;border:0;background:none;color:var(--ink);font-size:11px}.toast .undo{text-decoration:underline;text-underline-offset:2px}.toast .dismiss{color:var(--muted);width:14px}.has-undo:not(.secondary) .usage{padding-bottom:38px}.popup.has-undo:not(.secondary) .toast{right:48px}.dedicated-confirm [tabindex]{outline-offset:-2px}.secondary .inspection{padding-bottom:48px}.modal-open .notice{visibility:hidden}@keyframes appear{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+</style></head><body>
+<main class="layout"><aside class="lab"><h1>Forget an Account</h1><p class="intro">Compare three confirmation flows in the current Compact popup. All changes use sample Accounts only.</p>
+<h2 id="direction-title"></h2><p id="direction-copy"></p>
+<label for="count">Start with this many Accounts</label><select id="count"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>8</option><option>64</option></select>
+<label for="scenario">Sample names</label><select id="scenario"><option value="normal">Normal names</option><option value="long">Long Account name</option></select>
+<button class="wide" id="restart">Restart sample</button>
+<label for="reading-account">Receive a sample reading from</label><select id="reading-account"></select><button class="wide" id="receive">Receive sample reading</button>
+<div class="pair"><button id="advance">Advance 1 hour</button><button id="reopen">Reopen popup</button></div>
+<p class="event" id="event" aria-live="polite"></p>
+<p class="note">Try ⋯ → Forget account → Cancel or Forget.<br>Then Undo, or select the forgotten Account above and receive a reading.</p>
+<p class="note">Four → three switches to slides. Two → one removes navigation. The Active Account has no Forget action.</p>
+<p class="note">Undo stays available until dismissed, replaced by another removal, or the sample restarts. In slides, feedback uses the usage area so preferences stay put; details can scroll while it is visible.</p>
+<p class="note">Design review only. No extension storage is read or changed.</p>
+</aside><section class="preview"><div class="caption"><span id="mode-caption"></span><span>260 × 340</span></div><div id="stage"></div><p class="preview-note" id="flow-note"></p></section></main>
+<nav class="proto-picker" aria-label="Prototype variants"><span class="proto-picker-highlight" aria-hidden="true"></span><button class="proto-picker-item" data-active aria-current="true">Anchored</button><button class="proto-picker-item">Dedicated view</button><button class="proto-picker-item">Dialog</button></nav>
+<script>
+const MIN=60000,HOUR=60*MIN,BASE=Date.parse('2026-10-23T10:00:00Z');
+const names=['Personal workspace','Northstar Studio','Writing room','Research lab','Atlas engineering','Field notes','Weekend projects','Learning lab'];
+const PROMOTION_MS=15*MIN;
+const s={count:8,page:1,selected:null,query:'',scroll:0,theme:'dark',scenario:'mixed',now:BASE+MIN,activeId:'a0',ids:[],dirty:false,orderNotice:false,estimateMinutes:15,tz:'Asia/Calcutta',products:['ai'],accounts:[]};
+const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function duration(ms){const m=Math.max(0,Math.floor(ms/MIN)),h=Math.floor(m/60),d=Math.floor(h/24);return d?d+'d'+(h%24?' '+h%24+'h':''):h?h+'h'+(m%60?' '+m%60+'m':''):m?m+'m':'<1m';}
+function ago(ms){return ms<MIN?'just now':duration(ms)+' ago';}
+function ended(a){return a.reset!==null&&a.reset<=s.now;}
+function recentlyReset(a){return ended(a)&&s.now-a.reset<PROMOTION_MS;}
+function tableUsage(a){
+  if(!ended(a))return {text:a.percent+'%',color:tone(a),title:'Last observed usage'};
+  const estimated=s.now-a.reset<s.estimateMinutes*MIN;
+  return {
+    text:estimated?'~0%':'—',
+    color:estimated?'var(--green)':'var(--muted)',
+    title:(estimated?'Estimated 0% used after the observed reset '+ago(s.now-a.reset)+'. ':'Current usage unknown. ')+
+      'Last observed: '+a.percent+'%. Updated '+ago(s.now-a.last)+'. Send a message from this Account for a new reading.'
+  };
+}
+function tone(a){return ended(a)?'var(--muted)':a.percent<=60?'var(--green)':a.percent<=85?'var(--orange)':'var(--red)';}
+function exact(a){return a.reset===null?'Reset time unknown':new Intl.DateTimeFormat('en-GB',{dateStyle:'full',timeStyle:'short',timeZone:s.tz}).format(new Date(a.reset))+' ('+s.tz+'). Reset from the last captured reading; later resets have not been observed.';}
+function timing(a){return a.reset===null?'Reset time unknown':ended(a)?'Last reset '+ago(s.now-a.reset):'Resets in '+duration(a.reset-s.now);}
+function seed(){s.now=BASE+MIN;s.page=0;s.selected=null;s.query='';s.scroll=0;s.dirty=false;s.orderNotice=false;s.activeId='a0';s.accounts=Array.from({length:s.count},(_,i)=>({id:'a'+i,name:names[i%names.length]+(i>=names.length?' '+(Math.floor(i/names.length)+1):''),percent:i===0?24:i===1?76:i===2||i>0&&i%7===0?100:45,reset:s.scenario==='ended'?BASE-(i+1)*HOUR:s.scenario==='future'?BASE+(i+1)*HOUR:i===2?BASE-5*MIN:i===3?BASE-2*HOUR:s.scenario==='recent-pair'&&i===6?BASE-2*MIN:BASE+(i%4+1)*HOUR+18*MIN,last:BASE-(i===0?12:i===1?42:i===2?180:300+i)*MIN}));s.ids=[];s.catalog=structuredClone(s.accounts);s.undo=null;s.confirm=null;s.menu=null;const menu=document.getElementById('reading-account');menu.innerHTML=s.accounts.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');if(s.accounts.length>2)menu.value='a2';}
+function account(id){return s.accounts.find(a=>a.id===id);}
+function ordered(prioritizeResets=false){return [...s.accounts].sort((a,b)=>{if(a.id===s.activeId)return -1;if(b.id===s.activeId)return 1;if(prioritizeResets){const ar=recentlyReset(a),br=recentlyReset(b);if(ar!==br)return ar?-1:1;if(ar)return b.reset-a.reset||b.last-a.last;}const af=a.percent===100&&!ended(a),bf=b.percent===100&&!ended(b);return af!==bf?af?1:-1:af?a.reset-b.reset:b.last-a.last;});}
+function markOrderChange(){s.orderNotice=s.count>=4&&s.page===1&&s.ids.join('|')!==ordered(true).slice(1).map(a=>a.id).join('|');}
+function enter(page){const target=Math.max(0,Math.min(s.count>=4?1:Math.max(0,s.count-1),page));if(target===1&&s.page===0&&s.count>=4){s.ids=ordered(true).slice(1).map(a=>a.id);s.query='';s.scroll=0;s.selected=null;s.dirty=false;s.orderNotice=false;}s.page=target;s.menu=null;s.confirm=null;paint();document.querySelector('.arrows button:not(:disabled)')?.focus();}
+function status(){return '<div class="status"><span class="pill"><i></i>Peak</span><span class="aside">Ends in 3h 14m · today 11:30 PM</span></div>';}
+function detail(a){if(!a)return '<p class="empty">Send a message to see usage.</p>';const end=ended(a),estimate=end&&s.now-a.reset<3*HOUR;return `<div class="hero"><div class="identity"><span class="name" title="${esc(a.name)}">${esc(a.name)}</span>${a.id===s.activeId?'<span class="tag">Active</span>':actionButton(a)}</div><div class="value-line"><span class="value ${end?'dormant':''}" style="color:${estimate?'var(--green)':tone(a)}" ${end?`tabindex="0" title="${esc('Current usage has not been observed. Last observed: '+a.percent+'%. Send a message for a new reading.')}"`:''}>${end?estimate?'~0% <small>estimated</small>':'No recent reading':a.percent+'% used'}</span>${end?'':'<span class="quota">5h quota</span>'}</div>${end?`<dl class="facts"><dt>Last reset</dt><dd title="${esc(exact(a))}">${ago(s.now-a.reset)}</dd><dt>Last recorded usage</dt><dd>${a.percent}%</dd><dt>Updated</dt><dd>${ago(s.now-a.last)}</dd></dl>`:`<div class="bar"><i style="width:${a.percent}%;background:${tone(a)}"></i></div><p class="reset-detail" title="${esc(exact(a))}">${timing(a)}</p><p class="age">Updated ${ago(s.now-a.last)}</p>`}</div>`;}
+function preferences(){return `<div class="preferences" ${s.confirm?'inert':''}>${status()}<div class="divider"></div><div><p class="settings-title">Alert me for issues with:</p><div class="checks">${[['ai','Claude AI'],['code','Claude Code'],['cowork','Cowork'],['design','Design']].map(([id,name])=>`<label><input type="checkbox" data-product="${id}" ${s.products.includes(id)?'checked':''} ${s.products.length===1&&s.products.includes(id)?'disabled':''}>${name}</label>`).join('')}</div>${s.products.length===1?'<p class="hint">At least one product must be selected.</p>':''}</div><div class="divider"></div><div class="footer"><span>${s.tz}</span><button data-action="defaults">↺ reset to default</button></div><select class="tz" aria-label="Preview timezone">${['Asia/Calcutta','UTC','America/Los_Angeles'].map(tz=>`<option ${tz===s.tz?'selected':''}>${tz}</option>`).join('')}</select></div>`;}
+
+const directions=[['Anchored','Confirmation stays beside the Account action. Keeps the list visible; can cover nearby rows until you decide.'],['Dedicated view','The Account area becomes a focused confirmation. More room without an overlay; briefly replaces the usage or list.'],['Dialog','A centered confirmation dims the popup. Clearest pause before removal; interrupts the whole popup.']];
+s.count=4;s.scenario='mixed';s.menu=null;s.confirm=null;s.undo=null;s.anchorTop=90;s.catalog=[];s.focusBack=null;
+function actionButton(a){return a.id===s.activeId?'':`<button class="more" data-action="menu" data-id="${a.id}" aria-label="Actions for ${esc(a.name)}" aria-haspopup="menu" aria-expanded="${s.menu===a.id}">⋯</button>`;}
+function row(a){const usage=tableUsage(a);return `<tr data-id="${a.id}"><td><div class="name-actions"><button class="row-name" data-action="inspect" data-id="${a.id}" title="${esc(a.name)}">${esc(a.name)}</button>${actionButton(a)}</div><span class="row-age">${a.id===s.activeId?'Active · ':''}Updated ${ago(s.now-a.last)}</span></td><td class="row-used" style="color:${usage.color}" title="${esc(usage.title)}">${usage.text}</td><td class="reset-cell" title="${esc(exact(a))}">${ended(a)?ago(s.now-a.reset):'in '+duration(a.reset-s.now)}</td></tr>`;}
+function table(){const rows=s.ids.map(account).filter(Boolean).filter(a=>a.name.toLowerCase().includes(s.query.trim().toLowerCase()));return `<div class="list"><label class="search"><span aria-hidden="true">⌕</span><input type="search" id="account-search" aria-label="Search accounts" placeholder="Search accounts" value="${esc(s.query)}" autocomplete="off"></label><div class="table-scroll" tabindex="0" role="region" aria-label="Other Accounts table"><table><colgroup><col><col class="used"><col class="reset"></colgroup><thead><tr><th>Account</th><th>Used</th><th>Reset</th></tr></thead><tbody>${rows.map(row).join('')}</tbody></table>${rows.length?'':'<p class="empty">No matching accounts.</p>'}</div><p class="table-foot">${s.ids.length} saved Accounts</p></div>`;}
+function confirmation(extra=''){const a=account(s.confirm);if(!a)return '';return `<section class="${extra}" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-copy"><h2 class="confirm-title" id="confirm-title">Forget ${esc(a.name)}?</h2><p class="confirm-copy" id="confirm-copy">A later Usage reading can add it again.</p><div class="actions"><button data-action="cancel" id="cancel-forget">Cancel</button><button class="danger" data-action="forget">Forget account</button></div></section>`;}
+function popup(variant){const secondary=s.count>=4&&s.page===1,pages=s.count>=4?2:s.count,a=secondary?account(s.selected):ordered()[s.page],dedicated=s.confirm&&variant===1,overlay=s.menu||s.confirm&&!dedicated;let content=secondary?s.selected?`<div class="inspection"><button class="back" data-action="back">← Back to accounts</button><div class="usage">${detail(a)}</div></div>`:table():`<div class="usage">${detail(a)}</div>`;if(dedicated)content=confirmation('dedicated-confirm');return `<div class="popup ${s.theme==='light'?'light':''} ${secondary?'secondary':''} ${s.undo?'has-undo':''} ${overlay?'modal-open':''}" data-variant="${variant}" data-page="${s.page}"><div class="popup-body" ${overlay?'inert':''}><button class="theme" data-action="theme" aria-label="Toggle theme" ${dedicated?'disabled':''}>${s.theme==='dark'?'☼':'◕'}</button>${pages>1?`<nav class="arrows" aria-label="Account navigation"><button data-action="previous" aria-label="Previous account" ${s.page===0||dedicated?'disabled':''}>‹</button><button data-action="next" aria-label="Next account" ${s.page===pages-1||dedicated?'disabled':''} ${secondary?'style="visibility:hidden"':''}>›</button></nav>`:''}${secondary?status():''}${content}${pages>1?`<div class="dots" aria-hidden="true">${Array.from({length:pages},(_,i)=>`<i class="${i===s.page?'current':''}"></i>`).join('')}</div>`:''}${secondary?'':preferences()}${secondary&&!s.undo&&s.dirty?'<p class="notice" role="status">New reading received. Order updates when you reopen this list.</p>':''}</div>${s.menu?`<div class="layer" data-outside="true"><div class="panel action-menu" role="menu" aria-label="Account actions"><button role="menuitem" data-action="ask">Forget account</button></div></div>`:''}${s.confirm&&variant===0?`<div class="layer" data-outside="true">${confirmation('panel anchored-panel')}</div>`:''}${s.confirm&&variant===2?`<div class="layer dialog-layer" data-outside="true">${confirmation('panel')}</div>`:''}${s.undo&&!s.menu&&!s.confirm?`<div class="toast" role="status"><span class="toast-text" title="Forgot ${esc(s.undo.account.name)}">Forgot ${esc(s.undo.account.name)}</span><button class="undo" data-action="undo">Undo</button><button class="dismiss" data-action="dismiss" aria-label="Dismiss undo notification">×</button></div>`:''}<div class="sr-only" role="status">${secondary?s.selected?'Account details':'Other Accounts table':`Account ${s.page+1} of ${pages}`}</div></div>`;}
+function eventText(text){document.getElementById('event').textContent=text;}
+function refreshCatalog(){const select=document.getElementById('reading-account'),value=select.value;select.innerHTML=s.catalog.map(a=>`<option value="${a.id}">${esc(a.name)}${account(a.id)?'':' · forgotten'}</option>`).join('');if(s.catalog.some(a=>a.id===value))select.value=value;}
+function context(){document.getElementById('direction-title').textContent=directions[current][0];document.getElementById('direction-copy').textContent=directions[current][1];document.getElementById('mode-caption').textContent=s.count>=4?'Active + table':s.count===1?'One Account':s.count+' Account slides';document.getElementById('flow-note').textContent=s.confirm?'Cancel leaves the Account and your place unchanged.':s.undo?'Undo restores the captured reading. It does not replace a newer reading.':s.count>=4?'Open ⋯ beside a saved Account, then choose Forget account.':'Navigate to a non-Active Account and open ⋯ beside its name.';refreshCatalog();}
+function afterRender(focus){const scroll=document.querySelector('.table-scroll');if(scroll)scroll.scrollTop=s.scroll;const popupElement=document.querySelector('.popup'),panel=document.querySelector('.anchored-panel,.action-menu');if(panel)panel.style.setProperty('--panel-top',Math.max(14,Math.min(s.anchorTop,340-14-panel.getBoundingClientRect().height))+'px');const toast=document.querySelector('.toast');if(toast){const area=scroll?document.querySelector('.table-foot'):document.querySelector('.usage');if(area){const box=area.getBoundingClientRect(),root=popupElement.getBoundingClientRect();toast.style.setProperty('--toast-top',(scroll?box.bottom-root.top-46:box.bottom-root.top-32)+'px');}}context();if(!focus&&s.confirm)focus='cancel';if(!focus&&s.menu)focus='menu';if(focus==='cancel')document.getElementById('cancel-forget')?.focus();if(focus==='menu')document.querySelector('[role="menuitem"]')?.focus();if(focus==='return')document.querySelector(`.more[data-id="${s.focusBack}"]`)?.focus();if(focus==='search'){const input=document.getElementById('account-search');input?.focus();}if(focus==='undo')document.querySelector('.undo')?.focus();}
+function paint(focus){const scroll=document.querySelector('.table-scroll');if(scroll)s.scroll=scroll.scrollTop;stage.innerHTML=popup(current);afterRender(focus);}
+function resetSample(){s.count=Number(document.getElementById('count').value);s.scenario='mixed';seed();if(document.getElementById('scenario').value==='long'&&s.accounts[2]){s.accounts[2].name='Research and development workspace · 研究と開発 · International collaborators';s.catalog=structuredClone(s.accounts);}s.page=s.count>1?1:0;s.ids=s.count>=4?ordered(true).slice(1).map(a=>a.id):[];s.scroll=0;eventText('Sample restarted. Open an Account menu.');}
+function reconcile(){s.count=s.accounts.length;if(s.count>=4){s.page=1;s.selected=null;s.ids=s.ids.filter(id=>account(id)&&id!==s.activeId);for(const a of ordered(true).slice(1))if(!s.ids.includes(a.id))s.ids.push(a.id);}else{s.page=s.count>1?Math.min(Math.max(1,s.page),s.count-1):0;s.selected=null;s.ids=[];s.query='';s.scroll=0;}}
+function act(action,id,target){if(action==='menu'){const root=document.querySelector('.popup').getBoundingClientRect();s.anchorTop=target.getBoundingClientRect().bottom-root.top+4;s.focusBack=id;s.menu=id;paint('menu');return;}if(action==='ask'){s.confirm=s.menu;s.menu=null;paint('cancel');return;}if(action==='cancel'){s.menu=null;s.confirm=null;paint('return');return;}if(action==='forget'){const a=account(s.confirm);if(!a||a.id===s.activeId){s.confirm=null;paint();eventText('The Active Account cannot be forgotten.');return;}s.undo={account:structuredClone(a),ids:[...s.ids],query:s.query,scroll:s.scroll,page:s.page};s.accounts=s.accounts.filter(item=>item.id!==a.id);s.confirm=null;s.menu=null;reconcile();paint('undo');eventText('Forgot '+a.name+'. A later reading can add it again.');return;}if(action==='undo'){const saved=s.undo;if(!saved)return;const newer=account(saved.account.id);if(!newer){s.accounts.push(saved.account);s.ids=[...saved.ids];s.query=saved.query;s.scroll=saved.scroll;s.page=saved.page;}s.undo=null;reconcile();paint();document.querySelector('.table-scroll,.arrows button:not(:disabled),.theme')?.focus();eventText(newer?'This Account already returned with a newer reading. That reading was kept.':'Restored '+saved.account.name+' with its saved reading.');return;}if(action==='dismiss'){s.undo=null;paint();document.querySelector('.table-scroll,.theme')?.focus();return;}if(action==='previous'||action==='next'){enter(s.page+(action==='next'?1:-1));return;}if(action==='theme'){s.theme=s.theme==='dark'?'light':'dark';paint();return;}if(action==='inspect'){const scroll=document.querySelector('.table-scroll');s.scroll=scroll?.scrollTop||0;s.selected=id;paint();document.querySelector('.back')?.focus();return;}if(action==='back'){s.selected=null;paint();document.querySelector('.table-scroll')?.focus({preventScroll:true});return;}if(action==='defaults'){s.products=['ai'];s.tz='Asia/Calcutta';s.theme='dark';paint();eventText('Preview preferences reset.');}}
+document.addEventListener('click',e=>{if(e.target.dataset.outside){act('cancel');return;}const button=e.target.closest('[data-action]');if(button){act(button.dataset.action,button.dataset.id,button);return;}const row=e.target.closest('tr[data-id]');if(row&&!s.menu&&!s.confirm)act('inspect',row.dataset.id);});
+document.addEventListener('input',e=>{if(e.target.id==='account-search'){s.query=e.target.value;s.scroll=0;paint('search');}});
+document.addEventListener('change',e=>{if(e.target.id==='count'||e.target.id==='scenario'){resetSample();paint();}if(e.target.dataset.product){const id=e.target.dataset.product;s.products=e.target.checked?[...s.products,id]:s.products.filter(p=>p!==id);paint();}if(e.target.classList.contains('tz')){s.tz=e.target.value;paint();}});
+document.getElementById('restart').onclick=()=>{resetSample();paint();};
+document.getElementById('receive').onclick=()=>{const id=document.getElementById('reading-account').value,existing=account(id),sample=existing||s.catalog.find(a=>a.id===id);if(!sample)return;const a=existing||structuredClone(sample);if(!existing)s.accounts.push(a);s.now+=MIN;a.last=s.now;a.reset=s.now+5*HOUR;a.percent=28;s.activeId=id;s.count=s.accounts.length;s.menu=null;if(s.confirm===id)s.confirm=null;s.dirty=true;if(s.count<4)s.page=0;else if(s.ids.length===0){s.page=0;s.selected=null;}paint();eventText((existing?'New reading from ':'Rediscovered ')+a.name+'. It is now Active; the latest reading is kept.');};
+document.getElementById('advance').onclick=()=>{s.now+=HOUR;markOrderChange();paint();eventText('Advanced the sample clock by one hour.');};
+document.getElementById('reopen').onclick=()=>{s.page=0;s.selected=null;s.confirm=null;s.menu=null;s.query='';s.scroll=0;s.dirty=false;paint();eventText('Reopened on Active. Undo remains available until dismissed in this preview.');};
+document.addEventListener('scroll',e=>{if(e.target.classList?.contains('table-scroll'))s.scroll=e.target.scrollTop;},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(s.menu||s.confirm)){e.preventDefault();e.stopImmediatePropagation();act('cancel');return;}if((s.menu||s.confirm)&&e.target.closest('.popup')){if(e.key==='Tab'){const region=document.querySelector('[role="dialog"],[role="menu"]'),buttons=[...region.querySelectorAll('button')];if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons.at(-1).focus();}else if(!e.shiftKey&&document.activeElement===buttons.at(-1)){e.preventDefault();buttons[0].focus();}}if(['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();}return;}if(e.key==='Escape'&&s.selected){e.preventDefault();act('back');return;}if(e.target.closest('.popup')&&!e.target.closest('input,textarea,select,[contenteditable="true"]')&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();e.stopImmediatePropagation();enter(s.page+(e.key==='ArrowRight'?1:-1));}});
+resetSample();
+const variants=[0,1,2].map(v=>()=>{queueMicrotask(()=>afterRender());return popup(v);});
+// `variants` is an array of render functions, one per variant, in picker order.
+
+const stage = document.getElementById('stage');
+const picker = document.querySelector('.proto-picker');
+const highlight = picker.querySelector('.proto-picker-highlight');
+const items = [...picker.querySelectorAll('.proto-picker-item:not(.proto-picker-replay)')];
+const replay = picker.querySelector('.proto-picker-replay');
+let current = 0;
+
+function moveHighlight() {
+  const el = items[current];
+  highlight.style.width = el.offsetWidth + 'px';
+  highlight.style.transform = `translateX(${el.offsetLeft}px)`;
+}
+
+function mount(i) {
+  stage.innerHTML = '';
+  // Clear first, render next frame, so entrance animations re-run.
+  requestAnimationFrame(() => { stage.innerHTML = variants[i](); });
+}
+
+function setActive(i) {
+  if (i < 0 || i >= variants.length) return;
+  current = i;
+  items.forEach((el, j) => {
+    el.toggleAttribute('data-active', j === i);
+    if (j === i) el.setAttribute('aria-current', 'true');
+    else el.removeAttribute('aria-current');
+  });
+  moveHighlight();
+  const url = new URL(location);
+  url.searchParams.set('v', i + 1);
+  history.replaceState(null, '', url);
+  mount(i);
+}
+
+items.forEach((el, i) => el.addEventListener('click', () => setActive(i)));
+replay?.addEventListener('click', () => mount(current));
+window.addEventListener('resize', moveHighlight);
+
+document.addEventListener('keydown', (e) => {
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const num = parseInt(e.key, 10);
+  if (num >= 1 && num <= variants.length) setActive(num - 1);
+  else if (e.key === 'ArrowRight') setActive((current + 1) % variants.length);
+  else if (e.key === 'ArrowLeft') setActive((current - 1 + variants.length) % variants.length);
+  else if (e.key === 'r' || e.key === 'R') mount(current);
+});
+
+setActive((parseInt(new URLSearchParams(location.search).get('v'), 10) || 1) - 1);
+// Enable the slide only after first paint, so load doesn't animate.
+requestAnimationFrame(() => requestAnimationFrame(() => picker.setAttribute('data-ready', '')));
+</script></body></html>

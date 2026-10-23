@@ -2,9 +2,11 @@
 
 **What to build:** Let users remove a non-Active Account from the remembered list, confirm the action, Undo it, and track that Account again when a new Usage reading arrives. The layout adjusts immediately as the Account count crosses the table threshold.
 
-**Blocked by:** 03 and 03a (the table/detail flow and its later navigation/reset refinements).
+**Blocked by:** User review of the ticket 04 confirmation/Undo prototype. Tickets 03 and 03a are complete.
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
+
+**Next action:** Review [the current Compact Forget-flow prototype](../04-prototype/prototype.html) and [its design notes](../04-prototype/README.md). Choose Anchored, Dedicated view or Dialog confirmation, and finalize Undo placement/lifetime before production implementation. The user's 2026-10-24 instruction to prototype/finalize design first supersedes the earlier request to start implementing this ticket. No ticket 04 production changes have been made.
 
 ## Context
 
@@ -35,3 +37,5 @@ Prefer existing Account/storage/capture seams and meaningful user flows over imp
 ## Comments
 
 2026-10-22: Created from the finalized Account overview design. Not implemented.
+
+2026-10-24: Built an isolated three-direction confirmation picker on the current Compact design, with sample removal, Cancel, Undo, rediscovery, count transitions, keyboard handling, both themes and long-name cases. Awaiting design selection; production acceptance criteria above remain unchecked.

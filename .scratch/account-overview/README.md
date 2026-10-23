@@ -17,4 +17,4 @@ Tickets 01–03 have Status: ready-for-human for completed implementation handof
 
 The [third-Account capture bug #08](../multi-account-usage/issues/08-third-account-not-captured.md) was fixed and live-verified on 2026-10-23 in its own ticket. Its earlier needs-info/release-blocker notes are historical. Ticket 05 still requires final integrated capture/release QA; ticket 01's disposable fixtures are not live capture evidence.
 
-Remaining sequence: 04, then 05. The later threshold is four total Accounts: four-to-three becomes table-to-slides, while three-to-two remains slides. Tickets 04/05 use these updated thresholds. No further implementation or store publication is authorized merely by this index.
+Remaining sequence: review [04's current Compact Forget-flow prototype](04-prototype/prototype.html), finalize confirmation and Undo behavior, implement 04, then 05. The user requested design first on 2026-10-24; ticket 04 has no production changes. The threshold is four total Accounts: four-to-three becomes table-to-slides, while three-to-two remains slides. Tickets 04/05 use these updated thresholds. No store publication is authorized by this index.

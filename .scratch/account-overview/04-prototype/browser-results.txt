@@ -1,0 +1,117 @@
+PASS 1 dark: four Accounts have three table rows in fixed bounds
+PASS all three rows fit without horizontal overflow
+PASS Active Account has no Forget action
+PASS confirmation names the Account, explains rediscovery and focuses Cancel
+PASS confirmation stays in fixed popup bounds
+PASS Cancel restores query, row and menu-trigger focus
+PASS Escape dismisses menu and restores focus
+PASS four to three becomes slides, keeps preferences and offers Undo
+PASS Undo restores table, query and original captured reading
+PASS repeated removal leaves shared lower-control positions unchanged
+PASS a sample reading rediscovers the forgotten Account and makes it Active
+PASS Undo after rediscovery keeps the newer reading
+PASS two to one removes navigation
+PASS Undo restores two slides
+PASS three to two remains slides
+PASS Undo restores three slides
+PASS large list supports internal scrolling
+PASS Cancel preserves exact filtered order and scroll position
+PASS long international names wrap or scroll inside confirmation without widening popup
+PASS 1 light: four Accounts have three table rows in fixed bounds
+PASS all three rows fit without horizontal overflow
+PASS Active Account has no Forget action
+PASS confirmation names the Account, explains rediscovery and focuses Cancel
+PASS confirmation stays in fixed popup bounds
+PASS Cancel restores query, row and menu-trigger focus
+PASS Escape dismisses menu and restores focus
+PASS four to three becomes slides, keeps preferences and offers Undo
+PASS Undo restores table, query and original captured reading
+PASS repeated removal leaves shared lower-control positions unchanged
+PASS a sample reading rediscovers the forgotten Account and makes it Active
+PASS Undo after rediscovery keeps the newer reading
+PASS two to one removes navigation
+PASS Undo restores two slides
+PASS three to two remains slides
+PASS Undo restores three slides
+PASS large list supports internal scrolling
+PASS Cancel preserves exact filtered order and scroll position
+PASS long international names wrap or scroll inside confirmation without widening popup
+PASS 2 dark: four Accounts have three table rows in fixed bounds
+PASS all three rows fit without horizontal overflow
+PASS Active Account has no Forget action
+PASS confirmation names the Account, explains rediscovery and focuses Cancel
+PASS confirmation stays in fixed popup bounds
+PASS Cancel restores query, row and menu-trigger focus
+PASS Escape dismisses menu and restores focus
+PASS four to three becomes slides, keeps preferences and offers Undo
+PASS Undo restores table, query and original captured reading
+PASS repeated removal leaves shared lower-control positions unchanged
+PASS a sample reading rediscovers the forgotten Account and makes it Active
+PASS Undo after rediscovery keeps the newer reading
+PASS two to one removes navigation
+PASS Undo restores two slides
+PASS three to two remains slides
+PASS Undo restores three slides
+PASS large list supports internal scrolling
+PASS Cancel preserves exact filtered order and scroll position
+PASS long international names wrap or scroll inside confirmation without widening popup
+PASS 2 light: four Accounts have three table rows in fixed bounds
+PASS all three rows fit without horizontal overflow
+PASS Active Account has no Forget action
+PASS confirmation names the Account, explains rediscovery and focuses Cancel
+PASS confirmation stays in fixed popup bounds
+PASS Cancel restores query, row and menu-trigger focus
+PASS Escape dismisses menu and restores focus
+PASS four to three becomes slides, keeps preferences and offers Undo
+PASS Undo restores table, query and original captured reading
+PASS repeated removal leaves shared lower-control positions unchanged
+PASS a sample reading rediscovers the forgotten Account and makes it Active
+PASS Undo after rediscovery keeps the newer reading
+PASS two to one removes navigation
+PASS Undo restores two slides
+PASS three to two remains slides
+PASS Undo restores three slides
+PASS large list supports internal scrolling
+PASS Cancel preserves exact filtered order and scroll position
+PASS long international names wrap or scroll inside confirmation without widening popup
+PASS 3 dark: four Accounts have three table rows in fixed bounds
+PASS all three rows fit without horizontal overflow
+PASS Active Account has no Forget action
+PASS confirmation names the Account, explains rediscovery and focuses Cancel
+PASS confirmation stays in fixed popup bounds
+PASS Cancel restores query, row and menu-trigger focus
+PASS Escape dismisses menu and restores focus
+PASS four to three becomes slides, keeps preferences and offers Undo
+PASS Undo restores table, query and original captured reading
+PASS repeated removal leaves shared lower-control positions unchanged
+PASS a sample reading rediscovers the forgotten Account and makes it Active
+PASS Undo after rediscovery keeps the newer reading
+PASS two to one removes navigation
+PASS Undo restores two slides
+PASS three to two remains slides
+PASS Undo restores three slides
+PASS large list supports internal scrolling
+PASS Cancel preserves exact filtered order and scroll position
+PASS long international names wrap or scroll inside confirmation without widening popup
+PASS 3 light: four Accounts have three table rows in fixed bounds
+PASS all three rows fit without horizontal overflow
+PASS Active Account has no Forget action
+PASS confirmation names the Account, explains rediscovery and focuses Cancel
+PASS confirmation stays in fixed popup bounds
+PASS Cancel restores query, row and menu-trigger focus
+PASS Escape dismisses menu and restores focus
+PASS four to three becomes slides, keeps preferences and offers Undo
+PASS Undo restores table, query and original captured reading
+PASS repeated removal leaves shared lower-control positions unchanged
+PASS a sample reading rediscovers the forgotten Account and makes it Active
+PASS Undo after rediscovery keeps the newer reading
+PASS two to one removes navigation
+PASS Undo restores two slides
+PASS three to two remains slides
+PASS Undo restores three slides
+PASS large list supports internal scrolling
+PASS Cancel preserves exact filtered order and scroll position
+PASS long international names wrap or scroll inside confirmation without widening popup
+PASS no prototype runtime errors
+
+All prototype checks passed. Sample data only.
