@@ -30,10 +30,10 @@ document.getElementById('run').onclick = async () => {
       for (const multi of ['', '1']) {
         win = await open('expiry-' + theme + multi, { theme, multi });
         const doc = win.document;
-        const page = () => multi ? doc.querySelectorAll('.account-page')[1] : doc.querySelector('.usage-hero');
+        const page = () => [...doc.querySelectorAll('.account-page')].find(page => page.getAttribute('aria-hidden') === 'false');
         if (multi) doc.getElementById('account-next').click();
         const text = () => page().innerText;
-        const value = () => page().querySelector(multi ? '.account-percent' : '.usage-pct');
+        const value = () => page().querySelector('.account-percent');
         check(text().includes('100%') && text().includes('Resets in 1h'), theme + ' ' + (multi ? 'paged' : 'single') + ': ordinary reading and countdown');
         check(text().includes('Updated 20m ago'), 'reading age is shown');
         const stored = JSON.stringify(win.ticket01.state.local.accounts);
@@ -52,7 +52,7 @@ document.getElementById('run').onclick = async () => {
         await win.ticket01.advance(0);
         check(value().getAttribute('aria-description') === value().title && value().tabIndex === 0, 'dormant context is available to assistive technology and keyboard focus');
         check(JSON.stringify(win.ticket01.state.local.accounts) === stored, 'expiry and browsing leave stored readings and Active unchanged');
-        check((multi ? page().querySelector('.account-bar') : doc.querySelector('.bar-wrap')).hidden, 'expired reading hides the current-usage bar');
+        check(page().querySelector('.account-bar').hidden, 'expired reading hides the current-usage bar');
         await win.ticket01.advance(3 * 3600000 - 1);
         check(value().innerText === '~0% estimated', 'estimate remains until just before three hours after reset');
         await win.ticket01.advance(1);
@@ -61,9 +61,9 @@ document.getElementById('run').onclick = async () => {
         check(JSON.stringify(win.ticket01.state.local.accounts) === stored, 'estimated display never overwrites a saved Usage reading');
         await win.ticket01.reading();
         await settle();
-        const activeValue = doc.querySelector(multi ? '.account-page .account-percent' : '.usage-pct');
+        const activeValue = doc.querySelector('.account-page .account-percent');
         check(activeValue.innerText.includes('28%') && !activeValue.hasAttribute('title') && !activeValue.hasAttribute('aria-description') && !activeValue.hasAttribute('tabindex'), 'new reading clears the expired presentation and stale hover context');
-        check(doc.querySelector(multi ? '.account-page .usage-facts' : '#usage-facts').hidden, 'fresh readings hide the dormant fact block');
+        check(doc.querySelector('.account-page .usage-facts').hidden, 'fresh readings hide the dormant fact block');
       }
     }
 
@@ -81,8 +81,8 @@ document.getElementById('run').onclick = async () => {
     check(win.ticket01.state.sync.userTZ === win.Intl.DateTimeFormat().resolvedOptions().timeZone, 'reset restores system timezone');
     check(win.ticket01.messages.includes('USAGE_UPDATE') && win.ticket01.messages.includes('POLL_NOW'), 'reset requests icon and status refresh');
     check(win.document.getElementById('usage-sub').textContent === 'Send a message to see usage', 'reset restores the no-reading view');
-    check(win.document.getElementById('usage-updated').hidden && !win.document.getElementById('usage-pct').hasAttribute('title'), 'reset clears reading age and hover context');
-    check(win.document.getElementById('usage-facts').hidden && win.document.getElementById('usage-facts').children.length === 0, 'reset clears the dormant fact block');
+    check(win.document.getElementById('account-hero').hidden && win.document.getElementById('account-track').children.length === 0, 'reset clears saved Account detail and its hover context');
+    check(win.document.querySelectorAll('.usage-facts').length === 0, 'reset clears the dormant fact block');
     win = await open('reset', {}, true);
     check(Object.keys(win.ticket01.state.local.accounts).length === 0, 'cleared Accounts stay cleared after reopening');
     results.textContent += '\nAll lifecycle checks passed. Fixtures only; not a live extension capture test.\n';

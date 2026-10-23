@@ -5,6 +5,7 @@ const AccountPages = (() => {
   const dots = document.getElementById('account-dots');
   const previous = document.getElementById('account-previous');
   const next = document.getElementById('account-next');
+  const navigation = hero.querySelector('.account-nav');
   const announcement = document.getElementById('account-announcement');
   let accounts = [];
   let pageIndex = 0;
@@ -15,7 +16,7 @@ const AccountPages = (() => {
   }
 
   function showPage(index) {
-    if (accounts.length < 2) return;
+    if (accounts.length === 0) return;
     pageIndex = Math.max(0, Math.min(accounts.length - 1, index));
     track.style.transform = `translateX(-${pageIndex * 100}%)`;
     previous.disabled = pageIndex === 0;
@@ -39,7 +40,6 @@ const AccountPages = (() => {
       <div class="account-heading">
         <span class="account-name"></span>
         <span class="account-tag active" hidden>Active</span>
-        <span class="account-tag full" hidden>Full</span>
       </div>
       <div class="account-usage-top">
         <span class="account-percent"></span><span class="account-quota">5h quota</span>
@@ -53,7 +53,6 @@ const AccountPages = (() => {
     name.textContent = label;
     name.title = label;
     page.querySelector('.active').hidden = !account.isActive;
-    page.querySelector('.full').hidden = !account.isFull;
     const percent = Math.round(account.percent);
     const tone = account.isExpired ? 'unknown' : percent <= 60 ? 'green' : percent <= 85 ? 'orange' : 'red';
     page.dataset.tone = tone;
@@ -80,12 +79,15 @@ const AccountPages = (() => {
     return page;
   }
 
-  // Returns whether the paged hero replaces the popup's single-Account hero.
+  // One renderer serves every remembered Account; only multiple Accounts need paging.
   function render(orderedAccounts, tz) {
-    if (orderedAccounts.length < 2) {
+    if (orderedAccounts.length === 0) {
       hero.hidden = true;
       accounts = [];
       pageIndex = 0;
+      track.replaceChildren();
+      dots.replaceChildren();
+      announcement.textContent = '';
       return false;
     }
     const selectedId = accounts[pageIndex]?.accountId;
@@ -94,6 +96,8 @@ const AccountPages = (() => {
       orderedAccounts.findIndex(account => account.accountId === selectedId));
     accounts = orderedAccounts;
     hero.hidden = false;
+    navigation.hidden = accounts.length === 1;
+    dots.hidden = accounts.length === 1;
     // Data refreshes are immediate. Only a deliberate page change slides.
     track.classList.add('updating');
     track.replaceChildren(...accounts.map((account, i) => makePage(account, tz, i, accounts.length)));
@@ -107,7 +111,7 @@ const AccountPages = (() => {
   previous.addEventListener('click', () => showPage(pageIndex - 1));
   next.addEventListener('click', () => showPage(pageIndex + 1));
   document.addEventListener('keydown', event => {
-    if (hero.hidden || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    if (accounts.length < 2 || hero.hidden || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     if (event.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
     const direction = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
     if (!direction) return;

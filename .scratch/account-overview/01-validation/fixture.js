@@ -13,13 +13,25 @@
   };
   const seed = {
     now: base,
-    local: { state: 'green', accounts: params.get('empty') ? {} : { [id]: reading } },
-    sync: { theme: params.get('theme') || 'dark', userTZ: 'Asia/Calcutta', watchedProducts: ['code', 'design'] }
+    local: {
+      state: params.get('status') || 'green', accounts: params.get('empty') ? {} : { [id]: reading },
+      nextPeakAt: new Date(base + 7200000).toISOString(),
+      peakEndsAt: new Date(base + 28800000).toISOString(),
+      incidentTitle: 'Claude AI service disruption affecting message delivery and conversation loading across several regions. Engineers are investigating.',
+      incidentImpact: 'minor', affectedProducts: ['ai']
+    },
+    sync: { theme: params.get('theme') || 'dark', userTZ: 'Asia/Calcutta', watchedProducts: params.has('products') ? params.get('products').split(',') : ['code', 'design'] }
   };
   if (params.get('multi')) seed.local.accounts[other] = {
     label: 'Research workspace', percent: 45, resetsAt: (base + 7200000) / 1000,
     lastReadingAt: base, readingOrder: 2
   };
+  if (params.get('longLabels')) {
+    Object.values(seed.local.accounts).forEach(account => {
+      account.label = 'Research and development workspace with a deliberately very long Account name';
+    });
+  }
+  if (params.get('activeFull') && seed.local.accounts[other]) seed.local.accounts[other].percent = 100;
   const state = JSON.parse(localStorage.getItem(key) || 'null') || seed;
   const save = () => localStorage.setItem(key, JSON.stringify(state));
   const NativeDate = Date;

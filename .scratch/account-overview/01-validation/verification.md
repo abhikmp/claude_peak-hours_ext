@@ -86,3 +86,7 @@ The block uses 11px text, 4px between rows and 10px between columns. In the chec
 - Actual production-popup fixture screenshots: [estimated dark](facts-estimated-dark.png), [estimated light](facts-estimated-light.png), [older dormant dark](facts-dormant-dark.png), [older dormant light](facts-dormant-light.png). Sample readings only. Existing normal/empty-state coverage remains in the lifecycle run.
 - Console warnings/errors on screenshot checks: none. Separate Standards and Spec reviews: zero findings.
 - The installed extension has not been reloaded by the agent. Reload it once if Chrome still serves the earlier popup resources. No live readings, package or publication were changed.
+
+## Installed-extension confirmation — 2026-10-23
+
+The user supplied the updated live-popup screenshot and explicitly confirmed: “visual check is completed and everything is looking as intended.” It shows ~0% estimated, Reset, Last recorded and Updated in the intended compact layout, with status and preferences visible. This completes the final human visual check; the earlier note that it was unconfirmed is historical. Ticket 01 is complete.

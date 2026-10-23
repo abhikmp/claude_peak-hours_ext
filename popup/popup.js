@@ -151,65 +151,6 @@ function renderUsageFacts(element, account, tz) {
   element.querySelector('.usage-reading-age').textContent = formatReadingAge(account.ageMs).replace(/^Updated /, '');
 }
 
-// ── Render usage hero ──
-function renderUsageHero(account, tz) {
-  const { percent, resetsAt, isExpired } = account ?? {};
-  const pctEl = document.getElementById('usage-pct');
-  const fill  = document.getElementById('bar-fill');
-  const sub   = document.getElementById('usage-sub');
-  const updated = document.getElementById('usage-updated');
-  renderUsageFacts(document.getElementById('usage-facts'), account, tz);
-  document.querySelector('.bar-wrap').hidden = !!isExpired;
-  document.querySelector('.usage-quota-label').hidden = !!isExpired;
-  sub.hidden = !!isExpired;
-  updated.hidden = !account || isExpired;
-  updated.textContent = account ? formatReadingAge(account.ageMs) : '';
-  pctEl.removeAttribute('title');
-  pctEl.removeAttribute('aria-description');
-  pctEl.removeAttribute('tabindex');
-
-  if (isExpired) {
-    renderDormantUsage(pctEl, account);
-    pctEl.className = 'usage-pct dormant';
-    fill.style.width = '0%';
-    fill.className = 'bar-fill';
-    sub.textContent = '';
-    sub.className = 'usage-sub';
-    return;
-  }
-
-  if (percent === null || percent === undefined) {
-    pctEl.textContent = '— %';
-    pctEl.className = 'usage-pct';
-    fill.style.width = '0%';
-    fill.className = 'bar-fill';
-    sub.textContent = 'Send a message to see usage';
-    sub.className = 'usage-sub no-data';
-    return;
-  }
-
-  const pct = Math.round(Math.min(100, Math.max(0, percent)));
-  const colorClass = pct <= 60 ? 'green' : pct <= 85 ? 'orange' : 'red';
-
-  pctEl.textContent = `${pct}%\u00A0used`;
-  pctEl.className = `usage-pct ${colorClass}`;
-
-  fill.style.width = pct + '%';
-  fill.className = `bar-fill ${colorClass}`;
-
-  if (resetsAt) {
-    const msLeft = resetsAt * 1000 - Date.now();
-    const resetsAtISO = new Date(resetsAt * 1000).toISOString();
-    const clockTime = toLocalTimeStr(resetsAtISO, tz ?? Intl.DateTimeFormat().resolvedOptions().timeZone);
-    sub.textContent = msLeft > 0
-      ? `Resets in ${formatDuration(msLeft)} · ${clockTime}`
-      : 'Resetting soon…';
-  } else {
-    sub.textContent = '';
-  }
-  sub.className = 'usage-sub';
-}
-
 // ── Render status pill ──
 function renderPill(state, local, watched, tz) {
   const pill        = document.getElementById('status-pill');
@@ -286,12 +227,8 @@ async function render() {
   const now = Date.now();
   const accounts = local.accounts ?? {};
   const orderedAccounts = Accounts.getAccounts(accounts, now);
-  const paged = AccountPages.render(orderedAccounts, tz);
-  document.querySelector('.usage-hero').style.display = paged ? 'none' : '';
-  if (!paged) {
-    const active = orderedAccounts[0];
-    renderUsageHero(active, tz);
-  }
+  const hasAccounts = AccountPages.render(orderedAccounts, tz);
+  document.querySelector('.usage-hero').hidden = hasAccounts;
 
   // ── Status pill ──
   renderPill(state, local, watched, tz);
@@ -354,13 +291,16 @@ function renderTZList(filter = '') {
   list.innerHTML = '';
   matches.forEach(tz => {
     const li = document.createElement('li');
-    li.textContent = tz;
-    li.addEventListener('click', async () => {
+    const option = document.createElement('button');
+    option.type = 'button';
+    option.textContent = tz;
+    option.addEventListener('click', async () => {
       await chrome.storage.sync.set({ userTZ: tz });
       document.getElementById('tz-list').hidden = true;
       document.getElementById('tz-search').value = '';
       await render();
     });
+    li.append(option);
     list.appendChild(li);
   });
 }

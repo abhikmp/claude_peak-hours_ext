@@ -1,0 +1,88 @@
+PASS popup startup retains a year-old Account
+PASS saved label survives
+PASS opening popup writes no storage
+PASS idle popup refresh retains the Account beyond 48 more hours
+PASS closing/reopening preserves the Account
+PASS dark single: ordinary reading and countdown
+PASS reading age is shown
+PASS idle refresh shows explicitly estimated usage at the reset boundary
+PASS hover text preserves the observation and refresh guidance
+PASS dormant detail avoids paragraphs and redundant quota labels
+PASS dormant detail has three labeled fact rows
+PASS fact rows show observed reset in selected timezone, last recorded percent and age
+PASS reset timestamp comes from the actual last captured reading
+PASS reset display follows the selected timezone
+PASS dormant context is available to assistive technology and keyboard focus
+PASS expiry and browsing leave stored readings and Active unchanged
+PASS expired reading hides the current-usage bar
+PASS estimate remains until just before three hours after reset
+PASS estimate ends at exactly three hours after reset
+PASS fact rows remain visible and age refreshes after the estimate ends
+PASS estimated display never overwrites a saved Usage reading
+PASS new reading clears the expired presentation and stale hover context
+PASS fresh readings hide the dormant fact block
+PASS dark paged: ordinary reading and countdown
+PASS reading age is shown
+PASS idle refresh shows explicitly estimated usage at the reset boundary
+PASS hover text preserves the observation and refresh guidance
+PASS dormant detail avoids paragraphs and redundant quota labels
+PASS dormant detail has three labeled fact rows
+PASS fact rows show observed reset in selected timezone, last recorded percent and age
+PASS reset timestamp comes from the actual last captured reading
+PASS reset display follows the selected timezone
+PASS dormant context is available to assistive technology and keyboard focus
+PASS expiry and browsing leave stored readings and Active unchanged
+PASS expired reading hides the current-usage bar
+PASS estimate remains until just before three hours after reset
+PASS estimate ends at exactly three hours after reset
+PASS fact rows remain visible and age refreshes after the estimate ends
+PASS estimated display never overwrites a saved Usage reading
+PASS new reading clears the expired presentation and stale hover context
+PASS fresh readings hide the dormant fact block
+PASS light single: ordinary reading and countdown
+PASS reading age is shown
+PASS idle refresh shows explicitly estimated usage at the reset boundary
+PASS hover text preserves the observation and refresh guidance
+PASS dormant detail avoids paragraphs and redundant quota labels
+PASS dormant detail has three labeled fact rows
+PASS fact rows show observed reset in selected timezone, last recorded percent and age
+PASS reset timestamp comes from the actual last captured reading
+PASS reset display follows the selected timezone
+PASS dormant context is available to assistive technology and keyboard focus
+PASS expiry and browsing leave stored readings and Active unchanged
+PASS expired reading hides the current-usage bar
+PASS estimate remains until just before three hours after reset
+PASS estimate ends at exactly three hours after reset
+PASS fact rows remain visible and age refreshes after the estimate ends
+PASS estimated display never overwrites a saved Usage reading
+PASS new reading clears the expired presentation and stale hover context
+PASS fresh readings hide the dormant fact block
+PASS light paged: ordinary reading and countdown
+PASS reading age is shown
+PASS idle refresh shows explicitly estimated usage at the reset boundary
+PASS hover text preserves the observation and refresh guidance
+PASS dormant detail avoids paragraphs and redundant quota labels
+PASS dormant detail has three labeled fact rows
+PASS fact rows show observed reset in selected timezone, last recorded percent and age
+PASS reset timestamp comes from the actual last captured reading
+PASS reset display follows the selected timezone
+PASS dormant context is available to assistive technology and keyboard focus
+PASS expiry and browsing leave stored readings and Active unchanged
+PASS expired reading hides the current-usage bar
+PASS estimate remains until just before three hours after reset
+PASS estimate ends at exactly three hours after reset
+PASS fact rows remain visible and age refreshes after the estimate ends
+PASS estimated display never overwrites a saved Usage reading
+PASS new reading clears the expired presentation and stale hover context
+PASS fresh readings hide the dormant fact block
+PASS expired Active detail remains Active and retains its observation
+PASS reset-to-default clears all retained Accounts
+PASS reset restores theme and watched products
+PASS reset restores system timezone
+PASS reset requests icon and status refresh
+PASS reset restores the no-reading view
+PASS reset clears saved Account detail and its hover context
+PASS reset clears the dormant fact block
+PASS cleared Accounts stay cleared after reopening
+
+All lifecycle checks passed. Fixtures only; not a live extension capture test.

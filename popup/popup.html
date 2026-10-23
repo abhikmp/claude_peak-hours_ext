@@ -33,6 +33,7 @@
     </button>
 
     <!-- Usage hero — primary, top of popup -->
+    <div class="usage-region">
     <section class="account-hero" id="account-hero" aria-label="Account usage" hidden>
       <div class="account-viewport"><div class="account-track" id="account-track"></div></div>
       <div class="account-nav" role="group" aria-label="Account navigation">
@@ -55,10 +56,10 @@
         <div class="bar-fill" id="bar-fill"></div>
       </div>
       <div class="usage-sub" id="usage-sub">Send a message to see usage</div>
-      <div class="usage-updated" id="usage-updated" hidden></div>
-      <dl class="usage-facts" id="usage-facts" aria-label="Last captured reading" hidden></dl>
+    </div>
     </div>
 
+    <div class="lower-controls">
     <!-- Status pill — secondary signal -->
     <div class="pill-row">
       <div class="pill-and-aside">
@@ -71,7 +72,7 @@
         <span class="pill-aside" id="pill-aside" hidden></span>
       </div>
       <!-- Incident detail line — shown only in orange state -->
-      <div class="incident-sub" id="incident-sub" hidden></div>
+      <div class="incident-sub" id="incident-sub" tabindex="0" aria-label="Incident details" hidden></div>
     </div>
 
     <!-- Divider -->
@@ -102,6 +103,7 @@
     <div class="tz-picker">
       <input type="text" class="tz-search" id="tz-search" placeholder="Set custom timezone" autocomplete="off">
       <ul class="tz-list" id="tz-list" hidden></ul>
+    </div>
     </div>
 
   </div>

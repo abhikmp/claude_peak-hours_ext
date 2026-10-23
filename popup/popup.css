@@ -78,6 +78,8 @@
   margin: 0;
   padding: 0;
 }
+[hidden] { display: none !important; }
+html { width: 260px; height: 340px; overflow: hidden; }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -85,6 +87,7 @@ body {
   color: var(--text-primary);
   background: var(--bg);
   width: 260px;
+  height: 340px;
   /* Smooth inner content corners — Chrome clips the popup window itself,
      but rounding the body+container gives the content a softer feel */
   border-radius: 12px;
@@ -93,12 +96,16 @@ body {
 }
 
 .container {
+  height: 100%;
   padding: 14px 16px 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   position: relative; /* anchor for theme-toggle absolute positioning */
 }
+.usage-region { flex: 1; min-height: 0; }
+.usage-region > .usage-hero { max-height: 100%; overflow-y: auto; }
+.lower-controls { flex: none; display: flex; flex-direction: column; gap: 9px; }
 
 /* ══════════════════════════════════════════
    Theme toggle button — top-right corner
@@ -203,16 +210,10 @@ body {
   text-align: center;
 }
 
-.usage-pct.dormant { font-size: 20px; color: var(--text-secondary); }
 .usage-estimate-label { font-size: 11px; font-weight: 400; letter-spacing: 0; }
-.usage-pct.dormant:focus-visible, .account-percent:focus-visible {
+.account-percent:focus-visible {
   outline: 1px solid var(--text-secondary);
   outline-offset: 3px;
-}
-.usage-updated {
-  font-size: 11px;
-  line-height: 1.4;
-  color: var(--text-secondary);
 }
 
 .usage-facts {
@@ -337,6 +338,9 @@ body {
   color: var(--text-secondary);
   line-height: 1.4;
   padding-left: 2px;
+  max-height: 4.2em;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /* ══════════════════════════════════════════
@@ -398,12 +402,17 @@ body {
 }
 
 .tz-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 11px;
   color: var(--text-muted);
   transition: color 0.2s ease;
 }
 
 .tz-reset-btn {
+  flex-shrink: 0;
   background: none;
   border: none;
   font-size: 11px;
@@ -423,6 +432,7 @@ body {
    Timezone picker
 ══════════════════════════════════════════ */
 .tz-picker {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -450,6 +460,11 @@ body {
 }
 
 .tz-list {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
   list-style: none;
   max-height: 160px;
   overflow-y: auto;
@@ -460,12 +475,26 @@ body {
 }
 
 .tz-list li {
-  padding: 6px 10px;
   font-size: 12px;
   cursor: pointer;
   color: var(--text-secondary);
   border-bottom: 0.5px solid var(--border-light);
   transition: color 0.2s ease;
+}
+.tz-list button {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.tz-list button:focus-visible {
+  outline: 2px solid var(--text-secondary);
+  outline-offset: -2px;
 }
 
 .tz-list li:last-child {
@@ -473,7 +502,16 @@ body {
 }
 
 .tz-list li:hover,
-.tz-list li.selected {
+.tz-list li.selected,
+.tz-list li:focus-within {
   background: rgba(99, 102, 241, 0.15);
   color: #a5b4fc;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }
