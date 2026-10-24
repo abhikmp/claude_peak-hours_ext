@@ -119,10 +119,12 @@ PASS count reconciliation switches four→three, three→two, two→one
 PASS dark 64 forgotten: 260 × 340 with no outer overflow
 PASS controls covered by Undo cannot receive focus
 PASS Undo replaces the entire timezone/reset footer without controls peeking through
+PASS lower Undo bar fully replaces the table count and notice
 PASS theme preserves deadline and notification position
 PASS Undo restores exact raw identity, label, percentage, reset, timestamp and tie order
 PASS Undo removes recovery and releases covered controls
 PASS Undo restores both footer sections after recovery
+PASS table footer returns after Undo
 PASS Undo does not announce the restored observation as a new reading
 PASS dark 64 restored: 260 × 340 with no outer overflow
 PASS Undo does not change toolbar
@@ -248,13 +250,15 @@ PASS count reconciliation switches four→three, three→two, two→one
 PASS light 64 forgotten: 260 × 340 with no outer overflow
 PASS controls covered by Undo cannot receive focus
 PASS Undo replaces the entire timezone/reset footer without controls peeking through
+PASS lower Undo bar fully replaces the table count and notice
 PASS theme preserves deadline and notification position
 PASS Undo restores exact raw identity, label, percentage, reset, timestamp and tie order
 PASS Undo removes recovery and releases covered controls
 PASS Undo restores both footer sections after recovery
+PASS table footer returns after Undo
 PASS Undo does not announce the restored observation as a new reading
 PASS light 64 restored: 260 × 340 with no outer overflow
 PASS Undo does not change toolbar
 PASS flow has no browser exceptions
 
-258 passed, 0 failed
+262 passed, 0 failed

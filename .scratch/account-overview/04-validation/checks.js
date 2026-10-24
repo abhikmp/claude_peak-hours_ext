@@ -109,7 +109,7 @@ document.getElementById('run').onclick = async () => {
         if (count === 64) check(!doc.querySelector('.account-refresh-notice').textContent.includes('New reading received'), 'Forget does not announce a fictional new reading');
         check(JSON.stringify(win.ticket01.state.local.accounts['account-0']) === originalActive && win.ticket01.toolbar.length === icons,
           'Forget preserves Active raw reading and toolbar');
-        check(toastBox(win) === '16,278,228,32', 'Undo occupies the fixed 228 × 32 lower slot');
+        check(toastBox(win) === '16,292,228,32', 'Undo occupies the fixed 228 × 32 lower slot');
         const deadline = win.ticket01.state.local.accountUndo.expiresAt;
         check(deadline === win.Date.now() + 2500, 'offer deadline is exactly 2500ms');
         const dots = doc.getElementById('account-dots');
@@ -118,14 +118,17 @@ document.getElementById('run').onclick = async () => {
         check(doc.querySelector('.footer').inert && doc.querySelector('.tz-picker').inert, 'controls covered by Undo cannot receive focus');
         check(win.getComputedStyle(doc.querySelector('.footer')).visibility === 'hidden'
           && win.getComputedStyle(doc.querySelector('.tz-picker')).visibility === 'hidden', 'Undo replaces the entire timezone/reset footer without controls peeking through');
+        if (count === 64) check(win.getComputedStyle(doc.querySelector('.account-table-foot')).visibility === 'hidden'
+          && win.getComputedStyle(doc.querySelector('.account-refresh-notice')).visibility === 'hidden', 'lower Undo bar fully replaces the table count and notice');
         click(win, '#theme-toggle');
         await pause();
-        check(win.ticket01.state.local.accountUndo.expiresAt === deadline && toastBox(win) === '16,278,228,32', 'theme preserves deadline and notification position');
+        check(win.ticket01.state.local.accountUndo.expiresAt === deadline && toastBox(win) === '16,292,228,32', 'theme preserves deadline and notification position');
         await undo(win);
         check(JSON.stringify(win.ticket01.state.local.accounts[id]) === original, 'Undo restores exact raw identity, label, percentage, reset, timestamp and tie order');
         check(doc.querySelector('.account-undo').hidden && !doc.querySelector('.footer').inert, 'Undo removes recovery and releases covered controls');
         check(win.getComputedStyle(doc.querySelector('.footer')).visibility === 'visible'
           && win.getComputedStyle(doc.querySelector('.tz-picker')).visibility === 'visible', 'Undo restores both footer sections after recovery');
+        if (count === 64) check(win.getComputedStyle(doc.querySelector('.account-table-foot')).visibility === 'visible', 'table footer returns after Undo');
         if (count === 64) check(!doc.querySelector('.account-refresh-notice').textContent.includes('New reading received'), 'Undo does not announce the restored observation as a new reading');
         fixed(win, `${theme} ${count} restored`);
         check(win.ticket01.toolbar.length === icons, 'Undo does not change toolbar');

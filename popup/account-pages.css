@@ -216,10 +216,12 @@
 .account-dialog-buttons button { padding: 7px 9px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface-1); color: var(--text-primary); font: inherit; font-size: 11px; cursor: pointer; }
 .account-dialog-buttons #confirm-forget { border-color: #cf4545; color: #fff; background: #cf4545; }
 .account-dialog-buttons #confirm-forget:hover { border-color: #c73e3e; background: #c73e3e; }
-.account-undo { position: fixed; z-index: 15; left: 16px; right: 16px; bottom: 30px; box-sizing: border-box; height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 8px; overflow: hidden; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-1); color: var(--text-primary); font-size: 11px; box-shadow: 0 5px 18px #0002; }
+.account-undo { position: fixed; z-index: 15; left: 16px; right: 16px; bottom: 16px; box-sizing: border-box; height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 8px; overflow: hidden; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-1); color: var(--text-primary); font-size: 11px; box-shadow: 0 5px 18px #0002; }
 .account-undo[hidden] { display: none; }
 .account-has-undo .lower-controls .footer,
-.account-has-undo .lower-controls .tz-picker { visibility: hidden; }
+.account-has-undo .lower-controls .tz-picker,
+.account-has-undo .account-table-foot,
+.account-has-undo .account-refresh-notice { visibility: hidden; }
 .account-undo-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .account-undo button { flex: none; padding: 3px 0; border: 0; background: none; color: var(--text-primary); font: inherit; font-size: 11px; cursor: pointer; }
 .account-undo .account-undo-button { font-weight: 600; }
