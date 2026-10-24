@@ -1,9 +1,17 @@
 importScripts('../shared/accounts.js');
 importScripts('../shared/account-store.js');
-const accountStore = AccountStore.create(chrome.storage.local);
+importScripts('../shared/account-storage.js');
+// Capture scripts need no direct storage access. Restrict both areas before use.
+const storageReady = Promise.all([
+  chrome.storage.local.setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' }),
+  chrome.storage.sync.setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' })
+]);
+const accountStorage = AccountStorage.create(chrome.storage.local);
+const accountStore = AccountStore.create(accountStorage);
 let undoCleanupTimer;
 
 async function mutateAccounts(command) {
+  await storageReady;
   const result = await accountStore.mutate(command);
   clearTimeout(undoCleanupTimer);
   if (result.undo) {
@@ -234,7 +242,8 @@ const USAGE_COLORS = {
 };
 
 async function updateIcon() {
-  const { accounts = {} } = await chrome.storage.local.get('accounts');
+  await storageReady;
+  const { accounts = {} } = await accountStorage.get('accounts');
   const now = Date.now();
   const colorKey = Accounts.getIconColor(accounts, now);
   const color = USAGE_COLORS[colorKey];
@@ -357,6 +366,8 @@ async function injectCaptureIntoOpenTabs() {
 }
 
 chrome.runtime.onInstalled.addListener(async (details) => {
+  await storageReady;
+  await mutateAccounts({ action: 'getUndo' });
   if (details.reason === 'install' || details.reason === 'update') {
     await injectCaptureIntoOpenTabs().catch(() => {});
   }
@@ -379,7 +390,13 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return;
   if (msg?.type === 'ACCOUNT_MUTATION') {
-    mutateAccounts(msg.command).then(sendResponse, () => sendResponse({ error: 'Account update failed. Please try again.' }));
+    // Content scripts may capture readings/labels, never read Undo or delete data.
+    const capture = Boolean(sender.tab);
+    if (capture && (!sender.url?.startsWith('https://claude.ai/')
+        || !['reading', 'label'].includes(msg.command?.action))) return;
+    mutateAccounts(msg.command).then(result => sendResponse(capture
+      ? { status: result.status, needsLabel: result.needsLabel } : result),
+    () => sendResponse({ error: 'Account update failed. Please try again.' }));
     // Keep the response channel open while Chrome wakes/executes the worker.
     return true;
   }
@@ -389,7 +406,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 });
 
-chrome.runtime.onStartup.addListener(() => {
+chrome.runtime.onStartup.addListener(async () => {
+  await storageReady;
+  await mutateAccounts({ action: 'getUndo' });
   chrome.alarms.create(ALARM_NAME, { periodInMinutes: POLL_MINUTES });
   chrome.alarms.create(EXPIRY_ALARM_NAME, { periodInMinutes: 0.5 });
   poll();

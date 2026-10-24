@@ -37,9 +37,10 @@ function startWorker(accounts) {
     storage: {
       local: {
         get: async () => structuredClone(stored),
+        setAccessLevel: async () => {},
         set: async value => { writes++; stored = { ...stored, ...structuredClone(value) }; }
       },
-      sync: { set() { assert.fail('Account cleanup must not write sync storage'); } }
+      sync: { setAccessLevel: async () => {}, set() { assert.fail('Account cleanup must not write sync storage'); } }
     },
     alarms: { onAlarm: { addListener(listener) { onAlarm = listener; } } },
     action: {

@@ -29,7 +29,7 @@ A Usage reading for an Account that was not captured recently, because readings 
 _Avoid_: Old data, cached usage
 
 **Expired reading**:
-A Usage reading whose reset time has passed, meaning the Account has a fresh, full quota.
+A Usage reading whose captured reset time has passed. It proves only that the observed Quota window ended, not current usage. Table/detail views label bounded zero estimates explicitly, then show unknown usage, retaining the actual observation and age. Accounts are retained until Forget/reset, never deleted for age.
 _Avoid_: Reset, cleared
 
 **Peak hours**:

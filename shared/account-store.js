@@ -11,6 +11,7 @@
     let queue = Promise.resolve();
 
     async function apply(command) {
+      await storage.migrate?.();
       const stored = await storage.get(['accounts', 'accountUndo']);
       let accounts = stored.accounts ?? {};
       let undo = stored.accountUndo ?? null;

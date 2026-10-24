@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "QuotaBeacon",
   "version": "1.0.0",
+  "minimum_chrome_version": "120",
   "description": "Track Claude usage across accounts, with quota reset times, peak hours and outage status.",
   "permissions": [
     "alarms",
@@ -44,14 +45,6 @@
   "background": {
     "service_worker": "background/service-worker.js"
   },
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "data/timezones.json"
-      ],
-      "extension_ids": []
-    }
-  ],
   "action": {
     "default_popup": "popup/popup.html",
     "default_title": "QuotaBeacon",

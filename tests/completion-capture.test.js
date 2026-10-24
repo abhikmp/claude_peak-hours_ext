@@ -21,15 +21,21 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
       runtime: { id: 'usage-test', onMessage: { addListener(listener) { onMutation = listener; } },
         onInstalled: { addListener() {} }, onStartup: { addListener() {} } },
       storage: { local: {
+        setAccessLevel: async () => {},
         get: async () => structuredClone(stored),
         set: async value => { stored = { ...stored, ...structuredClone(value) }; }
-      } },
+      }, sync: { setAccessLevel: async () => {} } },
       alarms: { onAlarm: { addListener() {} } },
       action: { setIcon: async () => {} }
     }
   });
-  mutationWorker.importScripts = file => vm.runInContext(
-    fs.readFileSync(path.resolve(ROOT, 'background', file), 'utf8'), mutationWorker);
+  mutationWorker.importScripts = file => {
+    // This fixture observes capture/worker commands at the storage API seam.
+    // Real authenticated persistence is exercised in account-storage.test.js.
+    if (file.endsWith('/account-storage.js')) {
+      mutationWorker.AccountStorage = { create: storage => storage };
+    } else vm.runInContext(fs.readFileSync(path.resolve(ROOT, 'background', file), 'utf8'), mutationWorker);
+  };
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'background/service-worker.js'), 'utf8'), mutationWorker);
   const mutate = command => new Promise(resolve => {
     assert.equal(onMutation({ type: 'ACCOUNT_MUTATION', command }, { id: 'usage-test' }, resolve), true);
@@ -118,6 +124,7 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
     requests,
     notifications,
     mutate,
+    dispatch: (command, sender, reply) => onMutation({ type: 'ACCOUNT_MUTATION', command }, sender, reply),
     raw: () => structuredClone(stored),
     accounts: () => Accounts.getAccounts(stored.accounts, NOW),
     forgetAccounts() { stored.accounts = Accounts.clearAccounts(); },
@@ -170,16 +177,19 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
         } },
         storage: {
           local: {
+            setAccessLevel: async () => {},
             get: async () => structuredClone(stored),
             set: async value => { stored = { ...stored, ...structuredClone(value) }; },
             remove: async () => {}
           },
-          sync: { get: async () => ({ userTZ: 'UTC' }) }
+          sync: { setAccessLevel: async () => {}, get: async () => ({ userTZ: 'UTC' }) }
         },
         alarms: { create() {}, onAlarm: { addListener() {} } }
       } });
-      worker.importScripts = file => vm.runInContext(
-        fs.readFileSync(path.resolve(ROOT, 'background', file), 'utf8'), worker);
+      worker.importScripts = file => {
+        if (file.endsWith('/account-storage.js')) worker.AccountStorage = { create: storage => storage };
+        else vm.runInContext(fs.readFileSync(path.resolve(ROOT, 'background', file), 'utf8'), worker);
+      };
       vm.runInContext(fs.readFileSync(path.join(ROOT, 'background/service-worker.js'), 'utf8'), worker);
       onInstalled({ reason }).catch(error => { failure = error; });
       await new Promise(setImmediate);
@@ -193,6 +203,19 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
     }
   };
 }
+
+test('capture contexts cannot read recovery or delete Accounts, and capture replies contain no recovery data', async () => {
+  const capture = createCapture({ organizationFetch: async () => ({ ok: false }) });
+  const sender = { id: 'usage-test', tab: { id: 1 }, url: 'https://claude.ai/chat/example' };
+  for (const action of ['getUndo', 'clear', 'forget', 'undo', 'offerUndo', 'dismiss']) {
+    assert.equal(capture.dispatch({ action }, sender, () => assert.fail('Forbidden reply')), undefined);
+  }
+  assert.equal(capture.dispatch({ action: 'reading' }, { ...sender, url: 'https://example.invalid/' }, () => {}), undefined);
+  const reply = await new Promise(resolve => capture.dispatch({ action: 'reading', accountId: ACCOUNT_ID,
+    percent: 24, resetsAt: NOW / 1000 + 3600 }, sender, resolve));
+  assert.deepEqual(Object.keys(reply).sort(), ['needsLabel', 'status']);
+  assert.equal(reply.status, 'recorded');
+});
 
 test('a third Account becomes Active after a gzip RPC reply, preserving previous readings', async () => {
   const second = '22222222-2222-4222-8222-222222222222';

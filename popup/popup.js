@@ -214,10 +214,11 @@ function renderPill(state, local, watched, tz) {
 
 // ── Main render ──
 let renderRevision = 0;
+const accountStorage = AccountStorage.create(chrome.storage.local);
 async function render() {
   const revision = ++renderRevision;
   const [local, sync] = await Promise.all([
-    chrome.storage.local.get([
+    accountStorage.get([
       'state', 'fetchError', 'statusDescription', 'incidentTitle', 'incidentBody',
       'nextPeakAt', 'peakEndsAt', 'lastChecked', 'affectedProducts',
       'watchedAffected', 'incidentImpact',
@@ -407,8 +408,7 @@ PRODUCT_IDS.forEach(id => {
 
 // ── Init ──
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'local' && changes.accounts) render();
-  else if (area === 'local' && changes.accountUndo) AccountActions.syncUndo(changes.accountUndo.newValue);
+  if (area === 'local' && (changes.accounts || changes.accountUndo)) render();
 });
 async function initAccounts() {
   await AccountActions.mutate({ action: 'getUndo' }).catch(() => {});

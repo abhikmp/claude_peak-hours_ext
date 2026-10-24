@@ -1,101 +1,52 @@
-# QuotaBeacon — release design reference
+# QuotaBeacon design and data flow
 
-This describes the implemented QuotaBeacon release. It supersedes the earlier single-Account architecture notes in project-context.md. [CONTEXT.md](CONTEXT.md) defines the domain language; [release QA](docs/release/manual-qa.md) records checks and remaining publication steps.
+Implemented release candidate: 1.0.0, 2026-10-24. [Domain](CONTEXT.md), [handoff](.scratch/account-overview/05-release/HANDOFF.md), [privacy](docs/release/privacy-policy.md). Earlier project-context.md/prototype states are design history.
 
-## Product and release identity
+The popup stays **260 × 340px**. One Account has one detail view; two/three have slides with aligned status/preferences; four-plus have Active detail and a searchable table. Navigation stops at the ends. Browsing never changes Active. Long tables scroll internally without a visible scrollbar; names truncate with full title/detail text.
 
-QuotaBeacon is a separate extension from Peak Hours for Claude. Its first store package is version 1.0.0 and must be uploaded as a **new item**. The existing listing is not updated or unpublished by this release preparation. Account readings and preferences do not migrate between extension IDs.
+Active is the latest observed Account, not necessarily the signed-in one. Only supported numeric five-hour quota events create readings; no weekly/token totals or continuous quota polling.
 
-The popup gives priority to Claude quota usage. Peak hours and incidents appear as secondary signals in the pill, toolbar badge and tooltip.
+## Observations and comparison
 
-## Toolbar icon, badge and tooltip
+Accounts remain until Forget/reset. Details show actual Updated age, Last reset and Last recorded usage. After the captured reset, details show explicitly estimated ~0% for three hours, then No recent reading. Tables estimate green ~0% for strictly less than 15 minutes, then unknown usage. Estimates never update stored readings.
 
-The toolbar circle follows only the **Active account**, whose most recent Usage reading determines page 1. Browsing another Account page does not change it.
+Compact columns are Account / Used / Reset plus rightmost vertical actions. Reset text is 11px regular system font, relative past/future, with exact captured date/year/timezone accessible. On table opening: resets within 15 minutes first, newest first; then other non-Full by reading recency; then Full by soonest reset. Ordinary slides retain Active first, non-Full recency, then Full reset order.
 
-| Active Usage reading | Circle |
+Open-table membership, order and row identity freeze through readings, time boundaries and inspection. Values/Active update immediately; notices explain reopening. Back restores search, scroll and keyboard access.
+
+## Forget and Undo
+
+Only non-Active Accounts can be forgotten. Vertical menus open the selected Dialog naming the Account and explaining rediscovery. Cancel is initially focused; focus is trapped/restored safely. Both destructive buttons use softened red with white text.
+
+Removal follows the next Account in the browsed queue, falling back to the preceding one at the end. Tables stay open at four-plus; four→three becomes slides, three→two stays slides, two→one removes navigation. Undo restores context where available and inserts restored membership into an already-open table.
+
+Undo occupies one **228 × 32px** slot, **16px from bottom and sides**, on every view. It replaces the complete timezone/reset footer/picker visually, preserving space and blocking covered focus. The original 2,500ms deadline uses a 2px shrinking line, or numeric remaining time for reduced motion. Navigation, theme/reopening never restart it. Expiry/dismiss ends recovery; a replacement gets its own window. No prototype slider/picker ships.
+
+## Toolbar and availability
+
+The circle is green at 0–60%, orange above 60% through 85%, then red. Missing/expired Active observations use green as a neutral icon policy, never a guarantee of full quota; the icon is never grey. Browsing does not change it.
+
+Public status refreshes every five minutes. Weekday 5–11 AM Pacific is the configured peak window, not a measured speed forecast. Watched incidents show DOWN ahead of PEAK. White badges blink once per second while the worker runs; suspension can stop blinking. Off-peak/error clears them. Tooltips follow incident/peak/next-peak/unknown status. Popup Retry requests a fresh poll.
+
+Defaults: dark, system timezone, Claude AI watched. At least one watched product remains. Reset clears Accounts/recovery and restores preferences. The 30-second alarm updates expiry/icon, never deletes Accounts for age.
+
+## Capture and persistence
+
+Manifest MAIN scripts observe completion SSE or exact same-origin Bard StreamTimeline RPC. The decoder handles gzip/identity Connect envelopes and projects only numeric five-hour quota. Missing utilization is not zero; Claude retains its original response. Copied response bytes can transiently contain conversation content; none is retained or transmitted onward.
+
+The isolated bridge validates identity/values and sends reading/label commands to one worker AccountStore queue. Same-origin signed-in organization-name requests run independently with a 10-second timeout. Late names cannot resurrect forgotten Accounts; newer rediscovery wins over Undo. All Account mutations serialize across tabs/popup.
+
+AccountStorage encrypts the Account map and Undo value with AES-256-GCM, fresh 96-bit IVs and field-bound authentication. A non-extractable key persists separately in extension IndexedDB. The worker migrates pre-release plaintext. Authentication/key failures preserve ciphertext and fail the operation. The popup decrypts and rereads encrypted change notifications. This is not an OS vault and cannot protect a fully compromised browser profile.
+
+Local/sync storage use TRUSTED_CONTEXTS. Content senders from claude.ai may submit only readings/labels; replies exclude recovery. Popup commands manage Accounts. The MAIN bridge cannot authenticate observations against a compromised claude.ai page; readings are informational, never authorization/billing evidence.
+
+| Location | Contents |
 | --- | --- |
-| No Account, or an Expired reading | Green |
-| 0–60% used | Green, #22c55e |
-| Above 60% through 85% | Orange, #f97316 |
-| Above 85% through 100% | Red, #ef4444 |
+| Local storage | Encrypted accounts/accountUndo; plaintext public status cache |
+| Extension IndexedDB | Non-extractable AES key, no labels/readings |
+| Chrome sync | userTZ, watchedProducts, theme |
+| HTTPS | Public status, same-origin signed-in organization details, existing completion responses |
 
-The toolbar icon is **never grey**. An unavailable public status response is shown in the popup, without overriding the usage color.
+All executable logic is bundled. Minimum Chrome 120 reflects the half-minute alarm requirement. No cookies/history/tabs API permission is used; host access supplies the matching-tab query. The unused web-accessible timezone declaration is removed; popup loads its bundled JSON directly.
 
-| Public status | Badge | Tooltip |
-| --- | --- | --- |
-| Incident affecting a Watched product | DOWN, #c2410c background | Affected products and incident title |
-| Weekday 5–11 AM Pacific, without a watched incident | PEAK, #b91c1c background | Time until peak hours end |
-| Off peak | Empty | Next peak, or existing status description for an unwatched incident |
-| Status request failed | Empty | QuotaBeacon · Unknown |
-
-DOWN takes priority over PEAK. Badge text is white. While the service worker remains running, its interval alternates the badge on/off every second. Chrome can suspend the worker; continuous blinking while suspended is not promised. Polling refreshes the resolved status every five minutes. Usage expiry checks update the icon without changing badge or tooltip behavior.
-
-## Popup layout
-
-The popup is 260px wide, with 16px horizontal content padding. Existing dark/light tokens in popup/popup.css define its colors. Dark is the default; the top-right theme toggle persists the preference.
-
-Order: usage hero, public-status pill and aside/incident detail, divider, Watched product filter, divider, timezone/reset footer, timezone picker.
-
-### One Account and no reading
-
-With one Account, show its percentage, progress bar and reset countdown. Hide Account name, Active/Full tags, arrows, dots and reading age. With no readings, show “— %” and “Send a message to see usage.” The icon is green.
-
-An Expired reading displays 0%, an empty bar and “Full quota available — your limit has reset.” Stored readings are retained until cleanup or reset; display expiry does not erase them.
-
-### Multiple Accounts
-
-Only the usage hero pages. The pill, filters, footer, timezone picker and theme toggle stay fixed while paging.
-
-- Each page shows the Account name, tags, percentage, bar and reset text. Email-based organization labels display the username before @; stored labels remain unchanged. Other labels retain their names; unresolved names use “Account <first six ID characters>…”.
-- Page 1 is always Active, even at 100%. Active changes only when another Account produces a new Usage reading.
-- Remaining non-Full Accounts follow by most recent reading. Full accounts follow last, ordered by soonest reset.
-- A Full account is at 100% with a Quota window that has not ended. Expiry removes Full and returns it to normal ordering.
-- A non-Active reading at least 10 minutes old shows muted “Updated … ago” **beside the name**, at 9px. Active never shows reading age. Names truncate on one line; age and tags do not shrink or wrap.
-- Previous/next arrows sit in the right gutter, previous above next. Dots sit below the hero. Navigation stops at either end.
-- Left/right keys page unless the user is editing an input. Hidden pages are inert and excluded from accessibility navigation; a polite announcement identifies the selected page.
-- Deliberate page changes slide in 300ms. Reduced-motion preferences remove the transition. Data refreshes do not animate.
-- The flex track takes the tallest page's natural height; there is no fixed 100px minimum and no bottom age row.
-- Open on Active. Preserve the selected Account during ordinary refreshes; return to Active when a new Account becomes Active.
-
-Usage percentages use the green/orange/red thresholds above. Text and fills use theme tokens. Bars are 8px high with rounded ends. Countdown text uses the selected timezone, such as “Resets in 2h 18m · Fri 4:30 PM”.
-
-### Public-status pill
-
-| State | Pill | Adjacent text |
-| --- | --- | --- |
-| Off peak | Off peak, green | Next peak day/time, with countdown when under one hour |
-| Peak hours | Peak, red | Ends in duration and local time |
-| Watched incident | Outage, orange | Major/Partial severity and products; relevant incident sentence below |
-| Request failed | Status unavailable | Inline Retry button |
-
-The retry button requests a fresh poll. Outage text remains capped at 120 characters. An unwatched incident does not turn the pill into a watched outage. This release does not change the weekday Pacific peak window, incident matching or tooltip countdown rules.
-
-## Preferences and lifecycle
-
-Fresh installs default to Claude AI as the sole Watched product. Existing saved selections remain. At least one product must stay selected; the final checked checkbox is disabled. The timezone picker saves an IANA timezone and affects reset and peak-time displays.
-
-“Reset to default” restores system timezone, Claude AI only and dark theme, forgets all Accounts, updates the icon and requests a status poll.
-
-Accounts without a new reading for **more than 48 hours** are pruned by the existing 30-second alarm and when the popup opens. Exactly 48 hours is retained. The open popup refreshes its display every 30 seconds for age and expiry changes. If no Account remains, show the no-reading state and a green icon.
-
-## Capture and storage
-
-The pure Account module in shared/accounts.js owns identity, ordering, expiry, age, pruning and clearing. It takes time as an argument and uses no browser APIs.
-
-The MAIN-world capture script observes quota events in completion responses and forwards the completion URL, percentage and reset time. Only the ISOLATED bridge loads the Account module, extracts the organization UUID and writes readings to local storage. This avoids Chrome deduplicating the same script path across worlds.
-
-The bridge fetches an unresolved Account name independently from the signed-in same-origin organization endpoint, with a 10-second timeout. Failed names retry on a later reading. Label writes cannot restore a forgotten Account or change Active. Install/update injection supports Claude tabs already open.
-
-| Storage | Contents |
-| --- | --- |
-| chrome.storage.local, accounts | Map keyed by organization UUID: nullable label, percent, reset time in Unix seconds, last-reading time in milliseconds and a reading-order tie breaker |
-| chrome.storage.local, status fields | Public status, incident details, next peak/end time and last-check time |
-| chrome.storage.sync | userTZ, watchedProducts and theme |
-
-The old flat usagePercent, usageResetsAt and usageExpired keys are removed on update; there is no migration from a public usage-tracker release. The bridge applies readings/labels; the worker and popup may persist pruning; reset clears Accounts. Cross-tab simultaneous updates remain last-write-wins.
-
-Account names, which may be email addresses, and Usage readings stay locally on the device. Only preferences use Chrome sync storage. See [the privacy disclosure](docs/release/privacy-disclosure.md) for network behavior and publisher copy.
-
-## Visual evidence
-
-Current multi-Account layout: [Active page](.scratch/multi-account-usage/05-validation/screenshots/inline-active.jpg), [inline age](.scratch/multi-account-usage/05-validation/screenshots/inline-updated.jpg). These are disposable fixture readings. Earlier prototype/QA screenshots document earlier layouts; the bottom-row age presentation is superseded.
+Production evidence: [03a](.scratch/account-overview/03a-validation/verification.md), [04](.scratch/account-overview/04-validation/verification.md), [queue/button refinements](.scratch/account-overview/04-validation/refinements-verification.md), [footer replacement](.scratch/account-overview/04-validation/footer-replacement.md), [release](.scratch/account-overview/05-release/verification.md).
