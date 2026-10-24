@@ -62,7 +62,10 @@
         .map(field => [field, stored[field]]));
       if (Object.keys(legacy).length) await set(legacy);
     }
-    return { get, set, migrate };
+    // Explicit reset must work even if old ciphertext/the old key is unreadable.
+    // Empty markers contain no Account or recovery data and need no old key.
+    const clear = () => storage.set({ accounts: {}, accountUndo: null });
+    return { get, set, migrate, clear };
   }
   const api = { create };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

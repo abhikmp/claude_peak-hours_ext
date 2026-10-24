@@ -42,6 +42,15 @@ document.getElementById('run').onclick = async () => {
       await pause();
       check(doc.querySelector('.account-page .account-name').textContent.includes(original[target].label), 'encrypted storage change updates Active in the actual popup');
       check(win.ticket01.toolbar.length > 0 && (await win.ticket05.read()).accounts[target].percent === 88, 'persisted capture command updates toolbar and observation');
+      win.ticket01.state.local.accounts.ciphertext[0] ^= 1;
+      doc.getElementById('tz-reset-btn').click();
+      for (let i = 0; i < 100 && Object.keys((await win.ticket05.read().catch(() => ({accounts:{pending:true}}))).accounts).length; i++) await pause();
+      check(Object.keys((await win.ticket05.read()).accounts).length === 0 && (await win.ticket05.read()).accountUndo === null,
+        'actual Reset clears unreadable encrypted Accounts and recovery');
+      await win.ticket01.mutate({action:'reading',accountId:target,percent:12,resetsAt:win.Date.now()/1000+3600});
+      await pause();
+      check((await win.ticket05.read()).accounts[target].percent === 12 && !doc.getElementById('account-hero').hidden,
+        'capture and actual popup recover after Reset');
       check(win.ticket01.errors.length === 0, 'no runtime exceptions in encrypted lifecycle');
     }
     out.textContent += `\n${passed} passed, 0 failed\n`;

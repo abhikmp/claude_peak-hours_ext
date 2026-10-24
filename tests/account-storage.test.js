@@ -41,13 +41,23 @@ test('Forget and Undo retain exact observations across storage reopen without pl
   assert.equal((await f.open().get(['accountUndo'])).accountUndo, null);
 });
 
-test('tampered or wrong-key ciphertext fails closed without overwriting saved observations', async () => {
+test('unreadable observations reject ordinary mutations but explicit reset clears them and capture recovers', async () => {
   const f = await fixture();
   await f.open().migrate();
   const otherKey = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
   await assert.rejects(AccountStorage.create(f.raw, async () => otherKey).get(['accounts']));
   f.disk().accounts.ciphertext[0] ^= 1;
   const before = structuredClone(f.disk());
-  await assert.rejects(AccountStore.create(f.open()).mutate({ action: 'clear' }));
+  await assert.rejects(AccountStore.create(f.open()).mutate({ action: 'reading', accountId: 'new', percent: 24 }));
   assert.deepEqual(f.disk(), before);
+  // A reopened profile may have a replacement key. Reset must not need the old one.
+  const recovered = AccountStorage.create(f.raw, async () => otherKey);
+  const store = AccountStore.create(recovered, () => 1000);
+  assert.equal((await store.mutate({ action: 'clear' })).status, 'cleared');
+  const empty = await recovered.get(['accounts', 'accountUndo']);
+  assert.deepEqual(empty.accounts, {});
+  assert.equal(empty.accountUndo, null);
+  assert.equal((await store.mutate({ action: 'reading', accountId: 'new', percent: 24 })).status, 'recorded');
+  assert.equal((await recovered.get(['accounts'])).accounts.new.percent, 24);
+  assert.equal(JSON.stringify(f.disk()).includes('Sample@example.invalid'), false);
 });

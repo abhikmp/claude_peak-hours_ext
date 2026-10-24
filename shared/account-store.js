@@ -11,6 +11,12 @@
     let queue = Promise.resolve();
 
     async function apply(command) {
+      // A deliberate reset must never depend on decrypting the data it erases.
+      if (command.action === 'clear') {
+        if (storage.clear) await storage.clear();
+        else await storage.set({ accounts: rules.clearAccounts(), accountUndo: null });
+        return { status: 'cleared', undo: null, needsLabel: false };
+      }
       await storage.migrate?.();
       const stored = await storage.get(['accounts', 'accountUndo']);
       let accounts = stored.accounts ?? {};
@@ -75,12 +81,6 @@
           break;
         case 'dismiss':
           if (undo?.token === command.token) { undo = null; dirty = true; }
-          break;
-        case 'clear':
-          accounts = rules.clearAccounts();
-          undo = null;
-          dirty = true;
-          status = 'cleared';
           break;
         case 'getUndo': break;
         default: throw new Error('Unknown Account action');
