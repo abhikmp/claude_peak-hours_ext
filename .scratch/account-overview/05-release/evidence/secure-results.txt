@@ -1,0 +1,24 @@
+PASS dark: encrypted artifact renders at 260 × 340
+PASS both storage areas restricted to trusted contexts
+PASS pre-release Accounts migrate in the real worker
+PASS physical storage contains ciphertext rather than sample labels
+PASS Forget removes the real encrypted observation
+PASS temporary recovery is encrypted too
+PASS popup recreation reuses the persisted IndexedDB key and original offer
+PASS Undo after recreation restores the exact observation
+PASS encrypted storage change updates Active in the actual popup
+PASS persisted capture command updates toolbar and observation
+PASS no runtime exceptions in encrypted lifecycle
+PASS light: encrypted artifact renders at 260 × 340
+PASS both storage areas restricted to trusted contexts
+PASS pre-release Accounts migrate in the real worker
+PASS physical storage contains ciphertext rather than sample labels
+PASS Forget removes the real encrypted observation
+PASS temporary recovery is encrypted too
+PASS popup recreation reuses the persisted IndexedDB key and original offer
+PASS Undo after recreation restores the exact observation
+PASS encrypted storage change updates Active in the actual popup
+PASS persisted capture command updates toolbar and observation
+PASS no runtime exceptions in encrypted lifecycle
+
+22 passed, 0 failed

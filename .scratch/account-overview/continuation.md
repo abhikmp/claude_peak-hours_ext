@@ -19,7 +19,9 @@ The user explicitly authorized bringing every finalized prototype refinement int
 
 The current prototype default used for production is the 15-minute table estimate/priority policy. Its optional three-hour table-estimate selector remains an exploration comparison, not production UI. The existing three-hour **detail** policy is independent.
 
-## Ticket 04 complete — ticket 05 is next
+## Ticket 05 prepared — ticket 06 is next
+
+Release plan approved on 2026-10-24: [05](issues/05-verify-and-package-account-overview.md) now owns autonomous verification, documentation/privacy-policy drafting, Store copy/assets, policy review and ZIP/checksum preparation. [06](issues/06-manual-repository-migration-and-store-launch.md) owns the user's final manual live/package checks, publisher decisions/account steps, legacy branch/tag, GitHub merge/rename, policy hosting, Store submission/publication and existing-user transition. Execute 05 first and 06 last; neither was started by this planning update. Do not pause 05 for routine drafting or carry out 06 operations as part of preparation.
 
 Latest footer refinement, 2026-10-24: Undo now visually replaces the complete timezone/reset footer while retaining its layout space. Neither section peeks through beneath the bar, neither receives focus, and both return after Undo, expiry or dismissal without moving the rest of the popup. This is a direct production change, verified in both themes; see [footer replacement evidence](04-validation/footer-replacement.md).
 
@@ -31,7 +33,7 @@ Final choices: **Dialog** confirmation; **vertical ⋮ menus at the far right af
 
 Production uses one service-worker mutation queue across every tab and the popup for reading/label/Forget/Undo/clear and recovery lifecycle operations. Recovery retains the exact raw observation; newer rediscovered readings win. First display after successful removal activates the original 2,500ms deadline, so storage latency cannot shorten the visible interval. Reopening preserves that deadline, and Undo inserts the restored Account into an already-open table even without the original popup's browsing context. Reset and dismiss end recovery. All Compact/reset/layout rules above, including **Last recorded usage**, are retained. The [selected Dialog prototype](04-prototype/prototype.html?v=3) remains design history; [04 production checks](04-validation/verification.md) now supply implementation evidence.
 
-Next sequence: **05** handles final integrated release verification, release docs and packaging. Four-to-three becomes table-to-slides; three-to-two remains slides. Ticket 04 produced no release package or publication. Its verification contains 57 passing Node tests, 305 new browser assertions and 438 existing production regression assertions, plus the two-axis review with zero remaining findings.
+Next sequence: **05** prepares the release candidate and handoff autonomously; **06** completes human-run checks and the actual migration/launch. Four-to-three becomes table-to-slides; three-to-two remains slides. Ticket 04 produced no release package or publication. Its implementation evidence remains in the linked verification files; later footer/position refinements extend the original 57-test baseline and browser checks.
 
 Tickets 01–03a were completed previously. The third-Account capture bug #08 was separately fixed and live-verified on 2026-10-23; disposable popup fixtures are not new live capture evidence. Preserve existing unrelated untracked files and do not stage them wholesale.
 
@@ -40,3 +42,9 @@ Tickets 01–03a were completed previously. The third-Account capture bug #08 wa
 Run `python .scratch/account-overview/04-validation/serve.py` from the repo root (Windows sandbox may require the authorized loopback-server escalation). Open the [production matrix](http://127.0.0.1:8767/.scratch/account-overview/04-validation/checks.html?matrix=1), [lifecycle checks](http://127.0.0.1:8767/.scratch/account-overview/04-validation/checks.html?advanced=1), [accessibility checks](http://127.0.0.1:8767/.scratch/account-overview/04-validation/extra.html), or [production preview](http://127.0.0.1:8767/.scratch/account-overview/04-validation/preview.html). The same server also runs the earlier 01/02/03 check pages against the current worker/runtime path. These use disposable sample storage, never real extension readings.
 
 The selected [prototype](reset-time-exploration/prototype.html) remains as design history. Do not restart design exploration or ask which variant was selected.
+
+## Ticket 05 release-candidate handoff — 2026-10-24
+
+[Complete handoff](05-release/HANDOFF.md): verified 1.0.0 ZIP, checksum/source record, 64 passing Node tests, 393 extracted-popup browser assertions, production listing assets, corrected docs, local privacy policy and dashboard/reviewer copy. Accounts/recovery now use AES-256-GCM with a separate non-extractable local key; local/sync storage is restricted to trusted contexts and capture commands cannot retrieve recovery or delete Accounts. No OS/hardware-vault claim is made. Runtime functionality remains as approved above.
+
+Ticket 05 is prepared for review; ticket 06 is next and owns all final signed-in/package/publisher/hosting/migration/Store work. No signed-in session, Store publication, GitHub operation or legacy policy edit occurred. Earlier “05 not started” planning notes above are historical. Reproduce final artifact checks with `python tools/build-release.py` and `python .scratch/account-overview/05-release/serve.py` on port 8768; original 04 evidence remains history.
