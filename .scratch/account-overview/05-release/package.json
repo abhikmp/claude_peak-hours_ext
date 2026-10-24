@@ -1,9 +1,9 @@
 {
   "package": "quotabeacon-1.0.0-rc.zip",
   "version": "1.0.0",
-  "sha256": "99ab6a96fbf964ad465193fddebeee41bc6c37383ba5752cfc29de6d8c4d5f9f",
-  "sourceRevision": "1acf7fc681cd38f600cc91e5e089eb039fc7a289",
-  "runtimeSha256": "05776364624e485236341df162d27241470a48795ebf604a6b054bb5e45c47f1",
+  "sha256": "f9b97c5626e135817f5881d479167cabe88cae7e8ac768de0256e4ac52b9c20e",
+  "sourceRevision": "8d34de1095dc5cc279890a134ee0f112f3571913",
+  "runtimeSha256": "c040e6ebfe92b24b10790c03264fb19b99601f8a05fa608ba37c46ac5e77ed35",
   "files": {
     "background/service-worker.js": "2b3cfb98c260a7f0a72d0c09c49d0f74a359f659b092460856ce80c4e9991b8c",
     "content/connect-usage.js": "3534d120e9bc045eebae6bff0c1bd8b1c27b5336f6e2c509f8a4c610a1d994c8",
@@ -20,8 +20,8 @@
     "popup/popup.css": "17a54f32d65a4afa52df933c692f91962f137199cc71e3c6ed1983da6558a96c",
     "popup/popup.html": "90c7580faf7378766af34c1a632f191bd63a6ba2b304169ecfcf8cc087f8a387",
     "popup/popup.js": "7cd33df5fdcb4c3c02527080c9ce6788304a58550118c533901919fe90647709",
-    "shared/account-storage.js": "7037e8e1875417f25fce972a03d3f8ef49140f2f66df4fc3b692b54f8600564b",
-    "shared/account-store.js": "68ca5af58c91fe8775d28cc3dfd36f40f20b9258cc8e05f645b4390af7c84d0e",
+    "shared/account-storage.js": "832c327800319d41b857cde0a3ba8b6f309a8999ed51d49a46fad313b5bf9466",
+    "shared/account-store.js": "aa36bb1387b8a1068fc63ef5a3d8a9eedd7af7e17b76be95245f5359b5a43075",
     "shared/accounts.js": "7b116cc5df46fe8edd7ae3b9d779de81f361f6232022a0f5b8ea57a58a2be5bd"
   },
   "checks": "18 allowlisted files; source/ZIP/extraction equality; manifest paths/metadata; PNG dimensions; extracted JS syntax"

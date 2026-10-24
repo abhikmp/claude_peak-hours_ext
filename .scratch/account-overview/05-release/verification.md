@@ -18,9 +18,9 @@ The release server serves runtime files from extracted/, not the working source 
 | [Lifecycle](evidence/advanced-results.txt) | 36 passed | Frozen rows/search/scroll, inspection/Back, readings, original Undo deadline/reopening, rediscovery races, replacement/dismiss/reset and table restoration |
 | [Accessibility](evidence/extra-results.txt) | 31 passed | Long international labels, dormant details, focus trapping/restoration, complete footer restoration, linear countdown and emulated reduced-motion numeric fallback |
 | [Approved refinements](evidence/refinements-results.txt) | 42 passed | Queue successor/end fallback, table→slides successor, five→four table retention, softened red/white buttons and bounds in both themes |
-| [Encrypted integration](evidence/secure-results.txt) | 22 passed | Actual extracted AccountStorage/worker/popup, real browser Web Crypto + IndexedDB, plaintext migration, ciphertext physical storage, trusted-context API calls, encrypted Forget, popup recreation/key reuse, exact Undo and incoming Active/icon updates |
+| [Encrypted integration](evidence/secure-results.txt) | 26 passed | Actual extracted AccountStorage/worker/popup, real browser Web Crypto + IndexedDB, plaintext migration, ciphertext physical storage, trusted-context API calls, encrypted Forget, popup recreation/key reuse, exact Undo, incoming Active/icon updates, actual Reset after ciphertext corruption and subsequent capture |
 
-Total: **393 browser assertions, zero failures**. [Measured bounds](evidence/matrix-measurements.json). Older synchronous visual harnesses use a plaintext storage-API adapter because they inspect fixture state directly; the dedicated encrypted suite uses the real production adapter. This distinction is intentional and does not claim real Chrome permission enforcement was exercised by a shim. That enforcement and signed-in package operation remain 06.
+Total: **397 browser assertions, zero failures**. [Measured bounds](evidence/matrix-measurements.json). Older synchronous visual harnesses use a plaintext storage-API adapter because they inspect fixture state directly; the dedicated encrypted suite uses the real production adapter. This distinction is intentional and does not claim real Chrome permission enforcement was exercised by a shim. That enforcement and signed-in package operation remain 06.
 
 ## Node/runtime validation
 
@@ -45,3 +45,5 @@ Visual inspection confirms the selected Compact table typography/relative resets
 Run python tools/build-release.py, then python .scratch/account-overview/05-release/serve.py. Open the secure checks at http://127.0.0.1:8768/.scratch/account-overview/05-release/checks.html and press Run. On the same server, run 04-validation/checks.html?matrix=1, ?advanced=1, extra.html and refinements.html; results save into this release's evidence directory. Assets are reproduced through assets.html?mode=usage, compare or forget. The server may require authorized loopback access in the Windows sandbox.
 
 Run node --test tests/*.test.js and runtime syntax checks from the repo root. Do not install QA pages or include them in the ZIP.
+
+Review follow-up: both axes identified explicit Reset failing on unreadable encrypted data. Regression failed before the 8d34de1 fix and passed afterward; the final 26-check secure browser run corrupts physical ciphertext, uses the actual Reset button and captures again. Ordinary failed reads/mutations still preserve data. All suites above were rerun against the rebuilt artifact; source revision/checksum updated.

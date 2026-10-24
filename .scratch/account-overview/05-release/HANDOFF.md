@@ -5,7 +5,7 @@ Ticket 05 prepares the candidate; [ticket 06](../issues/06-manual-repository-mig
 ## Use these artifacts
 
 - [Release ZIP](quotabeacon-1.0.0-rc.zip), [SHA-256](SHA256SUMS), [source revision and per-file hashes](package.json). Explicit 18-file allowlist with manifest at root; exact extraction verified.
-- [Verification/evidence](verification.md): 64 Node tests and 393 browser assertions; synthetic conditions are identified, existing #08 reporter evidence linked.
+- [Verification/evidence](verification.md): 64 Node tests and 397 browser assertions; synthetic conditions are identified, existing #08 reporter evidence linked.
 - [Privacy policy](../../../docs/release/privacy-policy.md), [dashboard declarations/permissions](../../../docs/release/privacy-disclosure.md), [policy/security/branding/licensing audit](../../../docs/release/policy-audit.md).
 - [Store title/descriptions/category/language/assets](../../../docs/release/store-listing.md), [reviewer instructions](../../../docs/release/reviewer-instructions.md), [release notes](../../../docs/release/release-notes.md).
 - Required assets: [128px PNG icon](assets/icon-128.png), [usage screenshot](assets/01-usage.png), [comparison screenshot](assets/02-compare.png), [Forget/Undo screenshot](assets/03-forget.png). Three 1280 × 800 PNGs with safe samples.

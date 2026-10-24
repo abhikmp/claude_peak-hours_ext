@@ -36,7 +36,7 @@ Manifest MAIN scripts observe completion SSE or exact same-origin Bard StreamTim
 
 The isolated bridge validates identity/values and sends reading/label commands to one worker AccountStore queue. Same-origin signed-in organization-name requests run independently with a 10-second timeout. Late names cannot resurrect forgotten Accounts; newer rediscovery wins over Undo. All Account mutations serialize across tabs/popup.
 
-AccountStorage encrypts the Account map and Undo value with AES-256-GCM, fresh 96-bit IVs and field-bound authentication. A non-extractable key persists separately in extension IndexedDB. The worker migrates pre-release plaintext. Authentication/key failures preserve ciphertext and fail the operation. The popup decrypts and rereads encrypted change notifications. This is not an OS vault and cannot protect a fully compromised browser profile.
+AccountStorage encrypts the Account map and Undo value with AES-256-GCM, fresh 96-bit IVs and field-bound authentication. A non-extractable key persists separately in extension IndexedDB. The worker migrates pre-release plaintext. Authentication/key failures preserve ciphertext and fail ordinary operations. Explicit Reset clears records without decrypting old contents, so capture can recover with a replacement key. The popup decrypts and rereads encrypted change notifications. This is not an OS vault and cannot protect a fully compromised browser profile.
 
 Local/sync storage use TRUSTED_CONTEXTS. Content senders from claude.ai may submit only readings/labels; replies exclude recovery. Popup commands manage Accounts. The MAIN bridge cannot authenticate observations against a compromised claude.ai page; readings are informational, never authorization/billing evidence.
 

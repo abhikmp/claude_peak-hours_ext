@@ -8,6 +8,8 @@ PASS popup recreation reuses the persisted IndexedDB key and original offer
 PASS Undo after recreation restores the exact observation
 PASS encrypted storage change updates Active in the actual popup
 PASS persisted capture command updates toolbar and observation
+PASS actual Reset clears unreadable encrypted Accounts and recovery
+PASS capture and actual popup recover after Reset
 PASS no runtime exceptions in encrypted lifecycle
 PASS light: encrypted artifact renders at 260 × 340
 PASS both storage areas restricted to trusted contexts
@@ -19,6 +21,8 @@ PASS popup recreation reuses the persisted IndexedDB key and original offer
 PASS Undo after recreation restores the exact observation
 PASS encrypted storage change updates Active in the actual popup
 PASS persisted capture command updates toolbar and observation
+PASS actual Reset clears unreadable encrypted Accounts and recovery
+PASS capture and actual popup recover after Reset
 PASS no runtime exceptions in encrypted lifecycle
 
-22 passed, 0 failed
+26 passed, 0 failed
