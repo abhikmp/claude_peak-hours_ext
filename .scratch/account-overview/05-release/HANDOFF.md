@@ -1,10 +1,10 @@
-# QuotaBeacon 1.0.0 — release-candidate handoff
+# ClaudeBuddy 1.0.0 — release-candidate handoff
 
 Ticket 05 prepares the candidate; [ticket 06](../issues/06-manual-repository-migration-and-store-launch.md) owns final live/package checks, owner decisions and launch. No Store submission/publication, real signed-in QA, policy hosting or GitHub migration has occurred.
 
 ## Use these artifacts
 
-- [Release ZIP](quotabeacon-1.0.0-rc.zip), [SHA-256](SHA256SUMS), [source revision and per-file hashes](package.json). Explicit 18-file allowlist with manifest at root; exact extraction verified.
+- [Release ZIP](claudebuddy-1.0.0-rc.zip), [SHA-256](SHA256SUMS), [source revision and per-file hashes](package.json). Explicit 30-file allowlist with manifest at root; exact extraction verified.
 - [Verification/evidence](verification.md): 64 Node tests and 397 browser assertions; synthetic conditions are identified, existing #08 reporter evidence linked.
 - [Privacy policy](../../../docs/release/privacy-policy.md), [dashboard declarations/permissions](../../../docs/release/privacy-disclosure.md), [policy/security/branding/licensing audit](../../../docs/release/policy-audit.md).
 - [Store title/descriptions/category/language/assets](../../../docs/release/store-listing.md), [reviewer instructions](../../../docs/release/reviewer-instructions.md), [release notes](../../../docs/release/release-notes.md).
@@ -18,3 +18,7 @@ Confirm publisher/contact identity, access and trader/distribution/licence decis
 Runtime encryption uses AES-256-GCM and a separate non-extractable local key, not a hardware/OS vault; full-profile compromise remains a limit. Policy wording discloses transient reply-stream processing and browser-managed session use. No unrelated collection, developer backend or analytics is present.
 
 If QA or an owner decision changes runtime contents, return to 05: fix sources, commit the runtime, rebuild with python tools/build-release.py, rerun affected checks and update this evidence/checksum before upload. Never edit the ZIP manually. The runtime aggregate/per-file hashes establish byte identity even when later commits only update documentation/evidence.
+
+## ClaudeBuddy rebrand follow-up
+
+User approved the name and a friendly, warm, crisp crab with cute eyes. See [branding brief/proof](../../claudebuddy-branding/brief.md) and [source/prompt notes](../../../assets/branding/README.md). Current screenshots and active ZIP are ClaudeBuddy. The runtime allowlist now has 30 files, including 12 packaged quota-color crab PNGs. The rebrand reruns all 64 Node tests and the 26 encrypted-popup checks; unaffected layout evidence from ticket 05 remains reused. Internal storage/key/bridge identifiers remain intentionally compatible.

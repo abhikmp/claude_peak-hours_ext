@@ -21,3 +21,5 @@ The [third-Account capture bug #08](../multi-account-usage/issues/08-third-accou
 Remaining sequence: **05** is agent-owned preparation; **06** is the user's manual launch phase, done last. The linked tickets own their respective criteria; 05 completion means a prepared release candidate, not live verification or publication. No implementation, privacy-policy update, GitHub migration or Store action started with this planning update.
 
 2026-10-24: Ticket 05 prepared and reviewed; see [handoff](05-release/HANDOFF.md). Earlier implementation-not-started planning text is historical. Ticket 06 remains pending and owns final signed-in package checks and manual launch; no Store or GitHub action has been performed.
+
+Current product name: **ClaudeBuddy** (user-approved rebrand, 2026-10-24). Use the current handoff/package and [branding amendment](../claudebuddy-branding/brief.md); earlier QuotaBeacon references are historical.
