@@ -1,5 +1,7 @@
 # ClaudeBuddy branding amendment
 
+Current amendment: the user later restricted the crab to extension management and Store branding, restoring the original toolbar circles. [Toolbar correction and validation](toolbar-correction.md) supersede the toolbar-crab scope and package identity below, which describe the initial rebrand. The active package record is in ticket 05's package.json/SHA256SUMS.
+
 Status: complete; ready-for-human review and the existing manual launch phase.
 Starting revision: c9213bdc5e3dce34252322d3709c4a0f58124f34 on feature-usagebar.
 

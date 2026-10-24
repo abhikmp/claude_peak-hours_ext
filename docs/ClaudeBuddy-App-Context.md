@@ -129,7 +129,7 @@ The logo needs to work as:
 - A recognizable icon on Chrome's extension management page.
 - A larger app or Store icon, including at **128px**.
 - A mark on both light and dark backgrounds.
-- A mascot that can also appear in promotional imagery or motion.
+- A mascot that can appear in imagery or motion for the Web Store listing.
 
 The logo is reserved for the extension management page and Web Store listing. The browser toolbar uses the original simple green, orange, and red circular usage indicators. Do not replace those circles with the mascot or recolor the mascot to communicate usage levels.
 
