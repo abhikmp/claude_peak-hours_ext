@@ -135,7 +135,8 @@ const AccountActions = (() => {
   });
 
   function syncOverlay() {
-    // The transient overlay covers these preference controls on detail pages.
+    // Swap out the whole footer while preserving its layout space.
+    document.querySelector('.container').classList.toggle('account-has-undo', !toast.hidden);
     document.querySelectorAll('.lower-controls .footer, .lower-controls .tz-picker').forEach(element => {
       element.inert = !toast.hidden;
     });

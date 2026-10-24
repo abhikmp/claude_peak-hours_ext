@@ -26,9 +26,11 @@ PASS offer deadline is exactly 2500ms
 PASS count reconciliation switches four→three, three→two, two→one
 PASS dark 2 forgotten: 260 × 340 with no outer overflow
 PASS controls covered by Undo cannot receive focus
+PASS Undo replaces the entire timezone/reset footer without controls peeking through
 PASS theme preserves deadline and notification position
 PASS Undo restores exact raw identity, label, percentage, reset, timestamp and tie order
 PASS Undo removes recovery and releases covered controls
+PASS Undo restores both footer sections after recovery
 PASS dark 2 restored: 260 × 340 with no outer overflow
 PASS Undo does not change toolbar
 PASS flow has no browser exceptions
@@ -52,9 +54,11 @@ PASS offer deadline is exactly 2500ms
 PASS count reconciliation switches four→three, three→two, two→one
 PASS dark 3 forgotten: 260 × 340 with no outer overflow
 PASS controls covered by Undo cannot receive focus
+PASS Undo replaces the entire timezone/reset footer without controls peeking through
 PASS theme preserves deadline and notification position
 PASS Undo restores exact raw identity, label, percentage, reset, timestamp and tie order
 PASS Undo removes recovery and releases covered controls
+PASS Undo restores both footer sections after recovery
 PASS dark 3 restored: 260 × 340 with no outer overflow
 PASS Undo does not change toolbar
 PASS flow has no browser exceptions
@@ -81,9 +85,11 @@ PASS offer deadline is exactly 2500ms
 PASS count reconciliation switches four→three, three→two, two→one
 PASS dark 4 forgotten: 260 × 340 with no outer overflow
 PASS controls covered by Undo cannot receive focus
+PASS Undo replaces the entire timezone/reset footer without controls peeking through
 PASS theme preserves deadline and notification position
 PASS Undo restores exact raw identity, label, percentage, reset, timestamp and tie order
 PASS Undo removes recovery and releases covered controls
+PASS Undo restores both footer sections after recovery
 PASS dark 4 restored: 260 × 340 with no outer overflow
 PASS Undo does not change toolbar
 PASS flow has no browser exceptions
@@ -112,9 +118,11 @@ PASS offer deadline is exactly 2500ms
 PASS count reconciliation switches four→three, three→two, two→one
 PASS dark 64 forgotten: 260 × 340 with no outer overflow
 PASS controls covered by Undo cannot receive focus
+PASS Undo replaces the entire timezone/reset footer without controls peeking through
 PASS theme preserves deadline and notification position
 PASS Undo restores exact raw identity, label, percentage, reset, timestamp and tie order
 PASS Undo removes recovery and releases covered controls
+PASS Undo restores both footer sections after recovery
 PASS Undo does not announce the restored observation as a new reading
 PASS dark 64 restored: 260 × 340 with no outer overflow
 PASS Undo does not change toolbar
@@ -147,9 +155,11 @@ PASS offer deadline is exactly 2500ms
 PASS count reconciliation switches four→three, three→two, two→one
 PASS light 2 forgotten: 260 × 340 with no outer overflow
 PASS controls covered by Undo cannot receive focus
+PASS Undo replaces the entire timezone/reset footer without controls peeking through
 PASS theme preserves deadline and notification position
 PASS Undo restores exact raw identity, label, percentage, reset, timestamp and tie order
 PASS Undo removes recovery and releases covered controls
+PASS Undo restores both footer sections after recovery
 PASS light 2 restored: 260 × 340 with no outer overflow
 PASS Undo does not change toolbar
 PASS flow has no browser exceptions
@@ -173,9 +183,11 @@ PASS offer deadline is exactly 2500ms
 PASS count reconciliation switches four→three, three→two, two→one
 PASS light 3 forgotten: 260 × 340 with no outer overflow
 PASS controls covered by Undo cannot receive focus
+PASS Undo replaces the entire timezone/reset footer without controls peeking through
 PASS theme preserves deadline and notification position
 PASS Undo restores exact raw identity, label, percentage, reset, timestamp and tie order
 PASS Undo removes recovery and releases covered controls
+PASS Undo restores both footer sections after recovery
 PASS light 3 restored: 260 × 340 with no outer overflow
 PASS Undo does not change toolbar
 PASS flow has no browser exceptions
@@ -202,9 +214,11 @@ PASS offer deadline is exactly 2500ms
 PASS count reconciliation switches four→three, three→two, two→one
 PASS light 4 forgotten: 260 × 340 with no outer overflow
 PASS controls covered by Undo cannot receive focus
+PASS Undo replaces the entire timezone/reset footer without controls peeking through
 PASS theme preserves deadline and notification position
 PASS Undo restores exact raw identity, label, percentage, reset, timestamp and tie order
 PASS Undo removes recovery and releases covered controls
+PASS Undo restores both footer sections after recovery
 PASS light 4 restored: 260 × 340 with no outer overflow
 PASS Undo does not change toolbar
 PASS flow has no browser exceptions
@@ -233,12 +247,14 @@ PASS offer deadline is exactly 2500ms
 PASS count reconciliation switches four→three, three→two, two→one
 PASS light 64 forgotten: 260 × 340 with no outer overflow
 PASS controls covered by Undo cannot receive focus
+PASS Undo replaces the entire timezone/reset footer without controls peeking through
 PASS theme preserves deadline and notification position
 PASS Undo restores exact raw identity, label, percentage, reset, timestamp and tie order
 PASS Undo removes recovery and releases covered controls
+PASS Undo restores both footer sections after recovery
 PASS Undo does not announce the restored observation as a new reading
 PASS light 64 restored: 260 × 340 with no outer overflow
 PASS Undo does not change toolbar
 PASS flow has no browser exceptions
 
-242 passed, 0 failed
+258 passed, 0 failed

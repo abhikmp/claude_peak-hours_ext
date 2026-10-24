@@ -27,7 +27,7 @@ PASS persisted eligibility rejects stale Forget
 PASS replacement: production loads without exceptions
 PASS second removal gets its own full window
 PASS old timer and dismissal leave replacement offer intact
-PASS dismiss ends persisted recovery
+PASS dismiss ends persisted recovery and restores the footer
 PASS reset: production loads without exceptions
 PASS reset-to-default Account boundary clears Accounts and pending recovery together
 PASS final production flow has no exceptions

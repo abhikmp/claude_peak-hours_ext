@@ -116,12 +116,16 @@ document.getElementById('run').onclick = async () => {
         check(count === 2 ? dots.hidden : dots.children.length === (count === 4 ? 3 : count === 3 ? 2 : 2), 'count reconciliation switches four→three, three→two, two→one');
         fixed(win, `${theme} ${count} forgotten`);
         check(doc.querySelector('.footer').inert && doc.querySelector('.tz-picker').inert, 'controls covered by Undo cannot receive focus');
+        check(win.getComputedStyle(doc.querySelector('.footer')).visibility === 'hidden'
+          && win.getComputedStyle(doc.querySelector('.tz-picker')).visibility === 'hidden', 'Undo replaces the entire timezone/reset footer without controls peeking through');
         click(win, '#theme-toggle');
         await pause();
         check(win.ticket01.state.local.accountUndo.expiresAt === deadline && toastBox(win) === '16,278,228,32', 'theme preserves deadline and notification position');
         await undo(win);
         check(JSON.stringify(win.ticket01.state.local.accounts[id]) === original, 'Undo restores exact raw identity, label, percentage, reset, timestamp and tie order');
         check(doc.querySelector('.account-undo').hidden && !doc.querySelector('.footer').inert, 'Undo removes recovery and releases covered controls');
+        check(win.getComputedStyle(doc.querySelector('.footer')).visibility === 'visible'
+          && win.getComputedStyle(doc.querySelector('.tz-picker')).visibility === 'visible', 'Undo restores both footer sections after recovery');
         if (count === 64) check(!doc.querySelector('.account-refresh-notice').textContent.includes('New reading received'), 'Undo does not announce the restored observation as a new reading');
         fixed(win, `${theme} ${count} restored`);
         check(win.ticket01.toolbar.length === icons, 'Undo does not change toolbar');
@@ -231,12 +235,14 @@ document.getElementById('run').onclick = async () => {
     await win.ticket01.mutate({ action: 'dismiss', token: first.token }); await pause();
     check(!doc.querySelector('.account-undo').hidden && win.ticket01.state.local.accountUndo.token === second.token, 'old timer and dismissal leave replacement offer intact');
     click(win, '.account-undo-dismiss'); await pause();
-    check(doc.querySelector('.account-undo').hidden && win.ticket01.state.local.accountUndo === null, 'dismiss ends persisted recovery');
+    check(doc.querySelector('.account-undo').hidden && win.ticket01.state.local.accountUndo === null
+      && win.getComputedStyle(doc.querySelector('.footer')).visibility === 'visible', 'dismiss ends persisted recovery and restores the footer');
 
     win = await open('reset'); doc = win.document;
     click(win, '#account-next'); await forget(win, 'account-1');
     await win.ticket01.mutate({ action: 'clear' }); await pause();
-    check(Object.keys(win.ticket01.state.local.accounts).length === 0 && win.ticket01.state.local.accountUndo === null && doc.querySelector('.account-undo').hidden,
+    check(Object.keys(win.ticket01.state.local.accounts).length === 0 && win.ticket01.state.local.accountUndo === null && doc.querySelector('.account-undo').hidden
+      && win.getComputedStyle(doc.querySelector('.footer')).visibility === 'visible',
       'reset-to-default Account boundary clears Accounts and pending recovery together');
     check(win.ticket01.errors.length === 0, 'final production flow has no exceptions');
 

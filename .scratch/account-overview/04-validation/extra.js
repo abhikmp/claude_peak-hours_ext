@@ -44,8 +44,17 @@ document.getElementById('run').onclick = async () => {
       doc.getElementById('account-next').click(); doc.getElementById('theme-toggle').click(); await pause();
       check(toast.querySelector('.account-undo-line').getAnimations()[0] === animation && animation.effect.getTiming().easing === 'linear', 'navigation/theme retain the same linear transform animation');
       const themeButton = doc.getElementById('theme-toggle'); themeButton.focus();
+      const positions = () => JSON.stringify(['.pill-row','.product-filter','.footer','.tz-picker'].map(selector => {
+        const r = doc.querySelector(selector).getBoundingClientRect(); return [r.x,r.y,r.width,r.height];
+      }));
+      const reservedPositions = positions();
+      check(win.getComputedStyle(doc.querySelector('.footer')).visibility === 'hidden'
+        && win.getComputedStyle(doc.querySelector('.tz-picker')).visibility === 'hidden', 'both footer sections are visually replaced while Undo is available');
       await win.ticket01.advance(2500);
       check(toast.hidden && doc.activeElement === themeButton, 'expiry leaves unrelated focus in place');
+      check(win.getComputedStyle(doc.querySelector('.footer')).visibility === 'visible'
+        && win.getComputedStyle(doc.querySelector('.tz-picker')).visibility === 'visible' && positions() === reservedPositions,
+        'expiry restores the complete footer without moving status, products or controls');
       toast.querySelector('.account-undo-button').click(); await pause();
       check(!win.ticket01.state.local.accounts['account-1'], 'late Undo cannot restore an expired observation');
       check(win.ticket01.errors.length === 0, 'accessibility flow has no exceptions');

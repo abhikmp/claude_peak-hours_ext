@@ -32,6 +32,8 @@
 
 ### Undo duration, location and countdown
 
+- User refinement, 2026-10-24: Undo temporarily replaces the entire timezone/reset footer visually, superseding the earlier partial-overlay presentation. Preserve its reserved layout space, hide both footer sections completely and keep them unfocusable. Restore both sections automatically when the offer ends, without shifting status, product controls or other content.
+
 - **Final production duration: exactly 2,500ms (2.5 seconds).** Start when removal succeeds and the Undo notification becomes available. The earlier indefinite / five-second defaults are superseded. Ship no duration slider or user setting.
 - Notification copy: **“Forgot [Account name]”**, **Undo**, and a dismiss × control. Long names truncate and expose the full label. Keep the same compact visual treatment as the approved prototype.
 - **Always use the same lower slot on every page**, including Active, table, inspection and one/two/three-Account slides. Match the prototype: left/right 16px, bottom 30px, 228 × 32px at the standard popup bounds. Do not anchor it to the top/usage area, narrow it on page one, cover quota details, or move it when navigating. Do not add usage padding or shift preferences to make room. On detail pages this short-lived overlay may cover the preference footer; covered controls must not receive focus until it is gone.
@@ -91,6 +93,8 @@ This slice must go through persisted extension storage and the real capture/refr
 Prefer existing Account/storage/capture seams and meaningful user flows over implementation-mirroring tests. Verify four-to-three and three-to-two transitions and Undo against the actual production popup, then replay a new reading for the forgotten identity through the real bridge/storage path.
 
 ## Comments
+
+2026-10-24 FOOTER REPLACEMENT IMPLEMENTED: At the user's approval, directly updated production so the Undo bar replaces both complete footer sections visually instead of sitting over partially visible timezone/reset controls. Reserved spacing and existing timing remain unchanged. Both themes, exact bounds, footer restoration and stable positions are covered by [production verification](../04-validation/footer-replacement.md). No prototype was created.
 
 2026-10-24 USER REFINEMENTS IMPLEMENTED: Both Forget account controls now use softened red with white text. Removal follows the next Account in the browsed queue, falling back to the preceding Account at the end; table mode stays open while at least four Accounts remain. The reported three→two jump was reproduced by a failing production-popup regression before fixing the layout-rebuild page reset. [42 refinement checks and evidence](../04-validation/refinements-verification.md) cover both themes, table threshold/priority order, inspection, Undo and expiry. Full Node suite remains 57 passing; Standards and Spec re-reviews report no findings.
 
