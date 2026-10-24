@@ -21,6 +21,9 @@ const open = async (name, options = {}, reopen = false) => {
     previousFrame.replaceWith(frame);
   });
   await settle();
+  for (let attempt = 0; attempt < 100 && !frame.contentDocument.getElementById('tz-label')?.textContent; attempt++) {
+    await new Promise(resolve => setTimeout(resolve, 20));
+  }
   frame.contentWindow.addEventListener('error', event => errors.push(event.message));
   frame.contentWindow.addEventListener('unhandledrejection', event => errors.push(String(event.reason)));
   return frame.contentWindow;
@@ -158,8 +161,8 @@ document.getElementById('run').onclick = async () => {
         }
         check(doc.querySelectorAll('tbody tr').length === count - 1 && !doc.querySelector('tr[data-account-id="account-0"]'),
           'table includes every other Account and excludes Active initially');
-        check([...doc.querySelectorAll('th')].map(node => node.textContent).join('|') === 'Account|Used|Reset',
-          'comparison exposes Account / Used / Reset headers');
+        check([...doc.querySelectorAll('th')].map(node => node.textContent).join('|') === 'Account|Used|Reset|Actions',
+          'comparison exposes Account / Used / Reset and accessible Actions headers');
         const resetCell = doc.querySelector('.account-row-reset');
         check(resetCell.textContent.startsWith('in ') && win.getComputedStyle(resetCell).fontSize === '11px'
           && win.getComputedStyle(resetCell).fontWeight === '400' && resetCell.title.includes('2026') && resetCell.title.includes('Asia/Calcutta'), 'Compact reset copy and typography include exact captured date and timezone');

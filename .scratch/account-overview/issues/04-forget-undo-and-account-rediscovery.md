@@ -4,9 +4,9 @@
 
 **Blocked by:** None. Tickets 03 and 03a are complete; design finalized by the user on 2026-10-24.
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
-**Next action:** When the user next asks to implement ticket 04, implement **all finalized behavior below together** in production, including persistence, concurrency, capture integration, verification, review and a scoped commit. Do not reopen design selection, ask the user to repeat decisions, or deliver only part of this ticket. The user intends to resume in the morning; this update records the handoff and does not start production implementation now. No ticket 04 production changes have been made.
+**Next action:** Implementation complete on 2026-10-24. Reload the unpacked extension for production review. See [production verification](../04-validation/verification.md), [preview](../04-validation/preview.html), and [Standards/Spec review](../04-validation/review.md). Ticket 05 owns final integrated release verification and packaging; no package or publication is part of 04.
 
 **Authoritative design:** [current Compact prototype, Dialog / v=3](../04-prototype/prototype.html?v=3), at commit `20a08bb`, with **Undo fixed at 2.5 seconds in production**. The duration slider is prototype-only. This finalized section supersedes earlier exploratory comments and older prototype/spec wording wherever they disagree.
 
@@ -69,26 +69,28 @@ This slice must go through persisted extension storage and the real capture/refr
 
 ## Acceptance criteria
 
-- [ ] Non-Active table rows expose Forget account through their action menu. Non-Active slides at two or three total Accounts expose it in the name-row menu without adding a footer row or moving lower controls.
-- [ ] Confirmation identifies the Account and states that a later Usage reading can add it again; Cancel leaves both storage and display unchanged.
-- [ ] Selected Dialog, far-right vertical menus and hidden table scrollbar match the finalized design above; scrolling remains fully available.
-- [ ] Undo expires after 2.5 seconds in the same lower slot on every page, with a shrinking bottom countdown line/reduced-motion fallback and no production duration slider.
-- [ ] Page changes/reopening preserve the original deadline; stale Undo is rejected, reset clears recovery state, and replacement offers have independent timers.
-- [ ] Confirming Forget removes that Account's saved state locally and refreshes the real popup. Active and the toolbar remain unchanged.
-- [ ] Undo restores the removed Account and reading without overwriting a newer captured reading or undoing an unrelated storage update.
-- [ ] A subsequent Usage reading from a forgotten Account recreates it and makes it Active through the existing latest-reading rules. Forget is not a permanent block.
-- [ ] A delayed label fetch cannot resurrect a forgotten Account or change Active. Competing reading/label/Undo updates do not lose unrelated Accounts.
-- [ ] Four to three Accounts replaces the table with three detailed slides and shared lower controls. Undo returns to the table at four; three to two stays slides.
-- [ ] Two to one Account removes navigation and leaves the single-Account view. A later reading or Undo restores the appropriate count-dependent navigation.
-- [ ] Confirmation, feedback, Undo, rediscovery, and count transitions retain the exact 260 by 340px outer bounds. Longer content scrolls inside.
-- [ ] Behavioral tests exercise real persisted forget/restore/reading interactions and threshold transitions, including a fresh reading arriving before Undo and a delayed label result after Forget.
-- [ ] Browser verification covers row menus, cancellation, confirmation, Undo, keyboard focus, both themes, and a complete forgotten-Account rediscovery flow. Synthetic capture is labeled as such.
+- [x] Non-Active table rows expose Forget account through their action menu. Non-Active slides at two or three total Accounts expose it in the name-row menu without adding a footer row or moving lower controls.
+- [x] Confirmation identifies the Account and states that a later Usage reading can add it again; Cancel leaves both storage and display unchanged.
+- [x] Selected Dialog, far-right vertical menus and hidden table scrollbar match the finalized design above; scrolling remains fully available.
+- [x] Undo expires after 2.5 seconds in the same lower slot on every page, with a shrinking bottom countdown line/reduced-motion fallback and no production duration slider.
+- [x] Page changes/reopening preserve the original deadline; stale Undo is rejected, reset clears recovery state, and replacement offers have independent timers.
+- [x] Confirming Forget removes that Account's saved state locally and refreshes the real popup. Active and the toolbar remain unchanged.
+- [x] Undo restores the removed Account and reading without overwriting a newer captured reading or undoing an unrelated storage update.
+- [x] A subsequent Usage reading from a forgotten Account recreates it and makes it Active through the existing latest-reading rules. Forget is not a permanent block.
+- [x] A delayed label fetch cannot resurrect a forgotten Account or change Active. Competing reading/label/Undo updates do not lose unrelated Accounts.
+- [x] Four to three Accounts replaces the table with three detailed slides and shared lower controls. Undo returns to the table at four; three to two stays slides.
+- [x] Two to one Account removes navigation and leaves the single-Account view. A later reading or Undo restores the appropriate count-dependent navigation.
+- [x] Confirmation, feedback, Undo, rediscovery, and count transitions retain the exact 260 by 340px outer bounds. Longer content scrolls inside.
+- [x] Behavioral tests exercise real persisted forget/restore/reading interactions and threshold transitions, including a fresh reading arriving before Undo and a delayed label result after Forget.
+- [x] Browser verification covers row menus, cancellation, confirmation, Undo, keyboard focus, both themes, and a complete forgotten-Account rediscovery flow. Synthetic capture is labeled as such.
 
 ## Verification
 
 Prefer existing Account/storage/capture seams and meaningful user flows over implementation-mirroring tests. Verify four-to-three and three-to-two transitions and Undo against the actual production popup, then replay a new reading for the forgotten identity through the real bridge/storage path.
 
 ## Comments
+
+2026-10-24 IMPLEMENTED: Completed the entire finalized contract in production. All Account mutations now use one service-worker queue. Forget/Undo preserve raw readings and current unrelated updates, enforce Active eligibility, keep newer rediscovered readings, and clear recovery on reset. The notification starts its exact 2.5-second deadline when first displayed after successful removal, persists that deadline across reopening, and has independent replacement timers. Production browser verification covers both themes, 0/1/2/3/4/64 Accounts, layout/focus/count transitions, long names, reduced-motion fallback, delayed persistence, and Undo into a table reopened during the offer. Synthetic SSE/RPC replays use the manifest capture scripts, bridge and real worker; they are not a new live Claude capture. Full Node suite: 57 passing. Standards: zero remaining findings. Spec: two initial edge cases repaired and re-reviewed, zero remaining findings. See linked evidence. Earlier design-only comments below are historical.
 
 2026-10-24 FINAL APPROVAL: User finalized the design at **2.5 seconds**, asked for every finalized point to be saved in the upcoming implementation ticket, and intends to resume in the morning. On the next implementation request, deliver this whole ticket together without further design iterations. Status is ready-for-agent; all production acceptance boxes remain unchecked because this session only finalized/saved the design. Earlier “awaiting review” comments below are historical and superseded.
 

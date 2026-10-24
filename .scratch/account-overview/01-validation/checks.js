@@ -95,7 +95,7 @@ document.getElementById('run').onclick = async () => {
     check(Object.keys(win.ticket01.state.local.accounts).length === 0, 'reset-to-default clears all retained Accounts');
     check(win.ticket01.state.sync.theme === 'dark' && win.ticket01.state.sync.watchedProducts.join() === 'ai', 'reset restores theme and watched products');
     check(win.ticket01.state.sync.userTZ === win.Intl.DateTimeFormat().resolvedOptions().timeZone, 'reset restores system timezone');
-    check(win.ticket01.messages.includes('USAGE_UPDATE') && win.ticket01.messages.includes('POLL_NOW'), 'reset requests icon and status refresh');
+    check(win.ticket01.toolbar.length > 0 && win.ticket01.messages.includes('POLL_NOW'), 'reset refreshes the real worker icon and requests status refresh');
     check(win.document.getElementById('usage-sub').textContent === 'Send a message to see usage', 'reset restores the no-reading view');
     check(win.document.getElementById('account-hero').hidden && win.document.getElementById('account-track').children.length === 0, 'reset clears saved Account detail and its hover context');
     check(win.document.querySelectorAll('.usage-facts').length === 0, 'reset clears the dormant fact block');

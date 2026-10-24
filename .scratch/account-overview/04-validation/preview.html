@@ -1,0 +1,28 @@
+<!doctype html><meta charset="utf-8"><title>Ticket 04 · production preview</title>
+<style>body{margin:30px;background:#111;color:#ddd;font:13px system-ui}h1{font-size:20px;font-weight:500}p{color:#aaa}main{display:flex;gap:24px;flex-wrap:wrap}iframe{width:260px;height:340px;border:0;border-radius:10px}section p{margin:20px 0 12px}footer{margin-top:24px;color:#999}</style>
+<h1>QuotaBeacon · Forget and Undo</h1><p>Production popup and worker · 260 × 340 · disposable sample readings</p>
+<main>
+<section><p>Dark · confirmation</p><iframe id="dark-dialog" title="Dark confirmation"></iframe></section>
+<section><p>Light · confirmation</p><iframe id="light-dialog" title="Light confirmation"></iframe></section>
+<section><p>Dark · table Undo</p><iframe id="dark-undo" title="Dark table Undo"></iframe></section>
+<section><p>Light · Active Undo</p><iframe id="light-undo" title="Light Active Undo"></iframe></section>
+</main><footer>Undo stays in the same lower slot. The original reading and deadline are preserved.</footer>
+<script>
+for (const frame of document.querySelectorAll('iframe')) {
+  localStorage.removeItem('ticket01-ticket04-preview-' + frame.id);
+  frame.onload = async () => {
+    const win = frame.contentWindow, doc = win.document;
+    await new Promise(resolve => setTimeout(resolve, 30));
+    doc.getElementById('account-next').click();
+    const button = doc.querySelector('tbody tr .account-more');
+    button.click(); doc.querySelector('[role="menuitem"]').click();
+    if (frame.id.includes('undo')) {
+      doc.getElementById('confirm-forget').click();
+      await new Promise(resolve => setTimeout(resolve, 30));
+      for (const animation of doc.querySelector('.account-undo-line').getAnimations()) { animation.pause(); animation.currentTime = 400; }
+    }
+  };
+  frame.src = '/popup/popup.html?' + new URLSearchParams({case:'ticket04-preview-' + frame.id,
+    count:frame.id === 'dark-undo' ? 64 : 4, products:'ai', theme:frame.id.split('-')[0]});
+}
+</script>

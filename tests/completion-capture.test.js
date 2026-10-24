@@ -12,6 +12,28 @@ const RPC_FIXTURE = require('./fixtures/bard-message-limit.json');
 
 function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = 'MAIN', injectAtStart = true } = {}) {
   let stored = { accounts: structuredClone(initialAccounts) };
+  let onMutation;
+  const mutationWorker = vm.createContext({ URL, Date: class extends Date { static now() { return NOW; } },
+    setTimeout: (callback, delay) => setTimeout(callback, delay).unref(), clearTimeout,
+    OffscreenCanvas: class {
+      getContext() { return { clearRect() {}, beginPath() {}, arc() {}, fill() {}, getImageData() { return {}; } }; }
+    }, chrome: {
+      runtime: { id: 'usage-test', onMessage: { addListener(listener) { onMutation = listener; } },
+        onInstalled: { addListener() {} }, onStartup: { addListener() {} } },
+      storage: { local: {
+        get: async () => structuredClone(stored),
+        set: async value => { stored = { ...stored, ...structuredClone(value) }; }
+      } },
+      alarms: { onAlarm: { addListener() {} } },
+      action: { setIcon: async () => {} }
+    }
+  });
+  mutationWorker.importScripts = file => vm.runInContext(
+    fs.readFileSync(path.resolve(ROOT, 'background', file), 'utf8'), mutationWorker);
+  vm.runInContext(fs.readFileSync(path.join(ROOT, 'background/service-worker.js'), 'utf8'), mutationWorker);
+  const mutate = command => new Promise(resolve => {
+    assert.equal(onMutation({ type: 'ACCOUNT_MUTATION', command }, { id: 'usage-test' }, resolve), true);
+  });
   const listeners = [];
   const requests = [];
   const notifications = [];
@@ -66,7 +88,11 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
       requests.push({ url, options });
       return organizationFetch(url, options);
     }, chrome: {
-      runtime: { id: 'usage-test', sendMessage: async message => { notifications.push(message); onNotification?.(); } },
+      runtime: { id: 'usage-test', sendMessage: async message => {
+        const result = await mutate(message.command);
+        if (message.command.action === 'reading') { notifications.push(message); onNotification?.(); }
+        return result;
+      } },
       storage: {
         local: {
           get: async () => structuredClone(stored),
@@ -91,6 +117,8 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
   return {
     requests,
     notifications,
+    mutate,
+    raw: () => structuredClone(stored),
     accounts: () => Accounts.getAccounts(stored.accounts, NOW),
     forgetAccounts() { stored.accounts = Accounts.clearAccounts(); },
     async sendRpcReading(accountId, { encoding = 'gzip', chunkSize = 7, bytes, beforeResponse,
@@ -121,7 +149,7 @@ function createCapture({ organizationFetch, initialAccounts = {}, firstWorld = '
       }
       let onInstalled;
       let failure;
-      const worker = vm.createContext({ URL, console, fetch: () => new Promise(() => {}), chrome: {
+      const worker = vm.createContext({ URL, console, setTimeout, clearTimeout, fetch: () => new Promise(() => {}), chrome: {
         runtime: {
           getManifest: () => manifest,
           onInstalled: { addListener(listener) { onInstalled = listener; } },
@@ -393,4 +421,42 @@ test('a completion stores usage when Chrome deduplicates script paths across wor
     assert.equal(active.percent, 18);
     assert.equal(active.label, 'Personal');
   }
+});
+
+test('synthetic SSE and RPC captures rediscover a forgotten Account through the real worker without Undo overwriting it', async () => {
+  const work = '22222222-2222-4222-8222-222222222222';
+  for (const transport of ['sse', 'rpc']) {
+    const capture = createCapture({ organizationFetch: async () => ({ ok: true, json: async () => ({ name: 'Personal' }) }) });
+    await capture.sendReading(18);
+    await capture.sendReading(75, work);
+    const kept = capture.raw().accounts[work];
+    const result = await capture.mutate({ action: 'forget', accountId: ACCOUNT_ID });
+    assert.equal(result.status, 'forgotten');
+    await capture.mutate({ action: 'offerUndo', token: result.undo.token, offeredAt: NOW });
+    assert.equal(capture.raw().accounts[ACCOUNT_ID], undefined);
+    if (transport === 'rpc') await capture.sendRpcReading(ACCOUNT_ID);
+    else await capture.sendReading(28);
+    assert.equal((await capture.mutate({ action: 'undo', token: result.undo.token })).status, 'newer-kept');
+    assert.equal(capture.accounts()[0].accountId, ACCOUNT_ID);
+    assert.equal(capture.accounts()[0].percent, transport === 'rpc' ? 60 : 28);
+    assert.deepEqual(capture.raw().accounts[work], kept);
+  }
+});
+
+test('a label arriving after persisted Forget cannot recreate that Account or disturb Active', async () => {
+  let resolveName;
+  const work = '22222222-2222-4222-8222-222222222222';
+  const capture = createCapture({ organizationFetch: url => url.endsWith(ACCOUNT_ID)
+    ? new Promise(resolve => { resolveName = resolve; })
+    : Promise.resolve({ ok: true, json: async () => ({ name: 'Work' }) }) });
+  await capture.sendReading();
+  await capture.sendReading(75, work);
+  const { undo } = await capture.mutate({ action: 'forget', accountId: ACCOUNT_ID });
+  await capture.mutate({ action: 'offerUndo', token: undo.token, offeredAt: NOW });
+  resolveName({ ok: true, json: async () => ({ name: 'Delayed personal' }) });
+  await new Promise(setImmediate);
+  assert.equal(capture.raw().accounts[ACCOUNT_ID], undefined);
+  assert.equal(capture.accounts()[0].accountId, work);
+  assert.equal((await capture.mutate({ action: 'undo', token: undo.token })).status, 'restored');
+  assert.equal(capture.accounts().find(account => account.accountId === ACCOUNT_ID).label, 'Account 111111…');
 });

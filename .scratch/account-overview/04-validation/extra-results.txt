@@ -1,0 +1,29 @@
+PASS dark: long-name dormant slide fits naturally without a scrollbar
+PASS historical facts and three-hour detail policy survive
+PASS long dialog name wraps and scrolls internally
+PASS modal prevents background controls receiving focus
+PASS backdrop dismissal cancels and restores origin focus
+PASS Escape cancellation leaves saved Accounts intact
+PASS menu Escape restores the trigger
+PASS Undo truncates long names and exposes full label
+PASS navigation/theme retain the same linear transform animation
+PASS expiry leaves unrelated focus in place
+PASS late Undo cannot restore an expired observation
+PASS accessibility flow has no exceptions
+PASS light: long-name dormant slide fits naturally without a scrollbar
+PASS historical facts and three-hour detail policy survive
+PASS long dialog name wraps and scrolls internally
+PASS modal prevents background controls receiving focus
+PASS backdrop dismissal cancels and restores origin focus
+PASS Escape cancellation leaves saved Accounts intact
+PASS menu Escape restores the trigger
+PASS Undo truncates long names and exposes full label
+PASS navigation/theme retain the same linear transform animation
+PASS expiry leaves unrelated focus in place
+PASS late Undo cannot restore an expired observation
+PASS accessibility flow has no exceptions
+PASS emulated reduced-motion preference selects production numeric fallback without moving line
+PASS reduced-motion text shows remaining time
+PASS expiry returns disappearing Undo focus to a visible control
+
+27 passed, 0 failed

@@ -1,4 +1,21 @@
 importScripts('../shared/accounts.js');
+importScripts('../shared/account-store.js');
+const accountStore = AccountStore.create(chrome.storage.local);
+let undoCleanupTimer;
+
+async function mutateAccounts(command) {
+  const result = await accountStore.mutate(command);
+  clearTimeout(undoCleanupTimer);
+  if (result.undo) {
+    const token = result.undo.token;
+    undoCleanupTimer = setTimeout(() => {
+      // Read/expire through the same queue. An old callback cannot end a new offer.
+      mutateAccounts({ action: 'getUndo', token }).catch(() => {});
+    }, Math.max(0, AccountStore.recoveryDeadline(result.undo) - Date.now()));
+  }
+  if (result.status === 'recorded' || result.status === 'cleared') updateIcon();
+  return result;
+}
 
 const STATUS_URL = 'https://status.claude.com/api/v2/summary.json';
 const ALARM_NAME = 'statusPoll';
@@ -359,8 +376,13 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === EXPIRY_ALARM_NAME) updateIcon();
 });
 
-chrome.runtime.onMessage.addListener((msg, sender) => {
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return;
+  if (msg?.type === 'ACCOUNT_MUTATION') {
+    mutateAccounts(msg.command).then(sendResponse, () => sendResponse({ error: 'Account update failed. Please try again.' }));
+    // Keep the response channel open while Chrome wakes/executes the worker.
+    return true;
+  }
   if (msg?.type === 'POLL_NOW') poll();
   if (msg?.type === 'USAGE_UPDATE') {
     updateIcon();

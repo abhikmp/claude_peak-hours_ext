@@ -221,7 +221,7 @@ async function render() {
       'state', 'fetchError', 'statusDescription', 'incidentTitle', 'incidentBody',
       'nextPeakAt', 'peakEndsAt', 'lastChecked', 'affectedProducts',
       'watchedAffected', 'incidentImpact',
-      'accounts'
+      'accounts', 'accountUndo'
     ]),
     chrome.storage.sync.get(['userTZ', 'watchedProducts'])
   ]);
@@ -237,6 +237,7 @@ async function render() {
   const accounts = local.accounts ?? {};
   const orderedAccounts = Accounts.getAccounts(accounts, now);
   const hasAccounts = AccountPages.render(orderedAccounts, tz);
+  AccountActions.render(orderedAccounts, local.accountUndo);
   document.querySelector('.usage-hero').hidden = hasAccounts;
 
   // ── Status pill ──
@@ -329,8 +330,7 @@ document.getElementById('tz-reset-btn').addEventListener('click', async () => {
   });
   updateCheckboxConstraints();
 
-  await chrome.storage.local.set({ accounts: Accounts.clearAccounts() });
-  chrome.runtime.sendMessage({ type: 'USAGE_UPDATE' }).catch(() => {});
+  await AccountActions.mutate({ action: 'clear' });
 
   chrome.runtime.sendMessage({ type: 'POLL_NOW' }).catch(() => {});
   document.getElementById('tz-list').hidden = true;
@@ -408,8 +408,10 @@ PRODUCT_IDS.forEach(id => {
 // ── Init ──
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'local' && changes.accounts) render();
+  else if (area === 'local' && changes.accountUndo) AccountActions.syncUndo(changes.accountUndo.newValue);
 });
 async function initAccounts() {
+  await AccountActions.mutate({ action: 'getUndo' }).catch(() => {});
   await render();
   await initProductFilter();
   // Age and expiry also change while an otherwise idle popup stays open.

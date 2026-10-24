@@ -103,13 +103,25 @@
       return {};
     }
 
+    function forgetAccount(accounts, accountId, now) {
+      if (!Object.hasOwn(accounts, accountId) || getAccounts(accounts, now)[0]?.accountId === accountId) return accounts;
+      const remaining = { ...accounts };
+      delete remaining[accountId];
+      return remaining;
+    }
+
+    function restoreAccount(accounts, accountId, reading) {
+      // A real reading received after Forget always wins over recovery.
+      return Object.hasOwn(accounts, accountId) ? accounts : { ...accounts, [accountId]: { ...reading } };
+    }
+
     function getIconColor(accounts, now) {
       const active = getAccounts(accounts, now)[0];
       if (!active || active.isExpired || active.percent <= 60) return 'green';
       return active.percent <= 85 ? 'orange' : 'red';
     }
 
-    return { extractAccountId, applyReading, applyLabel, getAccounts, isRecentReset, orderComparisonAccounts, clearAccounts, getIconColor };
+    return { extractAccountId, applyReading, applyLabel, getAccounts, isRecentReset, orderComparisonAccounts, clearAccounts, forgetAccount, restoreAccount, getIconColor };
   })();
 
   if (typeof module !== 'undefined' && module.exports) {

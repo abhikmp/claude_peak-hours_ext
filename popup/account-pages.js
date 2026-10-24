@@ -20,8 +20,10 @@ const AccountPages = (() => {
   let tableIds = [];
   let tableRecentIds = new Set();
   let hasNewReading = false;
+  let hasMembershipChange = false;
   let hasPriorityChange = false;
   let selectedId = null;
+  let restoreContext = null;
 
   function displayLabel(label) {
     const email = label.trim().match(/^([^@\s]+)@[^@\s]+(?:['’]s\s+Organization)?$/i);
@@ -60,6 +62,7 @@ const AccountPages = (() => {
     if (changedPage && (track.contains(focused) || (focused === previous && previous.disabled) || (focused === next && next.disabled))) {
       (pageIndex === 0 ? next : previous).focus();
     }
+    AccountActions.syncOverlay();
   }
 
   function makePage(account, tz, index, count) {
@@ -72,6 +75,7 @@ const AccountPages = (() => {
       <div class="account-heading">
         <span class="account-name"></span>
         <span class="account-tag active" hidden>Active</span>
+        <button type="button" class="account-more" aria-haspopup="menu" aria-expanded="false"></button>
       </div>
       <div class="account-usage-top">
         <span class="account-percent"></span><span class="account-quota">5h quota</span>
@@ -90,6 +94,7 @@ const AccountPages = (() => {
     name.textContent = label;
     name.title = account.label;
     page.querySelector('.active').hidden = !account.isActive;
+    updateMenuButton(page.querySelector('.account-more'), account);
     const percent = Math.round(account.percent);
     page.dataset.tone = usageTone(account);
     const percentElement = page.querySelector('.account-percent');
@@ -133,8 +138,8 @@ const AccountPages = (() => {
         </label>
         <div class="account-table-scroll" tabindex="0" role="region" aria-label="Saved Accounts table">
           <table aria-label="Account usage comparison">
-            <colgroup><col><col class="account-used-column"><col class="account-reset-column"></colgroup>
-            <thead><tr><th scope="col">Account</th><th scope="col">Used</th><th scope="col">Reset</th></tr></thead>
+            <colgroup><col><col class="account-used-column"><col class="account-reset-column"><col class="account-action-column"></colgroup>
+            <thead><tr><th scope="col">Account</th><th scope="col">Used</th><th scope="col">Reset</th><th scope="col"><span class="account-announcement">Actions</span></th></tr></thead>
             <tbody></tbody>
           </table>
           <p class="account-search-empty" role="status" hidden>No matching accounts.</p>
@@ -151,10 +156,26 @@ const AccountPages = (() => {
     });
     page.querySelector('.account-back').addEventListener('click', backToTable);
     page.querySelector('tbody').addEventListener('click', event => {
+      if (event.target.closest('.account-more')) return;
       const row = event.target.closest('tr[data-account-id]');
       if (row) inspectAccount(row.dataset.accountId);
     });
     return page;
+  }
+
+  function updateMenuButton(button, account) {
+    button.dataset.accountId = account.accountId;
+    button.hidden = account.isActive;
+    button.setAttribute('aria-label', `Actions for ${account.label}`);
+    button.title = `Actions for ${account.label}`;
+    if (!button.firstChild) button.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="3" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="8" cy="13" r="1.2"/></svg>';
+  }
+
+  function makeRow(accountId) {
+    const row = document.createElement('tr');
+    row.dataset.accountId = accountId;
+    row.innerHTML = '<td><button type="button" class="account-row-name"></button><span class="account-row-age"></span></td><td class="account-row-used"></td><td class="account-row-reset"></td><td><button type="button" class="account-more" aria-haspopup="menu" aria-expanded="false"></button></td>';
+    return row;
   }
 
   function openTable() {
@@ -163,14 +184,10 @@ const AccountPages = (() => {
     tableIds = Accounts.orderComparisonAccounts(accounts, now).map(account => account.accountId);
     tableRecentIds = new Set(tableIds.filter(id => Accounts.isRecentReset(accountsById.get(id), now)));
     hasNewReading = false;
+    hasMembershipChange = false;
     hasPriorityChange = false;
     const body = tablePage.querySelector('tbody');
-    body.replaceChildren(...tableIds.map(accountId => {
-      const row = document.createElement('tr');
-      row.dataset.accountId = accountId;
-      row.innerHTML = `<td><button type="button" class="account-row-name"></button><span class="account-row-age"></span></td><td class="account-row-used"></td><td class="account-row-reset"></td>`;
-      return row;
-    }));
+    body.replaceChildren(...tableIds.map(makeRow));
     tablePage.querySelector('input').value = '';
     tablePage.querySelector('.account-refresh-notice').hidden = true;
     tablePage.querySelector('.account-list').hidden = false;
@@ -199,13 +216,15 @@ const AccountPages = (() => {
       const account = accountsById.get(id);
       return account && tableRecentIds.has(id) !== Accounts.isRecentReset(account, now);
     });
-    notice.hidden = !hasNewReading && !hasPriorityChange;
+    notice.hidden = !hasNewReading && !hasPriorityChange && !hasMembershipChange;
     notice.textContent = hasNewReading
       ? 'New reading received. Order updates when you reopen this list.'
+      : hasMembershipChange ? 'Saved Accounts changed. Order updates when you reopen this list.'
       : 'Reset priority updates when you reopen this list.';
     for (const row of tablePage.querySelectorAll('tbody tr')) {
       const account = accountsById.get(row.dataset.accountId);
       if (!account) continue;
+      updateMenuButton(row.querySelector('.account-more'), account);
       const name = row.querySelector('button');
       name.textContent = displayLabel(account.label);
       name.title = account.label;
@@ -273,11 +292,16 @@ const AccountPages = (() => {
       return false;
     }
     const activeChanged = accounts[0]?.accountId !== orderedAccounts[0].accountId;
-    const readingChanged = accounts.length !== orderedAccounts.length || orderedAccounts.some(account => {
+    const membershipChanged = accounts.length !== orderedAccounts.length || orderedAccounts.some(account => !accountsById.has(account.accountId));
+    const readingChanged = orderedAccounts.some(account => {
       const prior = accountsById.get(account.accountId);
-      return !prior || prior.lastReadingAt !== account.lastReadingAt || prior.lastObservedPercent !== account.lastObservedPercent
+      // Non-Active additions may be restored observations or delayed captures;
+      // the membership notice covers both without claiming a new observation.
+      if (!prior) return account.isActive;
+      return prior.lastReadingAt !== account.lastReadingAt || prior.lastObservedPercent !== account.lastObservedPercent
         || prior.resetsAt !== account.resetsAt || prior.isActive !== account.isActive;
     });
+    const removed = tableIds.filter(id => !orderedAccounts.some(account => account.accountId === id));
     accounts = orderedAccounts;
     accountsById = new Map(accounts.map(account => [account.accountId, account]));
     timezone = tz;
@@ -300,10 +324,38 @@ const AccountPages = (() => {
     } else {
       (layoutKind === 'table' ? accounts.slice(0, 1) : accounts).forEach((account, index) => updatePage(track.children[index], account, tz));
       if (layoutKind === 'table' && pageIndex === 1) {
+        if (removed.length) {
+          tableIds = tableIds.filter(id => accountsById.has(id));
+          for (const row of tablePage.querySelectorAll('tbody tr')) {
+            if (!accountsById.has(row.dataset.accountId)) row.remove();
+          }
+        }
         if (readingChanged) hasNewReading = true;
+        if (membershipChanged) hasMembershipChange = true;
         updateTable();
       }
       if (activeChanged && layoutKind !== 'table') pageIndex = 0;
+    }
+    if (restoreContext) {
+      const saved = restoreContext;
+      restoreContext = null;
+      if (layoutKind === 'table' && saved.layoutKind === 'table') {
+        const rows = new Map([...tablePage.querySelectorAll('tbody tr')].map(row => [row.dataset.accountId, row]));
+        tableIds = [...new Set([...saved.tableIds, ...tableIds, saved.restoredId])].filter(id => accountsById.has(id));
+        tablePage.querySelector('tbody').replaceChildren(...tableIds.map(id => rows.get(id) ?? makeRow(id)));
+        tableRecentIds = new Set(tableIds.filter(id => Accounts.isRecentReset(accountsById.get(id), Date.now())));
+        tablePage.querySelector('input').value = saved.query;
+        tablePage.querySelector('.account-list').hidden = false;
+        tablePage.querySelector('.account-list').inert = false;
+        tablePage.querySelector('.account-inspection').hidden = true;
+        selectedId = null;
+        pageIndex = saved.pageIndex;
+        updateTable();
+        tablePage.querySelector('.account-table-scroll').scrollTop = saved.scroll;
+        if (saved.selectedId && accountsById.has(saved.selectedId)) inspectAccount(saved.selectedId);
+      } else if (layoutKind === 'slides') {
+        pageIndex = Math.max(0, accounts.findIndex(account => account.accountId === saved.visibleId));
+      }
     }
     showPage(pageIndex);
     track.getBoundingClientRect();
@@ -327,5 +379,12 @@ const AccountPages = (() => {
     showPage(pageIndex + direction);
   });
 
-  return { render };
+  function captureContext() {
+    return { layoutKind, pageIndex, tableIds: [...tableIds], selectedId,
+      visibleId: accounts[pageIndex]?.accountId,
+      query: tablePage?.querySelector('input').value ?? '',
+      scroll: tablePage?.querySelector('.account-table-scroll').scrollTop ?? 0 };
+  }
+
+  return { render, captureContext, restoreContext(context) { restoreContext = context; } };
 })();
