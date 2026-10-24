@@ -1,6 +1,6 @@
 # ClaudeBuddy branding amendment
 
-Status: release candidate prepared; independent review pending.
+Status: complete; ready-for-human review and the existing manual launch phase.
 Starting revision: c9213bdc5e3dce34252322d3709c4a0f58124f34 on feature-usagebar.
 
 User approved renaming QuotaBeacon to ClaudeBuddy because it covers usage, peak hours and outages. User requested a crab-like companion, then refined it: friendlier and warmer, sharper/crisper, with cuter eyes. Product tagline: “Usage, peak hours & outage status for Claude.”
@@ -19,3 +19,5 @@ The active package and final handoff remain in [ticket 05 release](../account-ov
 - Three 1280 × 800 production Store screenshots were regenerated with ClaudeBuddy name/crab, safe sample readings and no design controls.
 - Build validates 30 explicit runtime files, manifest name/45-character description, all PNG sizes, extraction/source byte equality and checksums. Original generated source/prompt notes stay outside the runtime package.
 - Encrypted format/database and bridge identifiers remain unchanged by inspection; both capture transports pass the full suite.
+
+Independent [Standards/Spec review](review.md): zero findings on both axes. Final runtime source revision is 15fb678964a0c230bc891a5041e398c2a1785f9d. Current ZIP SHA-256: `483c891b8fcf31d9a629eb23e8f1e106e0387dc036c4eccbee060b5eeadb71bf`. The final active candidate is [claudebuddy-1.0.0-rc.zip](../account-overview/05-release/claudebuddy-1.0.0-rc.zip). Earlier QuotaBeacon candidate remains available in Git history and is removed from the active release directory.

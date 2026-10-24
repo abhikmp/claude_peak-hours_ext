@@ -22,3 +22,5 @@ If QA or an owner decision changes runtime contents, return to 05: fix sources, 
 ## ClaudeBuddy rebrand follow-up
 
 User approved the name and a friendly, warm, crisp crab with cute eyes. See [branding brief/proof](../../claudebuddy-branding/brief.md) and [source/prompt notes](../../../assets/branding/README.md). Current screenshots and active ZIP are ClaudeBuddy. The runtime allowlist now has 30 files, including 12 packaged quota-color crab PNGs. The rebrand reruns all 64 Node tests and the 26 encrypted-popup checks; unaffected layout evidence from ticket 05 remains reused. Internal storage/key/bridge identifiers remain intentionally compatible.
+
+Branding [Standards/Spec review](../../claudebuddy-branding/review.md): zero findings on both axes. Final ClaudeBuddy runtime source is 15fb678; the current SHA256SUMS/package.json identify its ZIP. No runtime changes followed review.
