@@ -49,8 +49,8 @@
     "default_popup": "popup/popup.html",
     "default_title": "ClaudeBuddy",
     "default_icon": {
-      "16": "icons/logo_16.png",
-      "48": "icons/logo_48.png"
+      "16": "icons/usage-green-16.png",
+      "48": "icons/usage-green-48.png"
     }
   }
 }

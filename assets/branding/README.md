@@ -2,7 +2,7 @@
 
 Original project-bound raster asset generated with the built-in image_gen tool on 24 October 2026. The final reference is [claudebuddy-crab.png](claudebuddy-crab.png), with real alpha transparency. The user asked for a friendlier, warmer crab with crisper edges and cuter eyes. This is an original character, not an Anthropic/Claude logo.
 
-`python tools/render-icons.py` exports this source to the 16/48/128px coral brand icons and 16/32/48/128px green/orange/red quota variants. Exports preserve the dark face and cream highlights while mapping coral pixels to the established quota palette. The source asset is a development/branding resource and is excluded from the runtime ZIP; all exported runtime PNGs are included explicitly.
+`python tools/render-icons.py` exports this source to the 16/48/128px coral brand icons for the extension management page and Web Store listing. The toolbar uses separate 16/32/48/128px green/orange/red circles, matching the original 8% inset and quota palette. The mascot is not used in the toolbar, including its manifest default. The source asset is a development/branding resource and is excluded from the runtime ZIP; all exported runtime PNGs are included explicitly.
 
 Generation prompt:
 
