@@ -21,6 +21,8 @@ The current prototype default used for production is the 15-minute table estimat
 
 ## Ticket 04 complete — ticket 05 is next
 
+Latest user refinements on 2026-10-24 are implemented: both Forget controls have softened red fills and white text; removal continues to the next Account in the browsed queue rather than jumping to Active. Existing tables remain open while four or more Accounts remain; table→slides follows the frozen row successor, with a previous-Account fallback at the end. See [refinement verification](04-validation/refinements-verification.md). These user amendments supersede the original prototype's button styling and removal navigation.
+
 The user requested implementation on 2026-10-24. The entire [finalized ticket 04](issues/04-forget-undo-and-account-rediscovery.md) is now implemented in production, tested and independently reviewed. See [production verification](04-validation/verification.md), [Standards/Spec review](04-validation/review.md), and the [production preview](04-validation/preview.html). Status is ready-for-human for review after reloading the unpacked extension.
 
 Final choices: **Dialog** confirmation; **vertical ⋮ menus at the far right after Reset**; **no visible table scrollbar**, with scrolling preserved; Undo notification **fixed to the same lower slot on all pages** (16px side insets, 30px from bottom, 228 × 32px); **2,500ms deadline** and **2px linear shrinking bottom line**, with reduced-motion time-left text. Navigation, theme, inspection and reopening preserve the original deadline. Expiry/dismiss ends Undo; a second removal starts its own complete window. The 1–5 second slider and other demo controls remain prototype-only and must not ship.

@@ -292,6 +292,20 @@ const AccountPages = (() => {
       return false;
     }
     const activeChanged = accounts[0]?.accountId !== orderedAccounts[0].accountId;
+    const remainingIds = new Set(orderedAccounts.map(account => account.accountId));
+    let continuationId;
+    if (!activeChanged && accounts.some(account => !remainingIds.has(account.accountId))) {
+      // Use the order the user was browsing, including the frozen table order.
+      const browsingTable = layoutKind === 'table' && pageIndex === 1;
+      const queue = browsingTable ? tableIds : accounts.map(account => account.accountId);
+      const viewedId = browsingTable
+        ? selectedId ?? queue.find(id => !remainingIds.has(id))
+        : accounts[pageIndex]?.accountId;
+      const removedIndex = queue.indexOf(viewedId);
+      continuationId = remainingIds.has(viewedId) ? viewedId
+        : queue.slice(removedIndex + 1).find(id => remainingIds.has(id))
+          ?? queue.slice(0, removedIndex).reverse().find(id => remainingIds.has(id));
+    }
     const membershipChanged = accounts.length !== orderedAccounts.length || orderedAccounts.some(account => !accountsById.has(account.accountId));
     const readingChanged = orderedAccounts.some(account => {
       const prior = accountsById.get(account.accountId);
@@ -313,7 +327,8 @@ const AccountPages = (() => {
     const nextLayoutKind = accounts.length >= 4 ? 'table' : 'slides';
     if (layoutKind !== nextLayoutKind || (nextLayoutKind === 'slides' && track.children.length !== accounts.length)) {
       layoutKind = nextLayoutKind;
-      pageIndex = 0;
+      pageIndex = layoutKind === 'slides' && continuationId
+        ? Math.max(0, accounts.findIndex(account => account.accountId === continuationId)) : 0;
       selectedId = null;
       tablePage = layoutKind === 'table' ? makeTablePage() : null;
       const pageAccounts = tablePage ? accounts.slice(0, 1) : accounts;

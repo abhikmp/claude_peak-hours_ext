@@ -205,8 +205,8 @@
 .account-more:hover { background: var(--surface-2); color: var(--text-primary); }
 .account-more:focus-visible, .account-action-menu button:focus-visible, .account-forget-dialog button:focus-visible, .account-undo button:focus-visible { outline: 2px solid var(--text-secondary); outline-offset: -2px; }
 .account-action-menu { position: fixed; z-index: 20; padding: 4px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg); box-shadow: 0 6px 20px #0003; }
-.account-action-menu button { display: block; padding: 8px 10px; border: 0; border-radius: 4px; background: none; color: var(--red-pct); font: inherit; font-size: 11px; cursor: pointer; }
-.account-action-menu button:hover { background: var(--surface-1); }
+.account-action-menu button { display: block; padding: 8px 10px; border: 0; border-radius: 4px; background: #cf4545; color: #fff; font: inherit; font-size: 11px; cursor: pointer; }
+.account-action-menu button:hover { background: #c73e3e; }
 .account-forget-dialog { box-sizing: border-box; width: 228px; max-width: calc(100vw - 32px); max-height: 300px; margin: auto; padding: 16px; overflow: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text-primary); font: inherit; box-shadow: 0 12px 32px #0005; }
 .account-forget-dialog::backdrop { background: #0008; }
 .account-forget-dialog h2 { margin: 0 0 8px; font-size: 14px; line-height: 1.4; font-weight: 600; overflow-wrap: anywhere; }
@@ -214,7 +214,8 @@
 .account-forget-dialog #forget-error { color: var(--red-pct); }
 .account-dialog-buttons { display: flex; justify-content: flex-end; gap: 6px; }
 .account-dialog-buttons button { padding: 7px 9px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface-1); color: var(--text-primary); font: inherit; font-size: 11px; cursor: pointer; }
-.account-dialog-buttons #confirm-forget { border-color: var(--red-border); color: var(--red-pct); background: var(--red-bg); }
+.account-dialog-buttons #confirm-forget { border-color: #cf4545; color: #fff; background: #cf4545; }
+.account-dialog-buttons #confirm-forget:hover { border-color: #c73e3e; background: #c73e3e; }
 .account-undo { position: fixed; z-index: 15; left: 16px; right: 16px; bottom: 30px; box-sizing: border-box; height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 8px; overflow: hidden; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-1); color: var(--text-primary); font-size: 11px; box-shadow: 0 5px 18px #0002; }
 .account-undo[hidden] { display: none; }
 .account-undo-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

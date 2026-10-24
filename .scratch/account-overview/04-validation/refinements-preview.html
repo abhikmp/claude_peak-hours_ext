@@ -1,0 +1,22 @@
+<!doctype html><meta charset="utf-8"><title>QuotaBeacon · Forget refinements</title>
+<style>body{margin:30px;background:#111;color:#ddd;font:13px system-ui}h1{font-size:20px;font-weight:500}p{color:#aaa}main{display:flex;gap:24px;flex-wrap:wrap}iframe{width:260px;height:340px;border:0;border-radius:10px}section p{margin:20px 0 12px}footer{margin-top:24px;color:#aaa}</style>
+<h1>QuotaBeacon · Forget account</h1><p>Softened red, white text · production popup · disposable sample Accounts</p>
+<main>
+<section><p>Dark · menu</p><iframe id="dark-menu" title="Dark Forget menu"></iframe></section>
+<section><p>Dark · confirmation</p><iframe id="dark-dialog" title="Dark Forget confirmation"></iframe></section>
+<section><p>Light · menu</p><iframe id="light-menu" title="Light Forget menu"></iframe></section>
+<section><p>Light · confirmation</p><iframe id="light-dialog" title="Light Forget confirmation"></iframe></section>
+</main><footer>Removal continues to the next Account. Tables remain open while four or more Accounts remain.</footer>
+<script>
+for (const frame of document.querySelectorAll('iframe')) {
+  localStorage.removeItem('ticket01-refinement-preview-' + frame.id);
+  frame.onload = async () => {
+    const doc = frame.contentDocument;
+    for (let attempt=0;attempt<100 && !doc.getElementById('tz-label')?.textContent;attempt++) await new Promise(resolve=>setTimeout(resolve,20));
+    doc.getElementById('account-next').click();
+    doc.querySelector('tbody tr .account-more').click();
+    if(frame.id.endsWith('dialog')) doc.querySelector('[role="menuitem"]').click();
+  };
+  frame.src='/popup/popup.html?' + new URLSearchParams({case:'refinement-preview-'+frame.id,count:4,products:'ai',theme:frame.id.split('-')[0],load:Date.now()});
+}
+</script>

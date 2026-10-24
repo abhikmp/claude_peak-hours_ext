@@ -51,7 +51,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         name = urlsplit(self.path).path.removeprefix('/qa-save/')
-        if name not in ['matrix', 'advanced', 'extra', 'ticket01', 'ticket02', 'ticket03']:
+        if name not in ['matrix', 'advanced', 'extra', 'ticket01', 'ticket02', 'ticket03', 'refinements']:
             self.send_error(404)
             return
         value = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
