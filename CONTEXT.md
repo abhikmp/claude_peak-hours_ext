@@ -1,4 +1,4 @@
-# QuotaBeacon
+# ClaudeBuddy
 
 A Chrome extension that tells a Claude user, at a glance, how much of their usage quota is left, whether Claude is likely to be slow, and whether a product they rely on has an incident.
 

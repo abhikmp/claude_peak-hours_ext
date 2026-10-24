@@ -20,8 +20,6 @@ async function poll({ time, watched = ['ai'], incident = false, fail = false }) 
       components: [{ id: 'web', name: 'Claude AI', status: incident ? 'major_outage' : 'operational' }],
       incidents: incident ? [{ name: 'Sample outage', impact: 'major', components: ['web'],
         incident_updates: [{ status: 'investigating', body: 'Investigating sample' }] }] : [] }) };
-  }, OffscreenCanvas: class {
-    getContext() { return { clearRect() {}, beginPath() {}, arc() {}, fill() {}, getImageData() { result.icon = this.fillStyle; return {}; } }; }
   }, chrome: {
     runtime: { id: 'status-test', onInstalled: { addListener() {} }, onStartup: { addListener() {} },
       onMessage: { addListener(value) { listener = value; } } },
@@ -29,7 +27,7 @@ async function poll({ time, watched = ['ai'], incident = false, fail = false }) 
     storage: { local: { setAccessLevel: async () => {}, get: async () => structuredClone(stored),
       set: async value => { stored = { ...stored, ...value }; } },
     sync: { setAccessLevel: async () => {}, get: async () => ({ watchedProducts: watched }) } },
-    action: { setIcon: async () => {}, setBadgeText: value => result.badges.push(value.text),
+    action: { setIcon: async value => { result.icon = value.path[16]; }, setBadgeText: value => result.badges.push(value.text),
       setBadgeBackgroundColor: value => { result.badgeColor = value.color; }, setBadgeTextColor() {},
       setTitle: value => { result.title = value.title; done(); } }
   } });
@@ -46,7 +44,7 @@ test('simulated status: watched outage outranks peak, with DOWN and incident too
   assert.equal(result.badges.at(-1), 'DOWN');
   assert.equal(result.badgeColor, '#c2410c');
   assert.equal(result.title, 'Issue: Claude AI · Sample outage');
-  assert.equal(result.icon, '#ef4444');
+  assert.equal(result.icon, 'icons/usage-red-16.png');
 });
 
 test('simulated status: peak boundary and weekend resolve badge/tooltip independently of usage', async () => {
@@ -60,7 +58,7 @@ test('simulated status: peak boundary and weekend resolve badge/tooltip independ
   assert.match(end.title, /^Off-peak · Next peak in /);
   const weekend = await poll({ time: '2026-10-24T13:00:00Z' });
   assert.equal(weekend.stored.state, 'green');
-  assert.equal(weekend.icon, '#ef4444');
+  assert.equal(weekend.icon, 'icons/usage-red-16.png');
 });
 
 test('simulated status: unwatched incident does not become DOWN, and request failure keeps the usage icon', async () => {
@@ -69,7 +67,7 @@ test('simulated status: unwatched incident does not become DOWN, and request fai
   assert.equal(unwatched.badges.at(-1), 'PEAK');
   const failed = await poll({ time: '2026-10-23T13:00:00Z', fail: true });
   assert.equal(failed.stored.state, 'grey');
-  assert.equal(failed.title, 'QuotaBeacon · Unknown');
+  assert.equal(failed.title, 'ClaudeBuddy · Unknown');
   assert.equal(failed.badges.at(-1), '');
-  assert.equal(failed.icon, '#ef4444');
+  assert.equal(failed.icon, 'icons/usage-red-16.png');
 });

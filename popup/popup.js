@@ -288,7 +288,7 @@ async function loadTimezones() {
     allTimezones = await res.json();
   } catch {
     allTimezones = [];
-    console.warn('QuotaBeacon: failed to load timezones.json');
+    console.warn('ClaudeBuddy: failed to load timezones.json');
   }
 }
 

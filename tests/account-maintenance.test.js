@@ -16,22 +16,7 @@ function startWorker(accounts) {
   let onAlarm;
   let icon;
   let writes = 0;
-  class Canvas {
-    constructor(width, height) { this.width = width; this.height = height; }
-    getContext() {
-      const { width, height } = this;
-      return {
-        clearRect() {}, beginPath() {}, arc() {}, fill() {},
-        getImageData() {
-          const data = new Uint8ClampedArray(width * height * 4);
-          const rgb = this.fillStyle.match(/\w\w/g).map(hex => parseInt(hex, 16));
-          data.set([...rgb, 255], ((height / 2) * width + width / 2) * 4);
-          return { width, height, data };
-        }
-      };
-    }
-  }
-  const context = vm.createContext({ URL, OffscreenCanvas: Canvas, Date: class extends Date {
+  const context = vm.createContext({ URL, Date: class extends Date {
     static now() { return NOW; }
   }, chrome: {
     storage: {
@@ -60,11 +45,7 @@ function startWorker(accounts) {
     accounts: () => Accounts.getAccounts(stored.accounts, NOW),
     local: () => stored,
     writes: () => writes,
-    iconColor: () => {
-      const image = icon.imageData[16];
-      const center = ((image.height / 2) * image.width + image.width / 2) * 4;
-      return [...image.data.slice(center, center + 4)];
-    }
+    iconPaths: () => icon.path
   };
 }
 
@@ -76,7 +57,7 @@ test('the 30-second alarm retains Accounts and their labels beyond 48 hours with
   assert.deepEqual(worker.accounts().map(account => account.accountId), [KEPT, OLD]);
   assert.deepEqual(worker.local().accounts, accounts);
   assert.equal(worker.writes(), 0);
-  assert.deepEqual(worker.iconColor(), [239, 68, 68, 255]);
+  assert.deepEqual(Object.values(worker.iconPaths()), [16, 32, 48, 128].map(size => `icons/usage-red-${size}.png`));
   assert.equal(worker.local().state, 'orange');
   assert.equal(worker.local().incidentTitle, 'Existing incident');
 });
@@ -88,7 +69,7 @@ test('a lone Account remains remembered beyond 48 hours and keeps driving the ic
   const worker = startWorker(accounts);
   await worker.tick();
   assert.equal(worker.accounts()[0].accountId, OLD);
-  assert.deepEqual(worker.iconColor(), [239, 68, 68, 255]);
+  assert.equal(worker.iconPaths()[16], 'icons/usage-red-16.png');
   assert.equal(worker.writes(), 0);
   await worker.tick();
   assert.equal(worker.writes(), 0);
@@ -100,7 +81,7 @@ test('an expired Active reading turns the icon green without deleting its stored
   }, NOW - 600000);
   const worker = startWorker(accounts);
   await worker.tick();
-  assert.deepEqual(worker.iconColor(), [34, 197, 94, 255]);
+  assert.equal(worker.iconPaths()[16], 'icons/usage-green-16.png');
   assert.equal(worker.accounts()[0].percent, null);
   assert.equal(worker.accounts()[0].lastObservedPercent, 100);
   assert.equal(worker.accounts()[0].isFull, false);

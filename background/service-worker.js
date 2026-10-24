@@ -235,37 +235,14 @@ function getNextPeakISO() {
 
 // ── Icon: color driven by usage %, not peak/outage state ──
 // Usage thresholds: missing/expired→green, 0–60→green, 61–85→orange, 86–100→red
-const USAGE_COLORS = {
-  green:  '#22c55e',
-  orange: '#f97316',
-  red:    '#ef4444'
-};
-
 async function updateIcon() {
   await storageReady;
   const { accounts = {} } = await accountStorage.get('accounts');
   const now = Date.now();
   const colorKey = Accounts.getIconColor(accounts, now);
-  const color = USAGE_COLORS[colorKey];
-  const sizes = [16, 32, 48, 128];
-  const imageData = {};
-
-  for (const size of sizes) {
-    const canvas = new OffscreenCanvas(size, size);
-    const ctx = canvas.getContext('2d');
-    const r = size / 2;
-    const inset = size * 0.08;
-
-    ctx.clearRect(0, 0, size, size);
-    ctx.beginPath();
-    ctx.arc(r, r, r - inset, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-
-    imageData[size] = ctx.getImageData(0, 0, size, size);
-  }
-
-  await chrome.action.setIcon({ imageData });
+  await chrome.action.setIcon({ path: Object.fromEntries(
+    [16, 32, 48, 128].map(size => [size, `icons/usage-${colorKey}-${size}.png`])
+  ) });
 }
 
 // ── Badge: blinking PEAK or DOWN, driven by peak/outage state ──
@@ -320,7 +297,7 @@ function buildTitle(result) {
     }
     return 'Off-peak · All clear';
   }
-  return 'QuotaBeacon · Unknown';
+  return 'ClaudeBuddy · Unknown';
 }
 
 async function poll() {

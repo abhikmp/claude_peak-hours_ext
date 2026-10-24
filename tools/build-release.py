@@ -1,4 +1,4 @@
-"""Build and verify the explicit QuotaBeacon runtime allowlist (Python stdlib)."""
+"""Build and verify the explicit ClaudeBuddy runtime allowlist (Python stdlib)."""
 import hashlib
 import json
 from pathlib import Path
@@ -26,6 +26,8 @@ data/timezones.json
 icons/logo_16.png
 icons/logo_48.png
 icons/logo_128.png'''.splitlines()
+FILES += [f'icons/usage-{color}-{size}.png'
+          for color in ['green', 'orange', 'red'] for size in [16, 32, 48, 128]]
 
 def sha(data):
     return hashlib.sha256(data).hexdigest()
@@ -34,7 +36,7 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     manifest = json.loads((ROOT / 'manifest.json').read_text())
     assert manifest['manifest_version'] == 3
-    assert manifest['name'] == 'QuotaBeacon'
+    assert manifest['name'] == 'ClaudeBuddy'
     assert len(manifest['name']) <= 75 and len(manifest['description']) <= 132
     assert re.fullmatch(r'\d+\.\d+\.\d+(?:\.\d+)?', manifest['version'])
     assert all(0 <= int(number) <= 65535 for number in manifest['version'].split('.'))
@@ -53,7 +55,12 @@ def main():
         data = content[f'icons/logo_{size}.png']
         assert data[:8] == b'\x89PNG\r\n\x1a\n'
         assert int.from_bytes(data[16:20], 'big') == int.from_bytes(data[20:24], 'big') == size
-    archive = OUT / f'quotabeacon-{manifest["version"]}-rc.zip'
+    for color in ['green', 'orange', 'red']:
+        for size in [16, 32, 48, 128]:
+            data = content[f'icons/usage-{color}-{size}.png']
+            assert data[:8] == b'\x89PNG\r\n\x1a\n'
+            assert int.from_bytes(data[16:20], 'big') == int.from_bytes(data[20:24], 'big') == size
+    archive = OUT / f'claudebuddy-{manifest["version"]}-rc.zip'
     with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as package:
         for file, data in sorted(content.items()):
             info = zipfile.ZipInfo(file, (2026, 10, 24, 0, 0, 0))
@@ -78,7 +85,7 @@ def main():
         'package': archive.name, 'version': manifest['version'], 'sha256': sha(archive.read_bytes()),
         'sourceRevision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'runtimeSha256': sha(json.dumps(hashes, sort_keys=True).encode()), 'files': hashes,
-        'checks': '18 allowlisted files; source/ZIP/extraction equality; manifest paths/metadata; PNG dimensions; extracted JS syntax'
+        'checks': f'{len(FILES)} allowlisted files; source/ZIP/extraction equality; manifest paths/metadata; PNG dimensions; extracted JS syntax'
     }
     (OUT / 'package.json').write_text(json.dumps(record, indent=2) + '\n', encoding='utf-8')
     (OUT / 'SHA256SUMS').write_text(f'{record["sha256"]}  {archive.name}\n', encoding='utf-8')

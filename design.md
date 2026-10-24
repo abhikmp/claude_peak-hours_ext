@@ -1,4 +1,4 @@
-# QuotaBeacon design and data flow
+# ClaudeBuddy design and data flow
 
 Implemented release candidate: 1.0.0, 2026-10-24. [Domain](CONTEXT.md), [handoff](.scratch/account-overview/05-release/HANDOFF.md), [privacy](docs/release/privacy-policy.md). Earlier project-context.md/prototype states are design history.
 
@@ -24,7 +24,7 @@ Undo occupies one **228 × 32px** slot, **16px from bottom and sides**, on every
 
 ## Toolbar and availability
 
-The circle is green at 0–60%, orange above 60% through 85%, then red. Missing/expired Active observations use green as a neutral icon policy, never a guarantee of full quota; the icon is never grey. Browsing does not change it.
+The crab is green at 0–60%, orange above 60% through 85%, then red. Missing/expired Active observations use green as a neutral icon policy, never a guarantee of full quota; the icon is never grey. Browsing does not change it.
 
 Public status refreshes every five minutes. Weekday 5–11 AM Pacific is the configured peak window, not a measured speed forecast. Watched incidents show DOWN ahead of PEAK. White badges blink once per second while the worker runs; suspension can stop blinking. Off-peak/error clears them. Tooltips follow incident/peak/next-peak/unknown status. Popup Retry requests a fresh poll.
 
@@ -50,3 +50,7 @@ Local/sync storage use TRUSTED_CONTEXTS. Content senders from claude.ai may subm
 All executable logic is bundled. Minimum Chrome 120 reflects the half-minute alarm requirement. No cookies/history/tabs API permission is used; host access supplies the matching-tab query. The unused web-accessible timezone declaration is removed; popup loads its bundled JSON directly.
 
 Production evidence: [03a](.scratch/account-overview/03a-validation/verification.md), [04](.scratch/account-overview/04-validation/verification.md), [queue/button refinements](.scratch/account-overview/04-validation/refinements-verification.md), [footer replacement](.scratch/account-overview/04-validation/footer-replacement.md), [release](.scratch/account-overview/05-release/verification.md).
+
+## ClaudeBuddy branding amendment — 2026-10-24
+
+User approved renaming QuotaBeacon to ClaudeBuddy with an original warm, friendly crab and subsequently requested crisper edges and cuter eyes. Coral is the static brand icon; toolbar crabs use the unchanged green/orange/red quota thresholds. All toolbar pixels are bundled PNGs at 16/32/48/128px; the worker chooses local paths without fetching images or drawing a canvas. The existing `quotabeacon-aes-gcm-v1` storage format, `quotabeacon-private` key database and capture bridge namespaces remain intentionally unchanged so the rebrand preserves saved readings, recovery and keys.

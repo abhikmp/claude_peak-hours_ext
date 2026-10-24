@@ -1,6 +1,6 @@
 # Policy and technical audit — 24 October 2026
 
-Scope: QuotaBeacon 1.0.0 release candidate. This records preparation and code findings, not Google approval. Store policy pages were rechecked during ticket 05.
+Scope: ClaudeBuddy 1.0.0 release candidate. This records preparation and code findings, not Google approval. Store policy pages were rechecked during ticket 05.
 
 ## Data and security findings
 
@@ -24,15 +24,15 @@ Removed unused web_accessible_resources entry for timezone JSON: only the popup 
 
 ## Branding, assets and attribution
 
-[Single purpose](https://developer.chrome.com/docs/webstore/program-policies/quality-guidelines): quota and service availability for Claude form one narrow decision-support purpose. [Branding/IP](https://developer.chrome.com/docs/webstore/program-policies/impersonation-and-intellectual-property): independent product name and explicit non-affiliation, no official/endorsed claims, rankings or fake browser warnings. The previous star mark was replaced by the existing runtime green circle, rasterized at true 16/48/128 sizes, with transparent padding. No Anthropic logo is used in prepared assets.
+[Single purpose](https://developer.chrome.com/docs/webstore/program-policies/quality-guidelines): quota and service availability for Claude form one narrow decision-support purpose. [Branding/IP](https://developer.chrome.com/docs/webstore/program-policies/impersonation-and-intellectual-property): independent product name and explicit non-affiliation, no official/endorsed claims, rankings or fake browser warnings. The previous star mark was replaced by the existing runtime green crab, rasterized at true 16/48/128 sizes, with transparent padding. No Anthropic logo is used in prepared assets.
 
-No bundled third-party library, font or imported image/code notice was identified in runtime sources. PeakClaude inspiration credit remains in README; no copied PeakClaude code was identified in this local review. Attribution does not establish ownership. No repository-wide LICENSE/COPYING exists; actual ownership and the publisher's licence choice remain owner decisions in 06, not fabricated permission to relicense. There is no applicable third-party runtime notice to add based on this local evidence.
+No bundled third-party library, font or imported third-party image/code notice was identified in runtime sources. The mascot was generated with the built-in imagegen tool; its source and prompts are recorded in assets/branding, outside the runtime ZIP. PeakClaude inspiration credit remains in README; no copied PeakClaude code was identified in this local review. Attribution does not establish ownership. No repository-wide LICENSE/COPYING exists; actual ownership and the publisher's licence choice remain owner decisions in 06, not fabricated permission to relicense. There is no applicable third-party runtime notice to add based on this local evidence.
 
 ## Listing and package
 
 [Listing fields](https://developer.chrome.com/docs/webstore/cws-dashboard-listing) and [image requirements](https://developer.chrome.com/docs/webstore/images): prepared title/manifest description, detailed description, English/productivity recommendation, true 128px PNG icon, and three 1280 × 800 PNG screenshots. Required icon and screenshot assets supplied; optional promotional tiles/video intentionally omitted. Screenshots show extracted production UI with safe samples and no lab controls. [Reviewer instructions](https://developer.chrome.com/docs/webstore/cws-dashboard-test-instructions) explain access/plan/event limits; no credentials invented.
 
-[Package preparation](https://developer.chrome.com/docs/webstore/prepare): explicit 18-file runtime allowlist, manifest root, no tests/labs/tickets/secrets/screenshots/Git content. Source/ZIP/extraction equality and hashes are recorded. Final publication is not implied.
+[Package preparation](https://developer.chrome.com/docs/webstore/prepare): explicit 30-file runtime allowlist, manifest root, no tests/labs/tickets/secrets/screenshots/Git content. Source/ZIP/extraction equality and hashes are recorded. Final publication is not implied.
 
 ## Owner-only confirmations — ticket 06
 

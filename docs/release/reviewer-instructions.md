@@ -1,6 +1,6 @@
-# Reviewer instructions — QuotaBeacon 1.0.0
+# Reviewer instructions — ClaudeBuddy 1.0.0
 
-Prepared for the new QuotaBeacon Store item; no credentials are included.
+Prepared for the new ClaudeBuddy Store item; no credentials are included.
 
 1. Install the submitted build in Chrome 120+, pin it and open the popup. Without an Account reading it shows “Send a message to see usage.” Public status and preferences are usable without Claude sign-in.
 2. Sign in to claude.ai using your own authorized access and send a message. When Claude supplies a supported numeric five-hour quota event, reopen the popup to see percentage, captured reset and actual reading age. Logging in alone is insufficient.

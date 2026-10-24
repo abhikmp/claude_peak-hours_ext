@@ -1,6 +1,6 @@
-# QuotaBeacon
+# ClaudeBuddy
 
-A compact Chrome extension for Claude quota and service availability. Independent of Anthropic.
+Usage, peak hours & outage status for Claude. Independent of Anthropic.
 
 - Capture a five-hour Usage reading after sending a message on claude.ai. Readings are observations, not continuously live quota; weekly/token totals are not tracked.
 - Compare one to three Accounts through detail slides. Four or more use Active detail and a searchable, internally scrolling table, within 260 × 340px.
@@ -10,13 +10,13 @@ A compact Chrome extension for Claude quota and service availability. Independen
 
 The toolbar follows Active: green through 60%, orange through 85%, then red. Missing/expired readings use green as a neutral policy, not proof of full quota. DOWN takes priority over PEAK; availability badges/tooltips are independent of usage. Browsing or logging in alone never switches Active; a new reading does.
 
-![QuotaBeacon Account comparison](.scratch/account-overview/05-release/assets/02-compare.png)
+![ClaudeBuddy Account comparison](.scratch/account-overview/05-release/assets/02-compare.png)
 
 Screenshots use current production code with disposable sample identities/readings, not live Claude evidence.
 
 ## Try locally
 
-Requires Chrome 120+. Open chrome://extensions, enable Developer mode and load this folder, or extract the [release ZIP](.scratch/account-overview/05-release/quotabeacon-1.0.0-rc.zip) and load its folder. Pin QuotaBeacon, sign in to claude.ai and send a message yourself. Use another Account in the same Chrome profile and send a message to remember it.
+Requires Chrome 120+. Open chrome://extensions, enable Developer mode and load this folder, or extract the [release ZIP](.scratch/account-overview/05-release/claudebuddy-1.0.0-rc.zip) and load its folder. Pin ClaudeBuddy, sign in to claude.ai and send a message yourself. Use another Account in the same Chrome profile and send a message to remember it.
 
 Capture supports completion SSE and Bard StreamTimeline RPC, including gzip quota events. Claude must return a numeric five-hour quota event; missing data never implies zero. Site/plan changes can make capture unavailable. No API key is required; the extension cannot raise limits.
 

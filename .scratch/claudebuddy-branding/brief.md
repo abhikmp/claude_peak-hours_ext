@@ -1,0 +1,21 @@
+# ClaudeBuddy branding amendment
+
+Status: release candidate prepared; independent review pending.
+Starting revision: c9213bdc5e3dce34252322d3709c4a0f58124f34 on feature-usagebar.
+
+User approved renaming QuotaBeacon to ClaudeBuddy because it covers usage, peak hours and outages. User requested a crab-like companion, then refined it: friendlier and warmer, sharper/crisper, with cuter eyes. Product tagline: “Usage, peak hours & outage status for Claude.”
+
+Scope: original coral crab source asset, manifest/install/Store icons, recognizable green/orange/red toolbar variants retaining quota thresholds, current product/docs/privacy/Store branding and regenerated listing screenshots, refreshed verified release candidate/checksum/source record. Retain encrypted storage format/database and capture bridge namespaces so existing readings, labels, recovery and key remain usable. Do not change popup layout, Account semantics or feature behavior. No remote repository rename, policy hosting, signed-in operation or Store publication.
+
+Validation: run existing Account/worker/status/capture tests, syntax/whitespace checks, inspect real-size icons in both themes, exercise encrypted production popup with the extracted new artifact, rebuild required 1280 × 800 listing assets. Reuse unaffected ticket 05 evidence explicitly, rather than labelling earlier checks as rerun. Final review uses Standards/Spec axes. Commit on current branch.
+
+The active package and final handoff remain in [ticket 05 release](../account-overview/05-release/HANDOFF.md); manual launch remains [ticket 06](../account-overview/issues/06-manual-repository-migration-and-store-launch.md).
+
+## Verification
+
+- Existing full Node suite: 64 passing, zero failures ([result](node-results.txt)). Runtime syntax checks pass through the release builder; no typechecking configuration exists.
+- Extracted ClaudeBuddy popup: 26 encrypted lifecycle assertions pass, including migration, saved-key reuse after recreation, Forget/Undo, Active/icon update, unreadable-record Reset and subsequent capture. Result is saved in the active release evidence; earlier unaffected layout evidence is reused explicitly.
+- [Icon proof](icon-proof.png): coral at 16/48/128px and quota crabs at native 16px, on light/dark backgrounds. All exported PNGs retain alpha transparency. Green/orange/red body hues preserve the existing thresholds and dark/catchlight facial features.
+- Three 1280 × 800 production Store screenshots were regenerated with ClaudeBuddy name/crab, safe sample readings and no design controls.
+- Build validates 30 explicit runtime files, manifest name/45-character description, all PNG sizes, extraction/source byte equality and checksums. Original generated source/prompt notes stay outside the runtime package.
+- Encrypted format/database and bridge identifiers remain unchanged by inspection; both capture transports pass the full suite.

@@ -1,4 +1,4 @@
-# QuotaBeacon dashboard declarations
+# ClaudeBuddy dashboard declarations
 
 Prepared 2026-10-24 for 1.0.0. Use with the [policy](privacy-policy.md), [listing](store-listing.md) and [audit](policy-audit.md). No dashboard or hosted policy has been changed.
 
@@ -31,6 +31,6 @@ The broad categories intentionally disclose transient/session handling; the expl
 
 Affirm the three dashboard certifications for this build: no sale/unrelated transfers, no unrelated uses, and no creditworthiness/lending uses. No ads, brokers, analytics or developer backend. Owner must maintain these commitments after release.
 
-Limited Use: QuotaBeacon's use of user information adheres to the Chrome Web Store User Data Policy, including the Limited Use requirements.
+Limited Use: ClaudeBuddy's use of user information adheres to the Chrome Web Store User Data Policy, including the Limited Use requirements.
 
 Policy hosting, verified public URL and publisher/contact confirmation belong to [ticket 06](../../.scratch/account-overview/issues/06-manual-repository-migration-and-store-launch.md). Keep the legacy policy separate.

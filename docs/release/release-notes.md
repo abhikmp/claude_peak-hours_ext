@@ -1,4 +1,4 @@
-# QuotaBeacon 1.0.0 release candidate
+# ClaudeBuddy 1.0.0 release candidate
 
 Prepared 24 October 2026; not submitted/published by ticket 05.
 
@@ -8,6 +8,6 @@ Non-Active menus offer confirmation, queue continuation and a 2.5-second Undo re
 
 Completion SSE and gzip/identity Bard RPC quota events remain supported, including the resolved third-Account capture bug. Absent numeric/weekly-only usage never implies zero. Usage icon colors remain separate from incident/peak badges/tooltips.
 
-Account/recovery storage now uses AES-256-GCM with a separate non-extractable local key. Capture contexts cannot read extension storage or invoke deletion/recovery. The popup rereads decrypted changes. Permissions remain alarms/storage/scripting and the two HTTPS hosts; unused web-accessible timezone access is removed. Chrome 120+ required. Correctly sized transparent circle icons match the existing usage-driven toolbar drawing.
+Account/recovery storage now uses AES-256-GCM with a separate non-extractable local key. Capture contexts cannot read extension storage or invoke deletion/recovery. The popup rereads decrypted changes. Permissions remain alarms/storage/scripting and the two HTTPS hosts; unused web-accessible timezone access is removed. Chrome 120+ required. An original warm coral crab identifies ClaudeBuddy; green/orange/red toolbar crabs retain the usage thresholds. Branding was renamed from QuotaBeacon before launch.
 
 Limitations: quota depends on supported Claude events, not live guarantees; no weekly/token tracking or limit increases. Badge blinking depends on worker lifetime. Encryption cannot protect complete profile compromise. Final signed-in package checks, publisher/legal choices, policy URL and Store approval remain ticket 06. A new extension ID does not migrate Peak Hours users/storage.
