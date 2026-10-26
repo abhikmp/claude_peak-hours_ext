@@ -1,8 +1,18 @@
 # ClaudeBuddy mascot
 
-Original project-bound raster asset generated with the built-in image_gen tool on 24 October 2026. The final reference is [claudebuddy-crab.png](claudebuddy-crab.png), with real alpha transparency. The user asked for a friendlier, warmer crab with crisper edges and cuter eyes. This is an original character, not an Anthropic/Claude logo.
+The current [claudebuddy-crab.png](claudebuddy-crab.png) is the exact user-selected image supplied on 26 October 2026 as `images/webstore_images/claudebuddy_logo.png`. It shows a warm coral paper-cut crab with cream eye highlights, cheeks, layered claws and soft shadows on a dark slate square. The source image is preserved without visual editing, including its background and corner detail; icon files are resized exports. Its external generation provenance is not recorded here.
 
 `python tools/render-icons.py` exports this source to the 16/48/128px coral brand icons for the extension management page and Web Store listing. The toolbar uses separate 16/32/48/128px green/orange/red circles, matching the original 8% inset and quota palette. The mascot is not used in the toolbar, including its manifest default. The source asset is a development/branding resource and is excluded from the runtime ZIP; all exported runtime PNGs are included explicitly.
+
+## Current promotional artwork
+
+Four matching compositions were generated with built-in image_gen using the selected logo as reference. [Exact prompts](promo-prompts.json) record the reference, tracked high-resolution sources in `promo-sources/`, output paths and dimensions. The finished exports are in the [release assets](../../.scratch/account-overview/05-release/assets/): marquee 1400 × 560, Store tile 440 × 280, project banner 820 × 300 and compact tile 440 × 254. Copies replace the existing files under `images/webstore_images/` and `images/promo_tile/`. Generation defines the artwork; Pillow only exports the final dimensions without cropping. Original source files remain available.
+
+The three listing screenshots were recaptured from the existing extracted-production sample fixture with the new logo header. Their popup pixels are rendered application UI, not generated artwork. Current copies use `01-usage.png`, `02-compare.png`, and `03-forget.png` under `images/webstore_images/scrshots/`; older differently named JPEGs there are historical exports and are not the current listing set.
+
+## Previous logo — historical prompts
+
+The earlier flat transparent crab was generated with the built-in image_gen tool on 24 October 2026 and is superseded by the user-selected image above. These prompts describe that earlier design, not the current asset.
 
 Generation prompt:
 

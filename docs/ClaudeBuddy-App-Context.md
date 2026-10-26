@@ -120,9 +120,9 @@ The brand should feel like a small companion looking out for the user while they
 
 ## Logo design context
 
-The current preferred direction is an **original friendly crab mascot**. The crab should have a warm expression, a recognizable silhouette, clean crisp edges, and cute eyes. A rounded body, expressive claws, and a gentle smile fit this direction. “Sharper” means a more precise graphic shape, rather than aggressive or spiky anatomy.
+The selected logo is a **friendly coral crab in a layered paper-cut style on a dark slate background**. It has a rounded body, raised curved claws, folded paper legs, large dark eyes with cream catchlights, coral cheek ovals, and a gentle smile. Soft shadows and subtle paper texture give the shapes depth. Preserve this character's warm expression, silhouette and cute eyes when making related visuals. “Sharper” means precise shapes, rather than aggressive or spiky anatomy.
 
-Warm coral is the current main brand-color direction. Dark facial features and small light eye highlights can help convey friendliness. Different visual treatments can be explored; this description is creative context rather than a requirement to reproduce an existing drawing.
+Warm coral, dark slate and small cream eye highlights define the selected treatment. Promotional images should use this same crab and visual style, with the ClaudeBuddy name and accurate feature copy.
 
 The logo needs to work as:
 
