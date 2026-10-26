@@ -19,3 +19,11 @@ Typography amendment: the user found the initial promo lettering generic. Refine
 - Full Node suite: 64 tests passed, zero failures. No JS/typechecking configuration change.
 
 - Rebuilt 30-file ZIP/source/extraction equality and checksums pass. Runtime source is a397d2a22d7f067dde792ceb1fd5e94f4dbda430; later typography/promotional/documentation changes are outside runtime. ZIP SHA-256: `9b0e6fdc8d7a1757b3eab03ec2c5e221a2f440f7d828d0fbacd279e90debb76d`.
+
+## Final review
+
+Standards: 0 remaining findings. No documented-standard violations or baseline smells; provenance, durable sources, dimensions and runtime/package identity checked.
+
+Spec: 0 remaining findings. All four final promo images visually inspected for warm serif name, legible sans-serif copy, character/composition consistency and accurate text. Selected logo/icons and all toolbar circles unchanged through the typography refinement.
+
+Review covers the selected-logo change from 2c9f55a to a397d2a and the final typography/documentation/package update from a397d2a to 95273d6. Stale audit text and a dimension-character encoding error in the initial prompt record were corrected and rechecked. No runtime changes follow the reviewed source revision.
