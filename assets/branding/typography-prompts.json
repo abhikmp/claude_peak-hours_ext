@@ -1,0 +1,48 @@
+{
+  "tool": "Built-in image_gen",
+  "date": "2026-10-26",
+  "change": "Typography-only refinement requested by user",
+  "editTargetsRevision": "a397d2a22d7f067dde792ceb1fd5e94f4dbda430",
+  "prompts": [
+    {
+      "asset": "marquee",
+      "prompt": "Use case: precise-object-edit. Edit target: first attached ClaudeBuddy promo image. Change ONLY typography; keep the exact crab artwork, pose, expression, paper layers, size, positioning, dark slate background, cream/coral palette, overall composition and image aspect ratio unchanged. The user finds the current rounded geometric sans-serif wordmark generic. Replace \"ClaudeBuddy\" with a distinctive warm editorial SERIF wordmark: softly sculpted chunky letterforms, clear bracketed serifs, noticeable thick/thin stroke contrast, expressive lowercase a/u/e, a beautiful open capital C, careful optical kerning, custom brand lettering character with a restrained 1970s book-jacket warmth. Think a sophisticated Recoleta/soft old-style serif direction, not bubbly cartoon type, not a standard rounded geometric sans. Set the name a little smaller with more breathing room, ample margin and balanced alignment. The wordmark must read exactly \"ClaudeBuddy\", one unbroken word, capital C and B. Tagline/feature copy should be a clean quiet humanist sans serif with normal weight, generous line spacing, clear hierarchy and high legibility. No embossed or 3D text: flat crisp cream type complements the dimensional paper crab. Preserve text exactly: \"ClaudeBuddy\" and \"Usage, peak hours & outage status for Claude.\" Wrap the tagline into two balanced lines if that improves legibility; do not add or remove words. Keep all text and artwork fully inside margins. Avoid extra slogans, borders, badges, sparkle marks, new illustrations, and changed crab anatomy. This should feel like a carefully typeset independent brand rather than a default app template.",
+      "source": "assets/branding/promo-sources/marquee.png",
+      "export": ".scratch/account-overview/05-release/assets/marquee_image.png",
+      "dimensions": [
+        1400,
+        560
+      ]
+    },
+    {
+      "asset": "store-tile",
+      "prompt": "Use case: precise-object-edit. Edit target: first attached ClaudeBuddy promo image. Change ONLY typography; keep the exact crab artwork, pose, expression, paper layers, size, positioning, dark slate background, cream/coral palette, overall composition and image aspect ratio unchanged. The user finds the current rounded geometric sans-serif wordmark generic. Replace \"ClaudeBuddy\" with a distinctive warm editorial SERIF wordmark: softly sculpted chunky letterforms, clear bracketed serifs, noticeable thick/thin stroke contrast, expressive lowercase a/u/e, a beautiful open capital C, careful optical kerning, custom brand lettering character with a restrained 1970s book-jacket warmth. Think a sophisticated Recoleta/soft old-style serif direction, not bubbly cartoon type, not a standard rounded geometric sans. Set the name a little smaller with more breathing room, ample margin and balanced alignment. The wordmark must read exactly \"ClaudeBuddy\", one unbroken word, capital C and B. Tagline/feature copy should be a clean quiet humanist sans serif with normal weight, generous line spacing, clear hierarchy and high legibility. No embossed or 3D text: flat crisp cream type complements the dimensional paper crab. Preserve text exactly: \"ClaudeBuddy\" and \"Usage, peak hours & outage status for Claude.\" Wrap the tagline into two balanced lines if that improves legibility; do not add or remove words. Keep all text and artwork fully inside margins. Avoid extra slogans, borders, badges, sparkle marks, new illustrations, and changed crab anatomy. This should feel like a carefully typeset independent brand rather than a default app template.",
+      "source": "assets/branding/promo-sources/store-tile.png",
+      "export": ".scratch/account-overview/05-release/assets/webstore_promo-tile.jpg",
+      "dimensions": [
+        440,
+        280
+      ]
+    },
+    {
+      "asset": "repository-banner",
+      "prompt": "Use case: precise-object-edit. Edit target: first attached ClaudeBuddy promo image. Change ONLY typography; keep the exact crab artwork, pose, expression, paper layers, size, positioning, dark slate background, cream/coral palette, overall composition and image aspect ratio unchanged. The user finds the current rounded geometric sans-serif wordmark generic. Replace \"ClaudeBuddy\" with a distinctive warm editorial SERIF wordmark: softly sculpted chunky letterforms, clear bracketed serifs, noticeable thick/thin stroke contrast, expressive lowercase a/u/e, a beautiful open capital C, careful optical kerning, custom brand lettering character with a restrained 1970s book-jacket warmth. Think a sophisticated Recoleta/soft old-style serif direction, not bubbly cartoon type, not a standard rounded geometric sans. Set the name a little smaller with more breathing room, ample margin and balanced alignment. The wordmark must read exactly \"ClaudeBuddy\", one unbroken word, capital C and B. Tagline/feature copy should be a clean quiet humanist sans serif with normal weight, generous line spacing, clear hierarchy and high legibility. No embossed or 3D text: flat crisp cream type complements the dimensional paper crab. Preserve text exactly: \"ClaudeBuddy\" and \"Usage, peak hours & outage status for Claude.\" Wrap the tagline into two balanced lines if that improves legibility; do not add or remove words. Keep all text and artwork fully inside margins. Avoid extra slogans, borders, badges, sparkle marks, new illustrations, and changed crab anatomy. This should feel like a carefully typeset independent brand rather than a default app template.",
+      "source": "assets/branding/promo-sources/repository-banner.png",
+      "export": ".scratch/account-overview/05-release/assets/promo_tile_git.png",
+      "dimensions": [
+        820,
+        300
+      ]
+    },
+    {
+      "asset": "compact-tile",
+      "prompt": "Use case: precise-object-edit. Edit target: first attached ClaudeBuddy promo image. Change ONLY typography; keep the exact crab artwork, pose, expression, paper layers, size, positioning, dark slate background, cream/coral palette, overall composition and image aspect ratio unchanged. The user finds the current rounded geometric sans-serif wordmark generic. Replace \"ClaudeBuddy\" with a distinctive warm editorial SERIF wordmark: softly sculpted chunky letterforms, clear bracketed serifs, noticeable thick/thin stroke contrast, expressive lowercase a/u/e, a beautiful open capital C, careful optical kerning, custom brand lettering character with a restrained 1970s book-jacket warmth. Think a sophisticated Recoleta/soft old-style serif direction, not bubbly cartoon type, not a standard rounded geometric sans. Set the name a little smaller with more breathing room, ample margin and balanced alignment. The wordmark must read exactly \"ClaudeBuddy\", one unbroken word, capital C and B. Tagline/feature copy should be a clean quiet humanist sans serif with normal weight, generous line spacing, clear hierarchy and high legibility. No embossed or 3D text: flat crisp cream type complements the dimensional paper crab. Preserve text exactly: \"ClaudeBuddy\", \"Usage\", \"Peak hours\", \"Outage status\". Retain the three existing feature icons. Keep all text and artwork fully inside margins. Avoid extra slogans, borders, badges, sparkle marks, new illustrations, and changed crab anatomy. This should feel like a carefully typeset independent brand rather than a default app template.",
+      "source": "assets/branding/promo-sources/compact-tile.png",
+      "export": ".scratch/account-overview/05-release/assets/promo_tile.png",
+      "dimensions": [
+        440,
+        254
+      ]
+    }
+  ]
+}

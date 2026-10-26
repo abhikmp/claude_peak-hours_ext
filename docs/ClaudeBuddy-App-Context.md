@@ -122,7 +122,7 @@ The brand should feel like a small companion looking out for the user while they
 
 The selected logo is a **friendly coral crab in a layered paper-cut style on a dark slate background**. It has a rounded body, raised curved claws, folded paper legs, large dark eyes with cream catchlights, coral cheek ovals, and a gentle smile. Soft shadows and subtle paper texture give the shapes depth. Preserve this character's warm expression, silhouette and cute eyes when making related visuals. “Sharper” means precise shapes, rather than aggressive or spiky anatomy.
 
-Warm coral, dark slate and small cream eye highlights define the selected treatment. Promotional images should use this same crab and visual style, with the ClaudeBuddy name and accurate feature copy.
+Warm coral, dark slate and small cream eye highlights define the selected treatment. Promotional images use this same crab and visual style, a warm editorial serif for the ClaudeBuddy name, and quieter sans-serif feature copy. Keep the copy accurate and the hierarchy clear.
 
 The logo needs to work as:
 
