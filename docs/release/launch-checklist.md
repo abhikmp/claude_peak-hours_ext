@@ -1,6 +1,6 @@
 # Ticket 06: repository migration and Store launch
 
-Status: in progress. Updated 28 October 2026. Publication is complete only when the real Store outcome and installation check are recorded.
+Status: ready-for-human. Updated 28 October 2026. The repository release phase is complete; Chrome Web Store work remains. Publication is complete only when the real Store outcome and installation check are recorded.
 
 ## Verified preparation
 
@@ -15,9 +15,9 @@ Status: in progress. Updated 28 October 2026. Publication is complete only when 
 - [x] Preserve the published legacy ZIP/CRX, source archive, checksums and comparison record in the [legacy GitHub Release](https://github.com/abhikmp/claudebuddy-chrome-ext/releases/tag/peak-hours-v1.0.0), with annotated tag `peak-hours-v1.0.0` at the verified source commit. All five assets are uploaded with matching SHA-256 digests.
 - [x] Keep the current source tree focused on the extension, tests, tools, final Store assets and maintained docs. Local working notes and generated artifacts remain ignored; promotional videos are excluded. The confirmed promotional MP4 was deleted locally; supporting workflow files remain local and ignored.
 - [x] Commit reviewed source to `feature-usagebar` (`83396079dbdff09d3fcdd36210f947c131c0fe37`) after verification: 76 Node tests pass, all 30 runtime hashes match the publisher-tested ZIP, the rebuild reproduces its SHA-256 exactly, documentation links and policy regeneration pass, and [Standards/Spec review](review.md) has no unresolved findings.
-- [ ] Merge the reviewed feature branch through a PR without replacing history. Keep `main` as default and preserve `legacy` as the archived Peak Hours source.
-- [ ] Associate the verified ClaudeBuddy source tag, ZIP, checksums and source record with a GitHub prerelease. Mark Store publication separately.
-- [ ] Host the ClaudeBuddy privacy policy at a final public URL and verify logged-out access. Retain the old product's policy independently.
+- [x] Merge the reviewed feature branch through [PR #2](https://github.com/abhikmp/claudebuddy-chrome-ext/pull/2) without replacing history. Merge commit: `7470d0e36d4a7e08633f9a845999de71997e3fb9`. `main` remains default and `legacy` is the archived Peak Hours source.
+- [x] Publish the [ClaudeBuddy GitHub prerelease](https://github.com/abhikmp/claudebuddy-chrome-ext/releases/tag/claudebuddy-v1.0.0-rc.1), with annotated tag `claudebuddy-v1.0.0-rc.1` at the merge commit. ZIP, `SHA256SUMS` and `package.json` are uploaded with matching digests. Runtime bytes match immutable source `83396079dbdff09d3fcdd36210f947c131c0fe37`; see [release identity](release-identity.json). Store publication remains separate.
+- [x] Publish the [ClaudeBuddy privacy policy](https://abhikmp.github.io/claudebuddy-chrome-ext/privacy-policy.html) through GitHub Pages (`main`, `/docs`). Unauthenticated HTTP 200 and exact source-byte equality verified on 28 October 2026; HTML SHA-256 `37146354ea7ca62ca4624378e75e577f2fb3c23340bd2b17cca805becd2199db`. This is a new site; no legacy policy was overwritten.
 
 ## Chrome Web Store
 

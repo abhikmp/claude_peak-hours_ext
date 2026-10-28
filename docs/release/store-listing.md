@@ -36,4 +36,4 @@ Optional final Store artwork: [marquee 1400 × 560](../../images/store/marquee_i
 
 Homepage/source: [ClaudeBuddy repository](https://github.com/abhikmp/claudebuddy-chrome-ext). Support: [GitHub Issues](https://github.com/abhikmp/claudebuddy-chrome-ext/issues). Legacy source: [Peak Hours branch](https://github.com/abhikmp/claudebuddy-chrome-ext/tree/legacy).
 
-Policy source: [privacy-policy.md](privacy-policy.md). Planned public URL: https://abhikmp.github.io/claudebuddy-chrome-ext/privacy-policy.html . Verify public access before entering it in the dashboard; the [launch checklist](launch-checklist.md) records hosting status. Keep the legacy product policy separate.
+Policy source: [privacy-policy.md](privacy-policy.md). Public policy: [ClaudeBuddy Privacy Policy](https://abhikmp.github.io/claudebuddy-chrome-ext/privacy-policy.html). Unauthenticated HTTP 200 and exact source-byte equality verified on 28 October 2026. Use this URL in the new item's dashboard; the [launch checklist](launch-checklist.md) records the remaining Store steps. Keep the legacy product policy separate.
