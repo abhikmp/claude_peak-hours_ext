@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "ClaudeBuddy",
+  "name": "ClaudeBuddy \u2013 Usage & Peak Hours Tracker",
   "version": "1.0.0",
   "minimum_chrome_version": "120",
   "description": "Usage, peak hours & outage status for Claude.",

@@ -15,5 +15,7 @@ Limitations: quota depends on supported Claude events, not live guarantees; no w
 
 Pre-release security hardening, 27 October 2026: invalid capture identifiers/reset timestamps are rejected, malformed older reset values display as unknown, and pending capture writes are bounded. Gzip quota frames and partial SSE lines stop at bounded sizes while preserving the site's original response. Permissions and data handling purposes remain unchanged.
 
+Store preparation, 28 October 2026: the package title is now **ClaudeBuddy – Usage & Peak Hours Tracker**, with no other packaged file changes. Updated listing copy and two cleaned 1280 × 800 browser screenshots are maintained in the repository. The publisher reports the new Store submission is pending review; approval, publication and Store-install checks remain pending. The original GitHub prerelease and [release identity](release-identity.json) are preserved; the title-only package has a separate [submission identity](store-submission-identity.json).
+
 
 Pre-release popup/toolbar correction, 27 October 2026: rooted circle-icon paths prevent worker image-load failures, and icon errors no longer interrupt availability badge/tooltip updates. Watched outages use **OUT** (ahead of PEAK). Dormant Account facts fit alongside outage details without unnecessary vertical scrolling.

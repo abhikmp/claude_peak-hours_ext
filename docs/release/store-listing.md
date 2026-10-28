@@ -1,8 +1,8 @@
 # ClaudeBuddy Store listing
 
-Prepared 24 October 2026; copy only. Upload assets/text during ticket 06.
+Prepared 24 October 2026; updated 28 October. Maintained listing copy and final assets. The publisher reports the new Store submission pending review; final uploaded text/assets are not independently verified. See [launch status](launch-checklist.md).
 
-Title: **ClaudeBuddy**
+Title: **ClaudeBuddy – Usage & Peak Hours Tracker**
 
 Short description (manifest, 45 characters): Usage, peak hours & outage status for Claude.
 
@@ -12,25 +12,55 @@ Single purpose: Help Claude users assess quota and service availability through 
 
 ## Detailed description — paste this section
 
-See your last captured Claude quota and service availability in one compact popup.
+Meet your Claude companion: captured usage, reset times, remembered accounts, peak hours and service status, together in one compact popup. Pin ClaudeBuddy to keep useful signals a glance away while you work.
 
-ClaudeBuddy observes supported five-hour quota events after you send messages on claude.ai. Compare up to three remembered Accounts through detailed slides, or four or more through a searchable table. Each reading keeps its actual age and captured reset time so you can distinguish observations from estimates and unknown usage.
+YOUR USAGE, IN COLOR
+The toolbar circle and usage bar follow the account with the latest captured reading:
+🟢 Green: 0–60% used.
+🟠 Orange: above 60% through 85% used — your recorded usage is getting higher.
+🔴 Red: above 85% used — your recorded usage is nearing the limit.
+Open the popup for the percentage, captured reset countdown and how long ago the reading was updated.
 
-• Usage-driven toolbar colors: green, orange and red follow the Account with the latest reading.
-• Account comparison: stable table rows, search, reset timing and detailed inspection.
-• Remembered Accounts stay until you forget them or reset the extension. Confirm removal, Undo for 2.5 seconds, and rediscover an Account through a later message.
-• Service availability: public Claude incidents, watched-product alerts and the configured weekday 5–11 AM Pacific peak-hours window.
-• Light/dark themes, timezone preferences and a fixed 260 × 340px popup.
+PEAK HOURS WITHOUT THE GUESSWORK
+🔴 A red PEAK badge draws attention to the configured weekday peak-hours window, 5–11 AM Pacific. Open the popup to see how long remains and the end time in your selected timezone.
+🟢 Outside that window, the popup shows Off peak and the next scheduled peak time, unless a watched outage takes priority.
+Peak hours follow a schedule; they are not a measurement of current traffic or a prediction of your account's quota.
 
-Readings update only when Claude returns a supported numeric five-hour quota event. This is not continuously live quota monitoring. A passed captured reset does not prove full current quota: short estimates are labelled, then usage becomes unknown. No weekly/token tracking, usage-limit increases or performance guarantees.
+SPOT SERVICE ISSUES FROM YOUR TOOLBAR
+🟠 An orange OUT badge draws attention to a reported incident affecting a product you watch. It takes priority over PEAK, helping you notice a service issue before assuming you have run out of quota.
+Open the popup for an Outage label, reported severity, affected products and a short incident message selected from the public status update. Longer messages can be scrolled within the popup.
+Choose which products to watch: Claude AI, Claude Code, Cowork or Design. Status comes from status.claude.com. If the status request fails, the popup shows Status unavailable with a retry control.
+PEAK and OUT badges blink while Chrome keeps the extension's background worker active. Chrome may pause the blinking when that worker sleeps. Badge alerts and the usage-circle color represent separate information.
 
-Account names (which may include emails), identifiers, readings and temporary Undo recovery are encrypted locally. Preferences may sync through Chrome. Capture temporarily processes copied Claude response streams to extract quota; chat content is not saved or uploaded. Organization labels use your existing signed-in Claude session; public availability comes from status.claude.com. No API key, ads, analytics or developer backend.
+ONE ACCOUNT OR SEVERAL? KEEP THEM IN VIEW
+• One account: a focused detail view with usage, reset timing and reading age.
+• Two or three accounts: slide between detailed account views using the arrows or left/right keyboard keys. Page dots show your position.
+• Four or more accounts: keep the Active account's detail view and move to a searchable table to compare remembered accounts. Open a row for its details, then return to your search and scroll position.
+Active means the account with the latest captured reading. Browsing a slide or row does not switch your Claude login or change Active.
+Account names come from Claude. When the account label is based on your signed-in email, ClaudeBuddy displays the username before the @ sign: alexmorgan@example.com appears as alexmorgan. Named organizations or workspaces keep their supplied name. If a name is temporarily unavailable, a shortened Account ID is shown instead.
 
-Requires Chrome 120 or later, access to claude.ai, and Claude returning a supported quota event. Some plans or site changes may not expose one. ClaudeBuddy is independent of Anthropic and is not an official Claude product.
+IDLE DOESN'T HAVE TO MEAN CONFUSING
+Before the first reading, the popup prompts you to send a message to see usage.
+After a captured reset passes, detail views briefly show ~0% estimated for up to three hours, then No recent reading. The last reset, last recorded usage and actual reading age remain available. Table estimates last only 15 minutes, then current usage is shown as unknown.
+🟢 A green toolbar circle is also the neutral state when a reading is missing or expired. It does not confirm zero usage or available quota. Send a message from that account for a fresh reading when Claude supplies one.
+
+MAKE IT YOURS
+Switch between light and dark themes and display times in your preferred timezone. Remembered accounts stay until you forget them or reset the extension. Forget another account with confirmation and a 2.5-second Undo; a later captured reading can add it again.
+
+PRIVATE BY DESIGN
+Account names, identifiers, readings and temporary Undo recovery are encrypted locally in your Chrome profile. Preferences may sync through Chrome. Response streams are processed locally to extract quota readings; conversation content is not saved or uploaded by ClaudeBuddy. No API key, ads, analytics or developer backend.
+
+HOW READINGS UPDATE
+Send a message on claude.ai to capture a reading when Claude returns a supported numeric five-hour quota event. Readings are observations, not continuous real-time monitoring. A passed reset time does not prove your current quota; estimates are explicitly labelled.
+Requires Chrome 120 or later and access to a signed-in Claude account. Some plans or changes to Claude may make readings unavailable. ClaudeBuddy does not track weekly usage or token totals, increase usage limits, automatically switch accounts or guarantee service availability.
+
+ClaudeBuddy is an independent extension and is not affiliated with or endorsed by Anthropic.
 
 ## Assets and URLs
 
 Required assets: [128px icon](../../images/store/icon-128.png), [usage](../../images/store/01-usage.png), [comparison](../../images/store/02-compare.png), [Forget/Undo](../../images/store/03-forget.png). The three screenshots are 1280 × 800 PNGs rendered from production UI with disposable sample readings. They include the selected brand logo. README screenshots show publisher-provided UI with a substituted sample Account name.
+
+Additional browser screenshots: [Chrome overview](../../images/store/04-browser-overview.jpg) and [Peak badge example](../../images/store/05-browser-peak.jpg), both 1280 × 800 opaque JPEGs. Based on a publisher-provided capture: the Account name is replaced with alexmorgan, bookmarks, New Tab shortcuts and the GitHub tab are removed, and the Peak variant illustrates a matching badge/popup state. These edited illustrations are not evidence of a new live reading or peak-hours observation.
 
 Optional final Store artwork: [marquee 1400 × 560](../../images/store/marquee_image.png), [Store tile 440 × 280](../../images/store/webstore_promo-tile.jpg). The coral crab identifies the brand; plain quota-color circles remain in the toolbar. Promotional videos are excluded from this release and repository.
 

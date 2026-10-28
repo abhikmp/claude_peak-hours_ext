@@ -1,8 +1,8 @@
 # ClaudeBuddy 1.0.0 release verification
 
-Candidate SHA-256: `b1b0f701be863b1da5dd95941d8c8a718495a85a14b2461a4e43a3ac81627cef`.
+Original publisher-tested candidate SHA-256: `b1b0f701be863b1da5dd95941d8c8a718495a85a14b2461a4e43a3ac81627cef`.
 
-The ZIP contains 30 explicitly allowlisted files. `python tools/build-release.py` writes the ZIP, per-file/source record and checksums to ignored `dist/`. Release artifacts belong in [GitHub Releases](https://github.com/abhikmp/claudebuddy-chrome-ext/releases); `release-identity.json` records the maintained candidate identity.
+The ZIP contains 30 explicitly allowlisted files. `python tools/build-release.py` writes the ZIP, per-file/source record and checksums to ignored `dist/`. Release artifacts belong in [GitHub Releases](https://github.com/abhikmp/claudebuddy-chrome-ext/releases); [release-identity.json](release-identity.json) preserves the original candidate identity. [store-submission-identity.json](store-submission-identity.json) separately records the title-only package prepared for Store submission.
 
 ## Automated evidence
 
@@ -20,6 +20,12 @@ On 27 October 2026 the publisher reported successful final live testing on the e
 
 Repository cleanup and moving build output to `dist/` must preserve the candidate ZIP checksum. A runtime-byte change requires a new identity and renewed affected validation. README screenshot account names use a sample identity; the original dimensions and pixels outside the name areas were preserved.
 
-## Limits
+## Title-only Store package — 28 October 2026
+
+At the publisher's request, only `manifest.json`'s `name` changed from `ClaudeBuddy` to `ClaudeBuddy – Usage & Peak Hours Tracker`. Version remains 1.0.0. The resulting ZIP SHA-256 is `57d6f423e589d00b295792c3a9705f37dcaf8407d945009dd3ee2c96af625fa6`. All other 29 packaged files are byte-identical to the original publisher-tested ZIP, and parsed manifest equality holds after removing only `name` from each. The package builder validates all 30 files, references, PNG dimensions and extracted JavaScript syntax. The full Node suite rerun for the repository synchronization passed **76 tests, 0 failures**; policy regeneration and both JPEG dimension/format checks also passed. No new signed-in browser QA is implied by the title-only change.
+
+The publisher subsequently reported the Store submission pending review. The exact uploaded digest, actual dashboard selections and item ID are not independently verified. The original GitHub prerelease, release tag and artifact identity remain unchanged. Cleaned browser screenshots use a sample Account name, omit bookmarks/shortcuts and the GitHub tab, and include an explicitly documented illustrated Peak state.
+
+## Remaining checks
 
 The [timezone report](../issues/timezone-offset.md) is deferred until after release by the publisher. It does not block 1.0.0. Store submission/approval/publication and installation under the actual new Store ID are separate from these checks; see the [launch checklist](launch-checklist.md). No Store publication follows merely from a source merge or GitHub Release.

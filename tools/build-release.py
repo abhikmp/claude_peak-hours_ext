@@ -36,7 +36,7 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     manifest = json.loads((ROOT / 'manifest.json').read_text())
     assert manifest['manifest_version'] == 3
-    assert manifest['name'] == 'ClaudeBuddy'
+    assert manifest['name'] == 'ClaudeBuddy \u2013 Usage & Peak Hours Tracker'
     assert len(manifest['name']) <= 75 and len(manifest['description']) <= 132
     assert re.fullmatch(r'\d+\.\d+\.\d+(?:\.\d+)?', manifest['version'])
     assert all(0 <= int(number) <= 65535 for number in manifest['version'].split('.'))

@@ -22,6 +22,8 @@ Use the exact ZIP/checksum from the current GitHub Release or a verified `dist/`
 
 ## Current candidate and post-publication checks
 
+The title-only Store package prepared later on 28 October has SHA-256 `57d6f423e589d00b295792c3a9705f37dcaf8407d945009dd3ee2c96af625fa6`; only the manifest name differs from the publisher-tested ZIP above. The publisher reports the Store submission is pending review. This does not establish a new signed-in QA run or independently verify the uploaded digest. See [submission identity](store-submission-identity.json) and [verification](verification.md).
+
 - [x] Publisher confirms the latest candidate passed real capture, Account switching and toolbar checks after the 27 October fixes.
 - [ ] Install the approved Store build under its actual new extension ID and verify capture, popup/preferences and toolbar. Record its Store URL/version/result in the launch checklist.
 

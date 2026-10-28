@@ -1,6 +1,6 @@
 # Ticket 06: repository migration and Store launch
 
-Status: ready-for-human. Updated 28 October 2026. The repository release phase is complete; Chrome Web Store work remains. Publication is complete only when the real Store outcome and installation check are recorded.
+Status: ready-for-human. Updated 28 October 2026. The publisher reports the new Chrome Web Store item is submitted and pending review. Approval, publication and the final Store installation check remain unverified. Publication is complete only when the real Store outcome and installation check are recorded.
 
 ## Verified preparation
 
@@ -23,10 +23,11 @@ Status: ready-for-human. Updated 28 October 2026. The repository release phase i
 
 Use [listing copy and final assets](store-listing.md), [data-use declarations](privacy-disclosure.md), [privacy policy](privacy-policy.md) and [reviewer instructions](reviewer-instructions.md).
 
-- [ ] Confirm publisher account/access requirements are complete.
-- [ ] Create a **new ClaudeBuddy item**, upload the verified ZIP, and enter the listing, assets, declarations, policy/support URLs, reviewer access and owner-selected visibility/regions. Keep the old Peak Hours item separate.
-- [ ] Submit for review and record its actual item ID/status. After approval, publish at the publisher's chosen time.
+- [x] Publisher reports dashboard access and submission complete on 28 October 2026.
+- [x] Publisher reports the **new ClaudeBuddy item** submitted with title **ClaudeBuddy – Usage & Peak Hours Tracker**. The prepared title-only ZIP SHA-256 is `57d6f423e589d00b295792c3a9705f37dcaf8407d945009dd3ee2c96af625fa6`; see [submission identity](store-submission-identity.json). The actual uploaded package digest, final dashboard fields and selected images have not been independently inspected. Keep the old Peak Hours item separate.
+- [x] Publisher reports **pending review** on 28 October 2026. This is a publisher report, not a dashboard/API verification.
+- [ ] Record the actual new Store item ID/URL and review outcome. After approval, publish at the publisher's chosen time.
 - [ ] Install the approved Store build under its new ID; verify capture, popup/preferences and toolbar. Record the Store URL/version/result without Account details.
 - [ ] Decide and carry out communication to existing Peak Hours users, and record whether the legacy listing remains published. GitHub migration and a new item do not transfer installed users or saved readings.
 
-Browser automation stopped during the prior attempt because it could not reliably determine Chrome's current URL for safety checks. No Store transaction was completed. Use a supported browser session or publisher-run steps for the remaining dashboard work. The original local ticket/history remains in ignored `.scratch/account-overview/`.
+The publisher chose to handle Store submission personally and later reported it pending review. The agent did not complete any Store transaction. GitHub source/documentation updates do not replace the submitted Store package. The original local ticket/history remains in ignored `.scratch/account-overview/`.
