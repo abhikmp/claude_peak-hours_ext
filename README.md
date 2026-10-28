@@ -4,6 +4,8 @@ Usage, peak hours & outage status for Claude. Independent of Anthropic.
 
 [Project](https://github.com/abhikmp/claudebuddy-chrome-ext) · [Support / report an issue](https://github.com/abhikmp/claudebuddy-chrome-ext/issues) · [Legacy Peak Hours source](https://github.com/abhikmp/claudebuddy-chrome-ext/tree/legacy)
 
+[Download the 1.0.0 candidate](https://github.com/abhikmp/claudebuddy-chrome-ext/releases/tag/claudebuddy-v1.0.0-rc.1) · [Public privacy policy](https://abhikmp.github.io/claudebuddy-chrome-ext/privacy-policy.html)
+
 - Capture a five-hour Usage reading after sending a message on claude.ai. Readings are observations, not continuously live quota; weekly/token totals are not tracked.
 - Compare one to three Accounts through detail slides. Four or more use Active detail and a searchable, internally scrolling table, within 260 × 340px.
 - See actual reading age and captured reset times. After reset, table estimates last 15 minutes and detail estimates three hours, then usage is unknown. Estimates never become observations.
