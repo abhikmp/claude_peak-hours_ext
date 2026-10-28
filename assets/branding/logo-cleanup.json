@@ -1,0 +1,8 @@
+{
+  "tool": "Built-in image_gen",
+  "date": "2026-10-27",
+  "originalSourceRevision": "baf8c36",
+  "prompt": "Use case: precise-object-edit. Edit this exact ClaudeBuddy logo image. Remove ONLY the small pale gray four-point Gemini sparkle/logo near the bottom-right corner. Seamlessly fill that tiny area with the same surrounding dark slate background texture and shading. Preserve the crab exactly: its placement, proportions, rounded paper-cut body, coral colors, face, eyes, catchlights, smile, cheeks, claws, legs, layered texture, lighting and shadows. Preserve the entire square composition, framing, original background and generous empty margins. Do not redesign, crop, zoom, recenter, add text, change colors, flatten layers, or introduce any new mark. Final result is the same logo image with the bottom-right sparkle absent. Keep square 2048 by 2048 composition.",
+  "source": "Historical generated source preserved at Git commit e79f3f6: assets/branding/logo-cleanup-source.png",
+  "export": "assets/branding/claudebuddy-crab.png"
+}

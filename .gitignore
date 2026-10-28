@@ -1,1 +1,31 @@
+# Local working notes, previews, and generated release artifacts.
+.scratch/
+dist/
+output/
+test/
+__pycache__/
+*.pyc
+
+# Store working copies and intermediate artwork; maintained exports live in images/store.
 images/webstore_images/
+images/promo_tile/
+images/screenshots/*
+!images/screenshots/usage-79-percent.png
+!images/screenshots/usage-86-percent.png
+!images/screenshots/no-recent-reading.png
+assets/branding/*
+!assets/branding/claudebuddy-crab.png
+!assets/branding/README.md
+!assets/branding/logo-cleanup.json
+
+# Retired promotional-video workflow and redundant local context.
+docs/marketing/
+docs/ClaudeBuddy-Promo-Agent-Prompt.md
+docs/ClaudeBuddy-App-Context.md
+tools/render-promo-teaser.py
+project-context.md
+*.mp4
+*.mov
+*.webm
+*.avi
+*.wav

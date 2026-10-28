@@ -18,30 +18,61 @@ function toLocalTimeStr(isoStr, tz) {
   }).format(new Date(isoStr));
 }
 
-// Maps incidentImpact strings from the API to short 2-word display labels
-function impactToLabel(impact) {
-  if (!impact || impact === 'none') return 'All Clear';
-  if (impact === 'critical') return 'Major Outage';
-  if (impact === 'major') return 'Major Outage';
-  if (impact === 'minor') return 'Partial Outage';
-  // Capitalise unknown values as a fallback
-  return impact.charAt(0).toUpperCase() + impact.slice(1);
+// Aside text for outage — severity + affected products
+function impactToAside(impact, affectedProducts) {
+  const severity = (impact === 'critical' || impact === 'major') ? 'Major' : 'Partial';
+  const products = affectedProducts?.length
+    ? affectedProducts.map(p => ({ ai: 'Claude AI', code: 'Claude Code', cowork: 'Cowork', design: 'Design' }[p] ?? p)).join(', ')
+    : '';
+  return products ? `${severity} · ${products}` : severity;
+}
+
+// Builds the aside text for the off-peak green state.
+// today / tomorrow / day-name, with <1hr countdown prefix.
+function formatNextPeakAside(nextPeakAt, tz) {
+  if (!nextPeakAt) return '';
+
+  const peakDate = new Date(nextPeakAt);
+  const msUntil  = peakDate - Date.now();
+
+  // Clock time in user's TZ, e.g. "5:00 AM"
+  const clockTime = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric', minute: '2-digit', hour12: true, timeZone: tz
+  }).format(peakDate);
+
+  // Day label: today / tomorrow / Wed …
+  const userTZ     = tz ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const todayStr   = new Intl.DateTimeFormat('en-CA', { timeZone: userTZ }).format(new Date());
+  const peakStr    = new Intl.DateTimeFormat('en-CA', { timeZone: userTZ }).format(peakDate);
+  const tomorrow   = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = new Intl.DateTimeFormat('en-CA', { timeZone: userTZ }).format(tomorrow);
+
+  let dayLabel;
+  if (peakStr === todayStr) {
+    dayLabel = 'today';
+  } else if (peakStr === tomorrowStr) {
+    dayLabel = 'tomorrow';
+  } else {
+    dayLabel = new Intl.DateTimeFormat('en-US', { weekday: 'short', timeZone: userTZ }).format(peakDate);
+  }
+
+  if (msUntil > 0 && msUntil < 60 * 60 * 1000) {
+    // < 1 hr: show countdown + anchor
+    return `Next peak in ${formatDuration(msUntil)} · ${dayLabel} ${clockTime}`;
+  }
+  return `Next peak · ${dayLabel} ${clockTime}`;
 }
 
 // Pick the single best ticker message from available incident data.
-// Priority: watched-product issue → major model issue → generic elevated error → null
 function pickTickerText(local, watched) {
   const title = local.incidentTitle ?? '';
   const body = local.incidentBody ?? '';
-
   if (!title) return null;
 
-  // Gather candidate strings (title + body lines)
   const rawCandidates = [title];
-  // body often has multiple sentences; split on ". " to get individual lines
   body.split(/\.\s+/).forEach(s => { if (s.trim()) rawCandidates.push(s.trim()); });
 
-  // Deduplicate: normalise whitespace + lowercase comparison
   const seen = new Set();
   const candidates = rawCandidates.filter(s => {
     const key = s.toLowerCase().replace(/\s+/g, ' ').replace(/[.,!?]$/, '');
@@ -50,7 +81,6 @@ function pickTickerText(local, watched) {
     return true;
   });
 
-  // Product name patterns for matching
   const PRODUCT_KEYWORDS = {
     ai: ['claude.ai', 'claude ai', 'logging in', 'login', 'web'],
     code: ['claude code', 'api'],
@@ -59,137 +89,190 @@ function pickTickerText(local, watched) {
   };
   const MODEL_WORDS = ['sonnet', 'opus', 'haiku', 'mythos', 'fable', 'model'];
 
-  // Score each candidate
   function score(text) {
     const lower = text.toLowerCase();
-    // Tier 1: matches a watched product
     for (const p of watched) {
       const kws = PRODUCT_KEYWORDS[p] ?? [];
       if (kws.some(kw => lower.includes(kw))) return 3;
     }
-    // Tier 2: mentions a model name
     if (MODEL_WORDS.some(m => lower.includes(m))) return 2;
-    // Tier 3: any other incident text
     return 1;
   }
 
-  // Sort by score descending, pick the best
   candidates.sort((a, b) => score(b) - score(a));
   const best = candidates[0];
-
-  // Trim to a reasonable length
   return best && best.length > 120 ? best.slice(0, 117) + '…' : (best || null);
 }
 
+function formatReadingAge(ageMs) {
+  return ageMs < 60000 ? 'Updated just now'
+    : `Updated ${formatDuration(Math.floor(ageMs / 60000) * 60000)} ago`;
+}
+
+function formatLastReset(resetsAt) {
+  const minutes = Math.max(0, Math.floor((Date.now() - resetsAt * 1000) / 60000));
+  return minutes < 1 ? 'just now' : minutes < 60 ? `${minutes}m ago`
+    : minutes < 1440 ? `${Math.floor(minutes / 60)}h ago` : `${Math.floor(minutes / 1440)}d ago`;
+}
+
+function formatExactReset(resetsAt, tz) {
+  return new Intl.DateTimeFormat('en-GB', {
+    dateStyle: 'full', timeStyle: 'short', timeZone: tz
+  }).format(new Date(resetsAt * 1000)) + ` (${tz})`;
+}
+
+function observedUsageText(account) {
+  return `Last observed: ${Math.round(account.lastObservedPercent)}%. Send a message from this Account for a new reading.`;
+}
+
+function renderDormantUsage(element, account) {
+  const estimated = Date.now() < account.resetsAt * 1000 + 3 * 60 * 60 * 1000;
+  element.classList.toggle('estimated', estimated);
+  element.textContent = estimated ? '~0% ' : 'No recent reading';
+  if (estimated) {
+    const label = document.createElement('span');
+    label.className = 'usage-estimate-label';
+    label.textContent = 'estimated';
+    element.append(label);
+  }
+  const context = estimated
+    ? 'Estimated for three hours after the observed 5-hour quota reset; current usage has not been observed. '
+    : 'The observed 5-hour quota period ended; current usage has not been observed. ';
+  element.title = context + formatReadingAge(account.ageMs) + '. ' + observedUsageText(account);
+  element.setAttribute('aria-description', element.title);
+  element.tabIndex = 0;
+}
+
+function renderUsageFacts(element, account, tz) {
+  element.hidden = !account?.isExpired;
+  element.replaceChildren();
+  if (element.hidden) return;
+  element.innerHTML = `
+    <dt title="Reset time from the last captured reading">Last reset</dt><dd><time></time></dd>
+    <dt>Last recorded usage</dt><dd class="usage-last-recorded"></dd>
+    <dt>Updated</dt><dd class="usage-reading-age"></dd>`;
+  const reset = new Date(account.resetsAt * 1000);
+  const time = element.querySelector('time');
+  time.dateTime = reset.toISOString();
+  time.textContent = formatLastReset(account.resetsAt);
+  time.title = formatExactReset(account.resetsAt, tz);
+  element.querySelector('.usage-last-recorded').textContent = `${Math.round(account.lastObservedPercent)}%`;
+  element.querySelector('.usage-reading-age').textContent = formatReadingAge(account.ageMs).replace(/^Updated /, '');
+}
+
+// ── Render status pill ──
+function renderPill(state, local, watched, tz) {
+  const pill        = document.getElementById('status-pill');
+  const pillText    = document.getElementById('pill-text');
+  const pillAside   = document.getElementById('pill-aside');
+  const incidentSub = document.getElementById('incident-sub');
+  const retryBtn    = document.getElementById('retry-btn');
+
+  pill.className = 'pill';
+  incidentSub.hidden = true;
+  retryBtn.hidden = true;
+  pillAside.hidden = true;
+  pillAside.textContent = '';
+
+  if (state === 'orange') {
+    pill.classList.add('orange');
+    pillText.textContent = 'Outage';
+    const aside = impactToAside(local.incidentImpact, local.affectedProducts);
+    if (aside) {
+      pillAside.textContent = aside;
+      pillAside.hidden = false;
+    }
+    const ticker = pickTickerText(local, watched);
+    if (ticker) {
+      incidentSub.textContent = ticker;
+      incidentSub.hidden = false;
+    }
+  } else if (state === 'red') {
+    pill.classList.add('red');
+    pillText.textContent = 'Peak';
+    if (local.peakEndsAt) {
+      const ms = new Date(local.peakEndsAt) - Date.now();
+      pillAside.textContent = `Ends in ${formatDuration(ms)} · today ${
+        new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: tz }).format(new Date(local.peakEndsAt))
+      }`;
+      pillAside.hidden = false;
+    }
+  } else if (state === 'green') {
+    pill.classList.add('green');
+    pillText.textContent = 'Off peak';
+    const aside = formatNextPeakAside(local.nextPeakAt, tz);
+    if (aside) {
+      pillAside.textContent = aside;
+      pillAside.hidden = false;
+    }
+  } else {
+    // Grey — fetch failure
+    pillText.textContent = 'Status unavailable';
+    retryBtn.hidden = false;
+  }
+}
+
+// ── Main render ──
+let renderRevision = 0;
+const accountStorage = AccountStorage.create(chrome.storage.local);
 async function render() {
+  const revision = ++renderRevision;
   const [local, sync] = await Promise.all([
-    chrome.storage.local.get([
+    accountStorage.get([
       'state', 'fetchError', 'statusDescription', 'incidentTitle', 'incidentBody',
       'nextPeakAt', 'peakEndsAt', 'lastChecked', 'affectedProducts',
-      'watchedAffected', 'incidentImpact'
+      'watchedAffected', 'incidentImpact',
+      'accounts', 'accountUndo'
     ]),
     chrome.storage.sync.get(['userTZ', 'watchedProducts'])
   ]);
+  if (revision !== renderRevision) return;
 
   const state = local.state ?? 'grey';
   const tz = sync.userTZ ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
   const VALID_PRODUCTS = new Set(['ai', 'code', 'cowork', 'design']);
-  const watched = (sync.watchedProducts ?? ['ai', 'code', 'cowork', 'design'])
-    .filter(p => VALID_PRODUCTS.has(p));
+  const watched = (sync.watchedProducts ?? ['ai']).filter(p => VALID_PRODUCTS.has(p));
 
-  // ── Circle color ──
-  const circle = document.getElementById('circle');
-  circle.className = `circle ${state}`;
+  // ── Usage hero ──
+  const now = Date.now();
+  const accounts = local.accounts ?? {};
+  const orderedAccounts = Accounts.getAccounts(accounts, now);
+  const hasAccounts = AccountPages.render(orderedAccounts, tz);
+  AccountActions.render(orderedAccounts, local.accountUndo);
+  document.querySelector('.usage-hero').hidden = hasAccounts;
 
-  // ── Box 1: short 2-word status label ──
-  const label = document.getElementById('status-label');
-  const sub = document.getElementById('status-sub');
-  const retryBtn = document.getElementById('retry-btn');
-
-  if (state === 'green') {
-    label.textContent = 'All Clear';
-    retryBtn.hidden = true;
-    const next = local.nextPeakAt;
-    if (next) {
-      const ms = new Date(next) - Date.now();
-      const localTime = toLocalTimeStr(next, tz);
-      sub.textContent = `Peak starts in ${formatDuration(ms)} (${localTime} your time)`;
-    } else {
-      sub.textContent = '';
-    }
-  } else if (state === 'red') {
-    label.textContent = 'Peak Hours';
-    retryBtn.hidden = true;
-    const ends = local.peakEndsAt;
-    if (ends) {
-      const ms = new Date(ends) - Date.now();
-      const localTime = toLocalTimeStr(ends, tz);
-      sub.textContent = `Ends in ${formatDuration(ms)} (${localTime} your time)`;
-    } else {
-      sub.textContent = 'Use with caution';
-    }
-  } else if (state === 'orange') {
-    // Use the actual impact level from the API to show e.g. "Partial Outage" or "Major Outage"
-    label.textContent = impactToLabel(local.incidentImpact);
-    retryBtn.hidden = true;
-    const affected = local.affectedProducts ?? [];
-    const PRODUCT_LABELS = { ai: 'AI', code: 'Code', cowork: 'Cowork', design: 'Design' };
-    const productStr = affected.map(p => PRODUCT_LABELS[p] ?? p).join(', ');
-    sub.textContent = productStr ? `Affects: Claude ${productStr}` : 'Check status page';
-  } else {
-    // Grey — fetch failure
-    label.textContent = 'Status Unavailable';
-    retryBtn.hidden = false;
-    sub.textContent = 'Will retry automatically in ~5 min';
-  }
-
-  // ── Box 2: always-visible ticker ──
-  const incidentBox = document.getElementById('incident-box');
-  const track = document.getElementById('ticker-track');
-
-  if (state === 'grey') {
-    // Show the fetch error message — static, no scroll needed (it's short)
-    incidentBox.classList.add('has-issue');
-    track.className = 'ticker-track no-issue';
-    track.style.animationDuration = '';
-    track.style.color = '#b45309'; // amber tone for error, distinct from incident orange
-    track.textContent = local.fetchError ?? 'Failed to reach status.claude.com';
-  } else {
-    track.style.color = ''; // reset any error colour override
-    const hasIssue = !!(local.incidentTitle);
-    const tickerText = hasIssue ? pickTickerText(local, watched) : null;
-
-    if (tickerText) {
-      incidentBox.classList.add('has-issue');
-      track.className = 'ticker-track'; // scrolling mode
-      // Duplicate text so the scroll loops seamlessly
-      track.textContent = tickerText + '   ·   ' + tickerText;
-      // Adjust speed: ~60px/s feels natural; longer text = longer animation
-      const approxPx = tickerText.length * 6.5;
-      track.style.animationDuration = Math.max(10, approxPx / 40) + 's';
-    } else {
-      incidentBox.classList.remove('has-issue');
-      track.className = 'ticker-track no-issue';
-      track.style.animationDuration = '';
-      track.textContent = 'No active issues';
-    }
-  }
+  // ── Status pill ──
+  renderPill(state, local, watched, tz);
 
   // ── Footer timezone label ──
   document.getElementById('tz-label').textContent = tz;
-  document.getElementById('tz-search').placeholder = 'Set custom timezone';
 }
 
-// ── Retry button (grey / fetch-failure state only) ──
+// ── Theme toggle ──
+// Persists preference to chrome.storage.sync so it survives popup close/reopen.
 
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+}
+
+async function initTheme() {
+  const sync = await chrome.storage.sync.get('theme');
+  applyTheme(sync.theme ?? 'dark');
+}
+
+document.getElementById('theme-toggle').addEventListener('click', async () => {
+  const current = document.documentElement.getAttribute('data-theme') ?? 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  await chrome.storage.sync.set({ theme: next });
+});
+
+// ── Retry button (grey state — icon only, spins while retrying) ──
 document.getElementById('retry-btn').addEventListener('click', async () => {
   const btn = document.getElementById('retry-btn');
-  btn.textContent = '↺ Retrying…';
   btn.disabled = true;
-  chrome.runtime.sendMessage({ type: 'POLL_NOW' }).catch(() => { });
-  // Give the service worker time to fetch and write state, then re-render
+  chrome.runtime.sendMessage({ type: 'POLL_NOW' }).catch(() => {});
   setTimeout(async () => {
-    btn.textContent = '↺ Retry';
     btn.disabled = false;
     await render();
   }, 2500);
@@ -205,7 +288,7 @@ async function loadTimezones() {
     allTimezones = await res.json();
   } catch {
     allTimezones = [];
-    console.warn('Claude Status: failed to load timezones.json');
+    console.warn('ClaudeBuddy: failed to load timezones.json');
   }
 }
 
@@ -219,32 +302,49 @@ function renderTZList(filter = '') {
   list.innerHTML = '';
   matches.forEach(tz => {
     const li = document.createElement('li');
-    li.textContent = tz;
-    li.addEventListener('click', async () => {
+    const option = document.createElement('button');
+    option.type = 'button';
+    option.textContent = tz;
+    option.addEventListener('click', async () => {
       await chrome.storage.sync.set({ userTZ: tz });
       document.getElementById('tz-list').hidden = true;
       document.getElementById('tz-search').value = '';
       await render();
     });
+    li.append(option);
     list.appendChild(li);
   });
 }
 
+// Reset button — resets timezone, watched products, theme, and usage to defaults
 document.getElementById('tz-reset-btn').addEventListener('click', async () => {
   const systemTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  await chrome.storage.sync.set({ userTZ: systemTZ });
+  await chrome.storage.sync.set({
+    userTZ: systemTZ,
+    watchedProducts: ['ai'],
+    theme: 'dark'
+  });
+  applyTheme('dark');
+  PRODUCT_IDS.forEach(id => {
+    const cb = document.getElementById(`pf-${id}`);
+    if (cb) cb.checked = (id === 'ai');
+  });
+  updateCheckboxConstraints();
+
+  await AccountActions.mutate({ action: 'clear' });
+
+  chrome.runtime.sendMessage({ type: 'POLL_NOW' }).catch(() => {});
   document.getElementById('tz-list').hidden = true;
   document.getElementById('tz-search').value = '';
   await render();
 });
 
 async function openTZList() {
-  const list = document.getElementById('tz-list');
   const search = document.getElementById('tz-search');
   search.value = '';
   if (allTimezones.length === 0) await loadTimezones();
   renderTZList('');
-  list.hidden = false;
+  document.getElementById('tz-list').hidden = false;
 }
 
 document.getElementById('tz-search').addEventListener('focus', openTZList);
@@ -253,7 +353,6 @@ document.getElementById('tz-search').addEventListener('input', (e) => {
   renderTZList(e.target.value);
 });
 
-// Close list when clicking outside the picker
 document.addEventListener('click', (e) => {
   const picker = document.querySelector('.tz-picker');
   if (!picker.contains(e.target)) {
@@ -266,8 +365,6 @@ document.addEventListener('click', (e) => {
 
 const PRODUCT_IDS = ['ai', 'code', 'cowork', 'design'];
 
-// Disable the sole remaining checked checkbox so the user can't uncheck it.
-// All others stay enabled normally. Re-enables everything once 2+ are checked.
 function updateCheckboxConstraints() {
   const checked = PRODUCT_IDS.filter(id => document.getElementById(`pf-${id}`)?.checked);
   const isLastOne = checked.length === 1;
@@ -276,8 +373,8 @@ function updateCheckboxConstraints() {
     if (!cb) return;
     const locked = isLastOne && cb.checked;
     cb.disabled = locked;
-    const label = cb.closest('label');
-    if (label) label.style.opacity = locked ? '0.45' : '';
+    const lbl = cb.closest('label');
+    if (lbl) lbl.style.opacity = locked ? '0.45' : '';
   });
   const hint = document.getElementById('product-filter-hint');
   if (hint) hint.hidden = !isLastOne;
@@ -285,7 +382,7 @@ function updateCheckboxConstraints() {
 
 async function initProductFilter() {
   const sync = await chrome.storage.sync.get('watchedProducts');
-  const watched = (sync.watchedProducts ?? PRODUCT_IDS).filter(p => PRODUCT_IDS.includes(p));
+  const watched = (sync.watchedProducts ?? ['ai']).filter(p => PRODUCT_IDS.includes(p));
   PRODUCT_IDS.forEach(id => {
     const cb = document.getElementById(`pf-${id}`);
     if (cb) cb.checked = watched.includes(id);
@@ -300,9 +397,7 @@ async function saveProductFilter() {
     return cb?.checked;
   });
   await chrome.storage.sync.set({ watchedProducts: watched });
-  // Re-evaluate state immediately with the new filter — don't wait for the next 5-min alarm
-  chrome.runtime.sendMessage({ type: 'POLL_NOW' }).catch(() => { });
-  // Give the service worker a moment to write new state, then re-render the popup
+  chrome.runtime.sendMessage({ type: 'POLL_NOW' }).catch(() => {});
   setTimeout(render, 400);
 }
 
@@ -311,6 +406,17 @@ PRODUCT_IDS.forEach(id => {
   if (cb) cb.addEventListener('change', saveProductFilter);
 });
 
-// Init
-render();
-initProductFilter();
+// ── Init ──
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && (changes.accounts || changes.accountUndo)) render();
+});
+async function initAccounts() {
+  await AccountActions.mutate({ action: 'getUndo' }).catch(() => {});
+  await render();
+  await initProductFilter();
+  // Age and expiry also change while an otherwise idle popup stays open.
+  setInterval(render, 30000);
+}
+
+// Apply theme before render to avoid a flash of wrong theme
+initTheme().then(initAccounts);

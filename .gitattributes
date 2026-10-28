@@ -1,0 +1,11 @@
+# Preserve the exact runtime bytes used by the publisher-tested release ZIP.
+manifest.json -text
+background/** -text
+content/** -text
+popup/** -text
+shared/** -text
+data/** -text
+docs/privacy-policy.html text eol=lf
+*.png binary
+*.jpg binary
+*.gif binary
