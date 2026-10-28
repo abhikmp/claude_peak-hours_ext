@@ -4,7 +4,9 @@ Usage, peak hours & outage status for Claude. Independent of Anthropic.
 
 [Project](https://github.com/abhikmp/claudebuddy-chrome-ext) · [Support / report an issue](https://github.com/abhikmp/claudebuddy-chrome-ext/issues) · [Legacy Peak Hours source](https://github.com/abhikmp/claudebuddy-chrome-ext/tree/legacy)
 
-[Download the 1.0.0 candidate](https://github.com/abhikmp/claudebuddy-chrome-ext/releases/tag/claudebuddy-v1.0.0-rc.1) · [Public privacy policy](https://abhikmp.github.io/claudebuddy-chrome-ext/privacy-policy.html)
+[Original 1.0.0 candidate](https://github.com/abhikmp/claudebuddy-chrome-ext/releases/tag/claudebuddy-v1.0.0-rc.1) · [Public privacy policy](https://abhikmp.github.io/claudebuddy-chrome-ext/privacy-policy.html)
+
+The publisher reports the new Chrome Web Store submission is pending review as of 28 October 2026, with the title **ClaudeBuddy – Usage & Peak Hours Tracker**. The title-only package differs from the original GitHub candidate only in the manifest name; see [package verification](docs/release/verification.md) and [launch status](docs/release/launch-checklist.md). Store approval and publication are not yet confirmed.
 
 - Capture a five-hour Usage reading after sending a message on claude.ai. Readings are observations, not continuously live quota; weekly/token totals are not tracked.
 - Compare one to three Accounts through detail slides. Four or more use Active detail and a searchable, internally scrolling table, within 260 × 340px.

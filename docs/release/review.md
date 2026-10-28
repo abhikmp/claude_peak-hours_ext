@@ -15,3 +15,17 @@ Recheck: **no remaining actionable Standards findings**. Applicable sources were
 Unfinished remote/Store actions are tracked separately in the launch checklist. This review does not certify submission, approval or publication. The immutable source/package identity record is added after committing the reviewed runtime, so it can point to a real source commit.
 
 Final result: Standards **0 unresolved findings**; Spec **0 actionable findings**.
+
+## Store submission synchronization — 28 October 2026
+
+Fixed baseline: `7608c4019dd4092b62fc660c30ddc7b3f3438910`; reviewed through `845cb97`. Independent Standards and Spec reviewers inspected the submitted-title, listing/assets and separate package-identity changes before push.
+
+### Standards
+
+**No actionable findings.** Final Store assets and maintained documentation stay tracked while generated ZIPs and working notes stay ignored. The original release identity is unchanged, and the separate submission record points to a real source commit whose runtime hashes match the record. Publisher-reported pending review is distinguished from independently verified evidence. Screenshot edits and the illustrated Peak state are documented. No applicable baseline code smell warrants a finding.
+
+### Spec
+
+**No actionable findings.** The diff matches the approved title, builder validation, expanded listing, two cleaned Store-sized browser screenshots, corrected privacy recommendations and publisher-reported review status. All 30 package hashes match the immutable source and prepared ZIP. The longer “for Claude” title, extension behavior and timezone code are unchanged. Approval, publication, uploaded digest and Store item ID remain unverified. No scope creep identified.
+
+Result: Standards **0 findings**; Spec **0 findings**. Verification: 76 passing Node tests, exact title-only ZIP comparison, build/source/extraction checks, policy regeneration, maintained links and JPEG format/dimension checks.
