@@ -22,4 +22,4 @@ Automatic deletion removes infrequently used Accounts precisely when users want 
 
 ## Scope and reference
 
-Individual forgetting remains limited to non-Active Accounts. Latest-reading Active and local-only retention remain. Ticket 05 adds authenticated encryption and trusted-context storage access without changing these semantics. See [approved spec](../../.scratch/account-overview/spec.md) and [implemented design](../../design.md). Bug #08 was fixed and reporter-verified on 2026-10-23; final signed-in package checks belong to ticket 06.
+Individual forgetting remains limited to non-Active Accounts. Latest-reading Active and local-only retention remain. The release adds authenticated encryption and trusted-context storage access without changing these semantics. See the [implemented design](../../design.md) and [release verification](../release/verification.md). The third-Account capture bug was fixed and reporter-verified on 2026-10-23; publication work is tracked in the [launch checklist](../release/launch-checklist.md).

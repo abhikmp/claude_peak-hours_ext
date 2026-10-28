@@ -33,4 +33,4 @@ Affirm the three dashboard certifications for this build: no sale/unrelated tran
 
 Limited Use: ClaudeBuddy's use of user information adheres to the Chrome Web Store User Data Policy, including the Limited Use requirements.
 
-Policy hosting, verified public URL and publisher/contact confirmation belong to [ticket 06](../../.scratch/account-overview/issues/06-manual-repository-migration-and-store-launch.md). Keep the legacy policy separate.
+The owner confirmed all publisher/contact decisions complete on 27 October 2026. Project: [claudebuddy-chrome-ext](https://github.com/abhikmp/claudebuddy-chrome-ext). Support: [GitHub Issues](https://github.com/abhikmp/claudebuddy-chrome-ext/issues). Policy hosting, final public URL verification and dashboard updates are tracked in the [launch checklist](launch-checklist.md). Keep the legacy policy separate.

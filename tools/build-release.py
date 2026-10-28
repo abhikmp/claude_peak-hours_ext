@@ -7,7 +7,7 @@ import subprocess
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / '.scratch/account-overview/05-release'
+OUT = ROOT / 'dist'
 FILES = '''manifest.json
 background/service-worker.js
 content/connect-usage.js
@@ -81,9 +81,14 @@ def main():
         if file.endswith('.js'):
             subprocess.run(['node', '--check', str(extracted / file)], check=True, capture_output=True)
     hashes = {file: sha(data) for file, data in sorted(content.items())}
+    # HEAD is a base revision when packaging reviewed, uncommitted repairs.
+    # Record that distinction explicitly; per-file hashes identify exact bytes.
+    changes = subprocess.check_output(['git', 'status', '--porcelain', '--', *FILES], cwd=ROOT, text=True).splitlines()
     record = {
         'package': archive.name, 'version': manifest['version'], 'sha256': sha(archive.read_bytes()),
         'sourceRevision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+        'sourceState': 'working-tree' if changes else 'commit',
+        'runtimeChanges': changes,
         'runtimeSha256': sha(json.dumps(hashes, sort_keys=True).encode()), 'files': hashes,
         'checks': f'{len(FILES)} allowlisted files; source/ZIP/extraction equality; manifest paths/metadata; PNG dimensions; extracted JS syntax'
     }

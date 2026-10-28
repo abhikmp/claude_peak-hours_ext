@@ -36,4 +36,4 @@ Reset to default clears all Accounts/recovery and restores default preferences. 
 
 ClaudeBuddy's use of user information adheres to the Chrome Web Store User Data Policy, including the Limited Use requirements.
 
-For privacy questions, use the publisher contact or Support hub on ClaudeBuddy's Chrome Web Store listing. Do not send passwords, cookies or chat transcripts. Policy changes will be published with an updated effective date.
+For privacy questions, use the publisher contact on ClaudeBuddy's Chrome Web Store listing or the [ClaudeBuddy support tracker](https://github.com/abhikmp/claudebuddy-chrome-ext/issues). The [source repository](https://github.com/abhikmp/claudebuddy-chrome-ext) contains the maintained project. Do not send passwords, cookies or chat transcripts. Policy changes will be published with an updated effective date.

@@ -11,19 +11,24 @@
 (function () {
   const Accounts = (() => {
     const STALE_AFTER_MS = 10 * 60 * 1000;
+    const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const isAccountId = value => typeof value === 'string' && UUID.test(value);
+    // Unix seconds, including fractions. Bound by Date's supported range rather
+    // than the current clock so historical observations remain usable.
+    const isResetTimestamp = value => value === null ||
+      (Number.isFinite(value) && value >= 0 && value <= 8640000000000);
 
     function extractAccountId(url, organizationId) {
-      if (typeof url !== 'string') return null;
+      if (typeof url !== 'string' || url.length > 4096) return null;
       try {
         const { origin, pathname } = new URL(url, 'https://claude.ai');
-        if (origin === 'https://claude.ai' && pathname ===
+        if (origin !== 'https://claude.ai') return null;
+        if (pathname ===
             '/claudeai-rpc/anthropic.bard.api.v1alpha.ConversationService/StreamTimeline') {
-          return typeof organizationId === 'string' &&
-            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(organizationId)
-            ? organizationId.toLowerCase() : null;
+          return isAccountId(organizationId) ? organizationId.toLowerCase() : null;
         }
         const match = pathname.match(/^\/api\/organizations\/([^/]+)\/.+\/completion$/);
-        return match ? match[1] : null;
+        return match && isAccountId(match[1]) ? match[1].toLowerCase() : null;
       } catch (_) {
         return null;
       }
@@ -51,7 +56,10 @@
         .sort((a, b) => b[1].lastReadingAt - a[1].lastReadingAt
           || (b[1].readingOrder ?? 0) - (a[1].readingOrder ?? 0))
         .map(([accountId, account], index) => {
-          const isExpired = account.resetsAt !== null && now >= account.resetsAt * 1000;
+          // Keep malformed legacy observations remembered; only their display
+          // reset becomes unknown. Reading the popup never rewrites raw data.
+          const resetsAt = isResetTimestamp(account.resetsAt) ? account.resetsAt : null;
+          const isExpired = resetsAt !== null && now >= resetsAt * 1000;
           const ageMs = Math.max(0, now - account.lastReadingAt);
           return {
             accountId,
@@ -59,7 +67,7 @@
             label: account.label ?? `Account ${accountId.slice(0, 6)}…`,
             percent: isExpired ? null : account.percent,
             lastObservedPercent: account.percent,
-            resetsAt: account.resetsAt,
+            resetsAt,
             lastReadingAt: account.lastReadingAt,
             isActive: index === 0,
             isExpired,
@@ -121,7 +129,7 @@
       return active.percent <= 85 ? 'orange' : 'red';
     }
 
-    return { extractAccountId, applyReading, applyLabel, getAccounts, isRecentReset, orderComparisonAccounts, clearAccounts, forgetAccount, restoreAccount, getIconColor };
+    return { isAccountId, isResetTimestamp, extractAccountId, applyReading, applyLabel, getAccounts, isRecentReset, orderComparisonAccounts, clearAccounts, forgetAccount, restoreAccount, getIconColor };
   })();
 
   if (typeof module !== 'undefined' && module.exports) {

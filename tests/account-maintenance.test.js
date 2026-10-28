@@ -57,7 +57,7 @@ test('the 30-second alarm retains Accounts and their labels beyond 48 hours with
   assert.deepEqual(worker.accounts().map(account => account.accountId), [KEPT, OLD]);
   assert.deepEqual(worker.local().accounts, accounts);
   assert.equal(worker.writes(), 0);
-  assert.deepEqual(Object.values(worker.iconPaths()), [16, 32, 48, 128].map(size => `icons/usage-red-${size}.png`));
+  assert.deepEqual(Object.values(worker.iconPaths()), [16, 32, 48, 128].map(size => `/icons/usage-red-${size}.png`));
   assert.equal(worker.local().state, 'orange');
   assert.equal(worker.local().incidentTitle, 'Existing incident');
 });
@@ -69,7 +69,7 @@ test('a lone Account remains remembered beyond 48 hours and keeps driving the ic
   const worker = startWorker(accounts);
   await worker.tick();
   assert.equal(worker.accounts()[0].accountId, OLD);
-  assert.equal(worker.iconPaths()[16], 'icons/usage-red-16.png');
+  assert.equal(worker.iconPaths()[16], '/icons/usage-red-16.png');
   assert.equal(worker.writes(), 0);
   await worker.tick();
   assert.equal(worker.writes(), 0);
@@ -81,7 +81,7 @@ test('an expired Active reading turns the icon green without deleting its stored
   }, NOW - 600000);
   const worker = startWorker(accounts);
   await worker.tick();
-  assert.equal(worker.iconPaths()[16], 'icons/usage-green-16.png');
+  assert.equal(worker.iconPaths()[16], '/icons/usage-green-16.png');
   assert.equal(worker.accounts()[0].percent, null);
   assert.equal(worker.accounts()[0].lastObservedPercent, 100);
   assert.equal(worker.accounts()[0].isFull, false);

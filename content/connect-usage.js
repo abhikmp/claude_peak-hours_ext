@@ -4,6 +4,29 @@
 (function () {
   const MAX_FRAME_BYTES = 32 * 1024 * 1024;
 
+  async function decompress(payload) {
+    const reader = new Blob([payload]).stream().pipeThrough(new DecompressionStream('gzip')).getReader();
+    const chunks = [];
+    let length = 0;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        length += value.length;
+        // Check before retaining the chunk or allocating the combined message.
+        if (length > MAX_FRAME_BYTES) throw new Error('Oversized Connect message');
+        chunks.push(value);
+      }
+      const result = new Uint8Array(length);
+      let offset = 0;
+      for (const chunk of chunks) { result.set(chunk, offset); offset += chunk.length; }
+      return result;
+    } finally {
+      reader.cancel().catch(() => {});
+      reader.releaseLock();
+    }
+  }
+
   function fields(bytes) {
     let offset = 0;
     const result = new Map();
@@ -97,9 +120,7 @@
       if (flags & 2) return; // EndStream JSON is not a quota event.
       if (flags & 1) {
         if (encoding !== 'gzip') throw new Error('Unsupported Connect compression');
-        const stream = new Blob([payload]).stream().pipeThrough(new DecompressionStream('gzip'));
-        payload = new Uint8Array(await new Response(stream).arrayBuffer());
-        if (payload.length > MAX_FRAME_BYTES) throw new Error('Oversized Connect message');
+        payload = await decompress(payload);
       }
       const value = reading(payload);
       if (value) onReading(value);

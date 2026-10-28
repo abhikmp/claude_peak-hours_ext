@@ -9,6 +9,8 @@ const storageReady = Promise.all([
 const accountStorage = AccountStorage.create(chrome.storage.local);
 const accountStore = AccountStore.create(accountStorage);
 let undoCleanupTimer;
+let pendingCaptureMutations = 0;
+const MAX_PENDING_CAPTURE_MUTATIONS = 64;
 
 async function mutateAccounts(command) {
   await storageReady;
@@ -236,16 +238,26 @@ function getNextPeakISO() {
 // ── Icon: color driven by usage %, not peak/outage state ──
 // Usage thresholds: missing/expired→green, 0–60→green, 61–85→orange, 86–100→red
 async function updateIcon() {
-  await storageReady;
-  const { accounts = {} } = await accountStorage.get('accounts');
-  const now = Date.now();
-  const colorKey = Accounts.getIconColor(accounts, now);
-  await chrome.action.setIcon({ path: Object.fromEntries(
-    [16, 32, 48, 128].map(size => [size, `icons/usage-${colorKey}-${size}.png`])
-  ) });
+  try {
+    await storageReady;
+    const { accounts = {} } = await accountStorage.get('accounts');
+    const now = Date.now();
+    const colorKey = Accounts.getIconColor(accounts, now);
+    await chrome.action.setIcon({ path: Object.fromEntries(
+      // Chromium loads these through fetch() in the worker context. A leading
+      // slash resolves at the extension root, rather than background/icons/.
+      [16, 32, 48, 128].map(size => [size, `/icons/usage-${colorKey}-${size}.png`])
+    ) });
+    return true;
+  } catch (error) {
+    // Icon failure must not abort polling before OUT/PEAK and the tooltip are
+    // refreshed, or create an unhandled rejection in alarm/capture callbacks.
+    console.warn('ClaudeBuddy: toolbar icon update failed; status updates continue.', error);
+    return false;
+  }
 }
 
-// ── Badge: blinking PEAK or DOWN, driven by peak/outage state ──
+// ── Badge: blinking PEAK or OUT, driven by peak/outage state ──
 let blinkInterval = null;
 let blinkVisible = true;
 
@@ -306,9 +318,9 @@ async function poll() {
 
   await updateIcon();
 
-  // Badge = peak/outage signal (DOWN takes priority over PEAK)
+  // Badge = peak/outage signal (OUT takes priority over PEAK)
   if (result.state === 'orange') {
-    startBadgeBlink('DOWN', '#c2410c');
+    startBadgeBlink('OUT', '#c2410c');
   } else if (result.state === 'red') {
     startBadgeBlink('PEAK', '#b91c1c');
   } else {
@@ -371,9 +383,34 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     const capture = Boolean(sender.tab);
     if (capture && (!sender.url?.startsWith('https://claude.ai/')
         || !['reading', 'label'].includes(msg.command?.action))) return;
-    mutateAccounts(msg.command).then(result => sendResponse(capture
+    let command = msg.command;
+    if (capture) {
+      if (!Accounts.isAccountId(command.accountId)) return;
+      const accountId = command.accountId.toLowerCase();
+      if (command.action === 'reading') {
+        const { percent, resetsAt = null } = command;
+        if (!Number.isFinite(percent) || percent < 0 || percent > 100 || !Accounts.isResetTimestamp(resetsAt)) return;
+        // The worker owns observation time and projects only accepted fields.
+        command = { action: 'reading', accountId, percent, resetsAt, observedAt: Date.now() };
+      } else {
+        if (typeof command.label !== 'string' || command.label.length > 1024 || !command.label.trim()) return;
+        command = { action: 'label', accountId, label: command.label.trim() };
+      }
+    }
+    // Bound queued work without evicting remembered Accounts or limiting their
+    // lifetime. Trusted popup recovery/reset remains available during a burst.
+    if (capture && pendingCaptureMutations >= MAX_PENDING_CAPTURE_MUTATIONS) {
+      sendResponse({ error: 'Capture queue is busy. Please try again.' });
+      return;
+    }
+    if (capture) pendingCaptureMutations++;
+    const reply = result => {
+      if (capture) pendingCaptureMutations--;
+      sendResponse(result);
+    };
+    mutateAccounts(command).then(result => reply(capture
       ? { status: result.status, needsLabel: result.needsLabel } : result),
-    () => sendResponse({ error: 'Account update failed. Please try again.' }));
+    () => reply({ error: 'Account update failed. Please try again.' }));
     // Keep the response channel open while Chrome wakes/executes the worker.
     return true;
   }

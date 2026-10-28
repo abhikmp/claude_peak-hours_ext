@@ -18,7 +18,7 @@
       });
       if (!response.ok) return;
       const details = await response.json();
-      if (!active || typeof details?.name !== 'string' || !details.name.trim()) return;
+      if (!active || typeof details?.name !== 'string' || details.name.length > 1024 || !details.name.trim()) return;
       const label = details.name.trim();
 
       await chrome.runtime.sendMessage({ type: 'ACCOUNT_MUTATION',
@@ -46,7 +46,7 @@
     const accountId = Accounts.extractAccountId(completionUrl, organizationId);
     if (!accountId) return;
     if (!Number.isFinite(percent) || percent < 0 || percent > 100) return;
-    if (resetsAt !== null && (!Number.isFinite(resetsAt) || resetsAt < 0)) return;
+    if (!Accounts.isResetTimestamp(resetsAt)) return;
     const now = Date.now();
 
     chrome.runtime.sendMessage({ type: 'ACCOUNT_MUTATION',

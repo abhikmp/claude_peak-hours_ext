@@ -29,7 +29,7 @@
         case 'reading': {
           const { accountId, percent, resetsAt = null, observedAt = now } = command;
           if (typeof accountId !== 'string' || !accountId || !Number.isFinite(percent) || percent < 0 || percent > 100
-              || (resetsAt !== null && (!Number.isFinite(resetsAt) || resetsAt < 0)) || !Number.isFinite(observedAt)) {
+              || !rules.isResetTimestamp(resetsAt) || !Number.isFinite(observedAt)) {
             throw new Error('Invalid Usage reading');
           }
           if (accounts[accountId]?.lastReadingAt > observedAt) break;

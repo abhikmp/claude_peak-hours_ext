@@ -43,8 +43,11 @@
 }
 .account-page[data-tone="unknown"] {
   --account-percent-color: var(--text-secondary, #6b7280);
+  gap: 3px;
 }
 .account-page[data-tone="unknown"] .account-percent { font-size: 20px; }
+/* Dormant facts and a two-line outage need to fit the same fixed hero slot. */
+.account-page[data-tone="unknown"] .usage-facts { margin-top: 0; row-gap: 2px; }
 .account-heading {
   display: flex;
   align-items: center;
