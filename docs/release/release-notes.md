@@ -1,4 +1,14 @@
-# ClaudeBuddy 1.0.0 release candidate
+# ClaudeBuddy 1.0.1 — testing candidate
+
+Prepared for local testing before Store submission. The publisher reports that 1.0.0 is published.
+
+- Fixed Account usage overflow during outages while preserving the approved 260 × 340px popup.
+- Incident messages that fit within two rendered lines stay inline. Longer messages, or messages over 3,000 characters, open through **View incident details** in a scrollable dialog.
+- Hiding the product-selection hint preserves its space, keeping the divider and footer aligned.
+
+The popup regression exercises 360 layouts plus dialog keyboard/focus, reading refreshes, table navigation and product-selection spacing. Permissions, capture and stored Account data are unchanged. Version 1.0.1 has not been uploaded to the Store.
+
+# ClaudeBuddy 1.0.0 release candidate (historical)
 
 Prepared 24 October 2026; not submitted/published by ticket 05.
 

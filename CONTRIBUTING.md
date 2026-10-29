@@ -16,12 +16,16 @@ Generated ZIPs, extracted builds, local experiments and AI working notes stay in
 
 ## Develop and verify
 
+Before committing, follow the repository-local identity and author/committer verification rule in [AGENTS.md](AGENTS.md#commit-identity) to keep personal email out of new commits.
+
 1. Load this repository as an unpacked extension at `chrome://extensions`.
 2. Run the affected test file while changing behavior, for example `node --test tests/status.test.js`.
 3. Run `node --test tests/*.test.js` before submitting a PR.
-4. Run `python tools/build-release.py`. The builder verifies all 30 allowlisted entries, manifest references, icon sizes, archive/source/extraction equality and extracted JavaScript syntax. It writes `dist/claudebuddy-1.0.0-rc.zip`, `dist/package.json` and `dist/SHA256SUMS` for version 1.0.0.
+4. Run `python tools/build-release.py`. The builder verifies all 30 allowlisted entries, manifest references, icon sizes, archive/source/extraction equality and extracted JavaScript syntax. It writes `dist/claudebuddy-<manifest-version>-rc.zip`, `dist/package.json` and `dist/SHA256SUMS` using the version in `manifest.json`.
 
 There is no TypeScript/typechecking configuration. Runtime paths preserve their byte representation in Git so a checkout can reproduce the publisher-tested ZIP. Keep the runtime allowlist in the builder current when adding packaged files.
+
+For popup layout changes, also run `node tests/popup-layout.browser.cjs` with `playwright-core` available on Node's module search path and Microsoft Edge installed. Set `POPUP_BROWSER_CHANNEL=chrome` to use Chrome instead. This renders the real popup at 260 × 340px with disposable extension API fixtures and checks outage length, reading states, themes, modal behavior, and stable product-hint spacing. It runs separately from the dependency-free Node suite.
 
 After editing `docs/release/privacy-policy.md`, run `python tools/render-privacy-policy.py` to update the public HTML. Run `python tools/render-privacy-policy.py --check` before submitting policy changes; the Markdown is the source of truth for both formats.
 

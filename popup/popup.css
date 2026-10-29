@@ -103,9 +103,13 @@ body {
   gap: 10px;
   position: relative; /* anchor for theme-toggle absolute positioning */
 }
-.usage-region { flex: 1; min-height: 0; }
+.usage-region { flex: 1; min-height: 116px; }
 .usage-region > .usage-hero { max-height: 100%; overflow-y: auto; }
 .lower-controls { flex: none; display: flex; flex-direction: column; gap: 7px; }
+/* Reserve Account space and a two-line incident slot within the 340px popup. */
+.container:has(#incident-sub:not([hidden])) { gap: 6px; }
+.container:has(#incident-sub:not([hidden])) .lower-controls { gap: 3px; }
+.container:has(#incident-sub:not([hidden])) .product-filter { gap: 3px; }
 
 /* ══════════════════════════════════════════
    Theme toggle button — top-right corner
@@ -339,10 +343,23 @@ body {
   color: var(--text-secondary);
   line-height: 1.4;
   padding-left: 2px;
-  max-height: 4.2em;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  height: 2.8em;
+  max-height: 2.8em;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow: hidden;
 }
+
+.incident-details-button { display: block; padding: 0; border: 0; background: none; font: inherit; color: var(--orange-text); cursor: pointer; text-align: left; }
+.incident-details-button:hover { text-decoration: underline; }
+.incident-details-button:focus-visible, .incident-close:focus-visible { outline: 2px solid var(--text-secondary); outline-offset: 2px; }
+.incident-dialog { position: fixed; width: 236px; height: 312px; max-height: calc(100% - 28px); margin: auto; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text-primary); }
+.incident-dialog[open] { display: flex; flex-direction: column; gap: 12px; }
+.incident-dialog::backdrop { background: #0008; }
+.incident-dialog-header { display: flex; justify-content: space-between; align-items: center; flex: none; }
+.incident-dialog h2 { font-size: 13px; font-weight: 600; }
+.incident-close { border: 0; background: var(--surface-2); color: var(--text-primary); border-radius: 4px; width: 24px; height: 24px; cursor: pointer; }
+.incident-dialog-message { flex: 1; min-height: 0; overflow-y: auto; overflow-wrap: anywhere; white-space: pre-wrap; font-size: 12px; line-height: 1.5; }
 
 /* ══════════════════════════════════════════
    Divider
@@ -392,6 +409,8 @@ body {
   font-size: 11px;
   color: var(--text-muted);
 }
+/* Keep the approved breathing room when multiple products hide the hint. */
+.product-filter-hint[hidden] { display: block !important; visibility: hidden; }
 
 /* ══════════════════════════════════════════
    Footer

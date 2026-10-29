@@ -72,7 +72,7 @@
         <span class="pill-aside" id="pill-aside" hidden></span>
       </div>
       <!-- Incident detail line — shown only in orange state -->
-      <div class="incident-sub" id="incident-sub" tabindex="0" aria-label="Incident details" hidden></div>
+      <div class="incident-sub" id="incident-sub" hidden><span id="incident-text"></span><button class="incident-details-button" id="incident-details-btn" type="button" aria-haspopup="dialog" aria-controls="incident-dialog" hidden>View incident details →</button></div>
     </div>
 
     <!-- Divider -->
@@ -107,6 +107,13 @@
     </div>
 
   </div>
+  <dialog class="incident-dialog" id="incident-dialog" aria-labelledby="incident-heading">
+    <div class="incident-dialog-header">
+      <h2 id="incident-heading">Incident details</h2>
+      <button class="incident-close" id="incident-close" type="button" aria-label="Close incident details" autofocus>×</button>
+    </div>
+    <div class="incident-dialog-message" id="incident-dialog-message" tabindex="0" role="region" aria-label="Full incident message"></div>
+  </dialog>
   <script src="../shared/accounts.js"></script>
   <script src="../shared/account-storage.js"></script>
   <script src="account-actions.js"></script>

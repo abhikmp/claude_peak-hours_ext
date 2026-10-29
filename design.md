@@ -1,6 +1,6 @@
 # ClaudeBuddy design and data flow
 
-Implemented release candidate: 1.0.0. [Domain](CONTEXT.md), [release verification](docs/release/verification.md), [privacy](docs/release/privacy-policy.md).
+Implemented testing candidate: 1.0.1. The publisher reports 1.0.0 is published; 1.0.1 remains a local testing package. [Domain](CONTEXT.md), [release verification](docs/release/verification.md), [privacy](docs/release/privacy-policy.md).
 
 The popup stays **260 × 340px**. One Account has one detail view; two/three have slides with aligned status/preferences; four-plus have Active detail and a searchable table. Navigation stops at the ends. Browsing never changes Active. Long tables scroll internally without a visible scrollbar; names truncate with full title/detail text.
 
@@ -27,6 +27,8 @@ Undo occupies one **228 × 32px** slot, **16px from bottom and sides**, on every
 The toolbar circle is green at 0–60%, orange above 60% through 85%, then red. Missing/expired Active observations use green as a neutral icon policy, never a guarantee of full quota; the icon is never grey. Browsing does not change it.
 
 Public status refreshes every five minutes. Weekday 5–11 AM Pacific is the configured peak window, not a measured speed forecast. Watched incidents show OUT ahead of PEAK. White badges blink once per second while the worker runs; suspension can stop blinking. Off-peak/error clears them. Tooltips follow incident/peak/next-peak/unknown status. Popup Retry requests a fresh poll.
+
+The popup reserves a two-line incident slot and at least 116px for Account usage. A message that fits within two rendered lines stays inline; more than two lines, or over 3,000 characters, switches to **View incident details**, opening the complete selected message in a scrollable dialog. The dialog uses the same theme, closes with its close button or Escape, and restores focus to its trigger. Status moving above the Account table remeasures the available message width. Ordinary reading refreshes preserve the open dialog and its scroll position. When multiple products are watched, the minimum-selection hint becomes invisible but retains its space, keeping the divider and footer fixed.
 
 Defaults: dark, system timezone, Claude AI watched. At least one watched product remains. Reset clears Accounts/recovery and restores preferences. The 30-second alarm updates expiry/icon, never deletes Accounts for age.
 
