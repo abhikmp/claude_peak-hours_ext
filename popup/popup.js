@@ -68,9 +68,9 @@ function formatNextPeakAside(nextPeakAt, tz) {
 function pickTickerText(local, watched) {
   const title = local.incidentTitle ?? '';
   const body = local.incidentBody ?? '';
-  if (!title) return null;
+  if (!title && !body) return null;
 
-  const rawCandidates = [title];
+  const rawCandidates = title ? [title] : [];
   body.split(/\.\s+/).forEach(s => { if (s.trim()) rawCandidates.push(s.trim()); });
 
   const seen = new Set();
@@ -101,8 +101,67 @@ function pickTickerText(local, watched) {
 
   candidates.sort((a, b) => score(b) - score(a));
   const best = candidates[0];
-  return best && best.length > 120 ? best.slice(0, 117) + '…' : (best || null);
+  // If an update sentence wins, retain the complete update for incident details.
+  return best === title ? title : (body.trim() ? body : null);
 }
+
+// The incident area always keeps two lines; only the full message dialog scrolls.
+const IncidentMessage = (() => {
+  const region = document.getElementById('incident-sub');
+  const text = document.getElementById('incident-text');
+  const button = document.getElementById('incident-details-btn');
+  const dialog = document.getElementById('incident-dialog');
+  const message = document.getElementById('incident-dialog-message');
+  let current = '';
+
+  function layout() {
+    if (region.hidden || !current) return;
+    const width = region.getBoundingClientRect().width;
+    if (!width) return;
+    let details = current.length > 3000;
+    if (!details) {
+      const probe = document.createElement('div');
+      probe.className = 'incident-sub';
+      probe.textContent = current;
+      Object.assign(probe.style, { position: 'fixed', left: '-10000px', top: '0',
+        width: width + 'px', height: 'auto', maxHeight: 'none', overflow: 'visible',
+        visibility: 'hidden', pointerEvents: 'none' });
+      document.body.append(probe);
+      details = probe.getBoundingClientRect().height > parseFloat(getComputedStyle(probe).lineHeight) * 2 + 0.5;
+      probe.remove();
+    }
+    text.hidden = details;
+    button.hidden = !details;
+  }
+
+  button.addEventListener('click', () => {
+    message.scrollTop = 0;
+    dialog.showModal();
+  });
+  document.getElementById('incident-close').addEventListener('click', () => dialog.close());
+  // Arrow keys scroll the message rather than navigating Accounts behind it.
+  dialog.addEventListener('keydown', event => event.stopPropagation());
+  dialog.addEventListener('close', () => {
+    if (button.hidden || button.closest('[hidden], [inert]')) {
+      document.getElementById('theme-toggle').focus({ preventScroll: true });
+    }
+  });
+  // The incident width changes when Account navigation moves status above the table.
+  new ResizeObserver(layout).observe(region);
+  document.fonts.ready.then(layout);
+
+  return { render(value) {
+    const next = value || '';
+    if (next !== current) {
+      if (dialog.open) dialog.close();
+      current = next;
+      text.textContent = current;
+      message.textContent = current;
+    }
+    region.hidden = !current;
+    layout();
+  } };
+})();
 
 function formatReadingAge(ageMs) {
   return ageMs < 60000 ? 'Updated just now'
@@ -165,14 +224,13 @@ function renderPill(state, local, watched, tz) {
   const pill        = document.getElementById('status-pill');
   const pillText    = document.getElementById('pill-text');
   const pillAside   = document.getElementById('pill-aside');
-  const incidentSub = document.getElementById('incident-sub');
   const retryBtn    = document.getElementById('retry-btn');
 
   pill.className = 'pill';
-  incidentSub.hidden = true;
   retryBtn.hidden = true;
   pillAside.hidden = true;
   pillAside.textContent = '';
+  IncidentMessage.render(state === 'orange' ? pickTickerText(local, watched) : null);
 
   if (state === 'orange') {
     pill.classList.add('orange');
@@ -181,11 +239,6 @@ function renderPill(state, local, watched, tz) {
     if (aside) {
       pillAside.textContent = aside;
       pillAside.hidden = false;
-    }
-    const ticker = pickTickerText(local, watched);
-    if (ticker) {
-      incidentSub.textContent = ticker;
-      incidentSub.hidden = false;
     }
   } else if (state === 'red') {
     pill.classList.add('red');
